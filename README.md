@@ -1,2 +1,3 @@
 # sms_hscroll
-sega master system horizontal scroll
+Assembly code for horizontal scrolling on the Sega Master System.
+I am studying assembly.
