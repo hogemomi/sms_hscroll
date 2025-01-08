@@ -2,7 +2,7 @@
 ;                      hscroll                                 ;
 ; -------------------------------------------------------------;
 
-.sdsctag 0.1, "Racer", "Step 1 - Scroller", "Anders S. Jensen"
+.sdsctag 0.1, "hscroll", "Step 1 - Scroller", "hogemomi"
 
 .memorymap                 ; create 2 x 16 kb slots for rom.
     defaultslot 0
