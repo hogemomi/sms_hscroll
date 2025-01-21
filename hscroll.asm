@@ -85,37 +85,38 @@ inigam
 
 ; Map placement at start
 ; Initial buffer
-       ld hl,$3800
-       ld (NextVramAdd),hl
-       ld hl,bgmap
-       ld (NextMapAdd),hl
+    ld hl,$3800
+    ld (NextVramAdd),hl
+    ld hl,bgmap
+    ld (NextMapAdd),hl
        
 ; loop count set
-       ld bc,24
-       ld (b_count),bc
+    ld bc,24
+    ld (b_count),bc
+
 ; start map configuration
 startmap
-       ld hl,(NextVramAdd) ; Write Vram Addressing
-       call vrampr
+    ld hl,(NextVramAdd) ; Write Vram Addressing
+    call vrampr
 
-       ld hl,(NextMapAdd)  ; Wriite mapdata
-       ld bc,64
-       call vramwr
+    ld hl,(NextMapAdd)  ; Wriite mapdata
+    ld bc,64
+    call vramwr
 
-       ld de,64           ; Map data address update
-       add hl,de
-       ld (NextMapAdd),hl; Vram address update
+    ld de,64   ; Map data address update
+    add hl,de
+    ld (NextMapAdd),hl; Vram address update
 
-       ld hl,(NextVramAdd)
-       ld de,$0040
-       add hl,de
-       ld (NextVramAdd),hl
+    ld hl,(NextVramAdd)
+    ld de,$0040
+    add hl,de
+    ld (NextVramAdd),hl
 
 ; loop count update
-       ld bc,(loop_cnt)
-       dec c
-       ld (loop_cnt),bc
-       jr nz,startmap
+    ld bc,(loop_cnt)
+    dec c
+    ld (loop_cnt),bc
+    jr nz,startmap
 
     xor a               ; set A = 0.
     ld (frame),a
