@@ -158,6 +158,33 @@ mloop
     and %00000111
     jr nz, mloop
 
+mapcolpr
+    ; Loop counter initialize
+    ld a,24
+    ld (loop_cnt),a
+
+    ld hl,$3800 ;マップ初期設定時の最終アドレス
+    ld bc,$01be ;次カラムの先頭アドレスまでの値
+    sbc hl,bc ;
+    ld (NextColSrcAdd),hl ;カラムアドレスをバッファに
+
+mapcolwr
+    ld hl,(NextColVramadd)
+    call vrampr
+    ld hl,(NextColSrcadd)
+    ld bc,2
+    call vramwr
+; Raw Src & Vram update
+    ld hl,(NextColSrcadd)
+    ld bc,128
+    add hl,bc
+    ld (NextRawSrcadd)hl
+
+    ld hl,(NextColVramadd)
+    ld bc,$40
+    add hl,bc
+    ld (NextRawVramAdd),hl
+
 
 ; --------------------------------------------------------------
 ; SUBROUTINES
