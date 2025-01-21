@@ -154,6 +154,10 @@ mloop
 
     jp mloop            ; jump back for another round.
 
+; Conditional branching
+    and %00000111
+    jr nz, mloop
+
 
 ; --------------------------------------------------------------
 ; SUBROUTINES
