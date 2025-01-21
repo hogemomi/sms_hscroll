@@ -191,6 +191,12 @@ mapcolwr
     add hl,bc
     ld (NextColSrcadd)hl
 
+; loop count update
+    ld bc,(loop_cnt)
+    dec c
+    ld (loop_cnt),bc
+    jr nz,startmap
+
 ; --------------------------------------------------------------
 ; SUBROUTINES
 ; --------------------------------------------------------------
