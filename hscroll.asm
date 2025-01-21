@@ -83,11 +83,39 @@ inigam
     ld bc,192*32          ; 2 tiles (!), each tile is 32 bytes.
     call vramwr         ; write background tiles to vram.
 
-    ld hl,$3800         ; point to name table.
-    call vrampr         ; prepare vram.
-    ld hl,bgmap         ; point to background tilemap data.
-    ld bc,32*28*2       ; 32 x 28 tiles, each is 2 bytes.
-    call vramwr         ; write name table to vram.
+; Map placement at start
+; Initial buffer
+       ld hl,$3800
+       ld (NextVramAdd),hl
+       ld hl,bgmap
+       ld (NextMapAdd),hl
+       
+; loop count set
+       ld bc,24
+       ld (b_count),bc
+; start map configuration
+startmap
+       ld hl,(NextVramAdd) ; Write Vram Addressing
+       call vrampr
+
+       ld hl,(NextMapAdd)  ; Wriite mapdata
+       ld bc,64
+       call vramwr
+
+       ld de,64           ; Map data address update
+       add hl,de
+       ld (NextMapAdd),hl; Vram address update
+
+       ld hl,(NextVramAdd)
+       ld de,$0040
+       add hl,de
+       ld (NextVramAdd),hl
+
+; loop count update
+       ld bc,(loop_cnt)
+       dec c
+       ld (loop_cnt),bc
+       jr nz,startmap
 
     xor a               ; set A = 0.
     ld (frame),a
