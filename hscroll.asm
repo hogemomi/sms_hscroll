@@ -80,7 +80,7 @@ inigam
     ld hl,$0000         ; first tile @ index 0.
     call vrampr         ; prepare vram.
     ld hl,bgtile        ; background tile data (the road).
-    ld bc,2*32          ; 2 tiles (!), each tile is 32 bytes.
+    ld bc,192*32          ; 2 tiles (!), each tile is 32 bytes.
     call vramwr         ; write background tiles to vram.
 
     ld hl,$3800         ; point to name table.
