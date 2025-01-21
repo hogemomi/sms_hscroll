@@ -180,6 +180,7 @@ mapcolwr
     ld hl,(NextColSrcadd)
     ld bc,2
     call vramwr
+
 ; Vram & Src update
     ld hl,(NextColVramadd)
     ld bc,$40
