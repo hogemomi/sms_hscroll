@@ -72,12 +72,14 @@ inigam
 ; Setup the background assets for the main loop.
 
     ld hl,$c000         ; color bank 1, color 0.
+    ld bc,1
     call vrampr         ; prepare vram.
     ld hl,bgpal         ; First value in bgpal
     ld bc,4             ; 4 colors.
     call vramwr         ; set background palette.
        
     ld hl,$0000         ; first tile @ index 0.
+    ld bc,1
     call vrampr         ; prepare vram.
     ld hl,bgtile        ; background tile data (the road).
     ld bc,192*32          ; 2 tiles (!), each tile is 32 bytes.
@@ -97,7 +99,8 @@ inigam
 ; start map configuration
 startmap
     ld hl,(NextVramAdd) ; Write Vram Addressing
-    call vrampr
+    ld bc,1
+    call vrampr
 
     ld hl,(NextMapAdd)  ; Wriite mapdata
     ld bc,64
@@ -170,21 +173,21 @@ mapcolpr
 
 mapcolwr
     ld hl,(NextColVramadd)
+    ld bc2
     call vrampr
     ld hl,(NextColSrcadd)
     ld bc,2
     call vramwr
-; Raw Src & Vram update
-    ld hl,(NextColSrcadd)
-    ld bc,128
-    add hl,bc
-    ld (NextRawSrcadd)hl
-
+; Vram & Src update
     ld hl,(NextColVramadd)
     ld bc,$40
     add hl,bc
     ld (NextRawVramAdd),hl
 
+    ld hl,(NextColSrcadd)
+    ld bc,2
+    add hl,bc
+    ld (NextColSrcadd)hl
 
 ; --------------------------------------------------------------
 ; SUBROUTINES
@@ -192,12 +195,18 @@ mapcolwr
 ; PREPARE VRAM.
 ; Set up vdp to recieve data at vram address in HL.
 
-vrampr push af
+vrampr
+    push af
     ld a,l
     out ($bf),a
     ld a,h
     or $40
     out ($bf),a
+    inc hl
+    dec bc
+    ld a,c
+    or b
+    jp nz,vrampr
     pop af
     ret
 
@@ -206,7 +215,8 @@ vrampr push af
 ; Write BC amount of bytes from data source pointed to by HL.
 ; Tip: Use vrampr before calling.
 
-vramwr ld a,(hl)
+vramwr
+    ld a,(hl)
     out ($be),a
     inc hl
     dec bc
