@@ -26,6 +26,10 @@
 
 .enum $c000 export         ; export labels to symbol file.
 
+    NextRawSrcAdd dw
+    NextRawVramAdd
+    NextColSrcAdd
+    NextColVramAdd
     scroll db           ; vdp scroll register buffer.
     frame db            ; frame counter.
 
