@@ -26,10 +26,10 @@
 
 .enum $c000 export         ; export labels to symbol file.
 
-    NextRawSrcAdd dw
-    NextRawVramAdd dw
-    NextColSrcAdd dw
-    NextColVramAdd dw
+    NextRawSrc dw
+    NextRawVram dw
+    NextColSrc dw
+    NextColVram dw
     scroll db           ; vdp scroll register buffer.
     frame db            ; frame counter.
 
@@ -92,9 +92,9 @@ inigam
 ; Map placement at start
 ; Initial buffer
     ld hl,$3800
-    ld (NextRawVramAdd),hl
+    ld (NextRawVram),hl
     ld hl,bgmap
-    ld (NextRawVramAdd),hl
+    ld (NextRawVram),hl
        
 ; loop count set
     ld bc,24
@@ -102,24 +102,24 @@ inigam
 
 ; start map configuration
 startmap
-    ld hl,(NextRawVramAdd) ; Write Vram Addressing
+    ld hl,(NextRawVram) ; Write Vram Addressing
     call vrampr
 
 ; Wriite mapdata
-    ld hl,(NextRawSrcAdd)
+    ld hl,(NextRawSrc)
     ld bc,64
     call vramwr
 
 ; Map data address update
     ld de,64
     Add hl,de
-    ld (NextMapAdd),hl
+    ld (NextRawSrc),hl
 
 ; Vram address update
-    ld hl,(NextVramAdd)
+    ld hl,(NextRawVram)
     ld de,$0040
     add hl,de
-    ld (NextVramAdd),hl
+    ld (NextRawVram),hl
 
 ; loop count update
     ld bc,(loop_cnt)
@@ -173,29 +173,29 @@ mapcolpr
     ld (loop_cnt),a
 
     ld hl,$3800 ;マップ初期設定時の最終アドレス
-    ld (NextColVramAdd),hl
-    ld hl,(NextRawSrcAdd)
+    ld (NextColVram),hl
+    ld hl,(NextRawSrc)
     ld bc,$0bfe ;次カラムの先頭アドレスまでの値
     sbc hl,bc ;
-    ld (NextColSrcAdd),hl ;カラムアドレスをバッファに
+    ld (NextColSrc),hl ;カラムアドレスをバッファに
 
 mapcolwr
-    ld hl,(NextColVramAdd)
+    ld hl,(NextColVram)
     call vrampr
-    ld hl,(NextColSrcAdd)
+    ld hl,(NextColSrc)
     ld bc,2
     call vramwr
 
 ; Vram & Src update
-    ld hl,(NextColVramAdd)
+    ld hl,(NextColVram)
     ld bc,$40
     add hl,bc
-    ld (NextRawVramAdd),hl
+    ld (NextRawVram),hl
 
-    ld hl,(NextColSrcAdd)
+    ld hl,(NextColSrc)
     ld bc,$0bfe ;次カラムの先頭アドレスまでの値
     sbc hl,bc
-    ld (NextColSrcAdd)hl
+    ld (NextColSrc),hl
 
 ; loop count update
     ld bc,(loop_cnt)
