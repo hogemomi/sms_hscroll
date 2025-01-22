@@ -102,14 +102,17 @@ startmap
     ld bc,1
     call vrampr
 
-    ld hl,(NextMapAdd)  ; Wriite mapdata
+; Wriite mapdata
+    ld hl,(NextMapAdd)
     ld bc,64
     call vramwr
 
-    ld de,64   ; Map data address update
-    add hl,de
-    ld (NextMapAdd),hl; Vram address update
+; Map data address update
+    ld de,64
+    Add hl,de
+    ld (NextMapAdd),hl
 
+; Vram address update
     ld hl,(NextVramAdd)
     ld de,$0040
     add hl,de
@@ -167,30 +170,30 @@ mapcolpr
     ld (loop_cnt),a
 
     ld hl,$3800 ;マップ初期設定時の最終アドレス
-    ld (NextColVramadd),hl
-    ld hl,(NextRawSrcadd)
+    ld (NextColVramAdd),hl
+    ld hl,(NextRawSrcAdd)
     ld bc,$01be ;次カラムの先頭アドレスまでの値
     sbc hl,bc ;
     ld (NextColSrcAdd),hl ;カラムアドレスをバッファに
 
 mapcolwr
-    ld hl,(NextColVramadd)
+    ld hl,(NextColVramAdd)
     ld bc2
     call vrampr
-    ld hl,(NextColSrcadd)
+    ld hl,(NextColSrcAdd)
     ld bc,2
     call vramwr
 
 ; Vram & Src update
-    ld hl,(NextColVramadd)
+    ld hl,(NextColVramAdd)
     ld bc,$40
     add hl,bc
     ld (NextRawVramAdd),hl
 
-    ld hl,(NextColSrcadd)
-    ld bc,2
-    add hl,bc
-    ld (NextColSrcadd)hl
+    ld hl,(NextColSrcAdd)
+    ld bc,$01be ;次カラムの先頭アドレスまでの値
+    sbc hl,bc
+    ld (NextColSrcAdd)hl
 
 ; loop count update
     ld bc,(loop_cnt)
