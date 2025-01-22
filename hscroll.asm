@@ -99,7 +99,6 @@ inigam
 ; start map configuration
 startmap
     ld hl,(NextVramAdd) ; Write Vram Addressing
-    ld bc,1
     call vrampr
 
 ; Wriite mapdata
@@ -178,7 +177,6 @@ mapcolpr
 
 mapcolwr
     ld hl,(NextColVramAdd)
-    ld bc2
     call vrampr
     ld hl,(NextColSrcAdd)
     ld bc,2
