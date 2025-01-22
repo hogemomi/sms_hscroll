@@ -27,9 +27,9 @@
 .enum $c000 export         ; export labels to symbol file.
 
     NextRawSrcAdd dw
-    NextRawVramAdd
-    NextColSrcAdd
-    NextColVramAdd
+    NextRawVramAdd dw
+    NextColSrcAdd dw
+    NextColVramAdd dw
     scroll db           ; vdp scroll register buffer.
     frame db            ; frame counter.
 
@@ -92,9 +92,9 @@ inigam
 ; Map placement at start
 ; Initial buffer
     ld hl,$3800
-    ld (NextVramAdd),hl
+    ld (NextRawVramAdd),hl
     ld hl,bgmap
-    ld (NextMapAdd),hl
+    ld (NextRawVramAdd),hl
        
 ; loop count set
     ld bc,24
@@ -102,11 +102,11 @@ inigam
 
 ; start map configuration
 startmap
-    ld hl,(NextVramAdd) ; Write Vram Addressing
+    ld hl,(NextRawVramAdd) ; Write Vram Addressing
     call vrampr
 
 ; Wriite mapdata
-    ld hl,(NextMapAdd)
+    ld hl,(NextRawSrcAdd)
     ld bc,64
     call vramwr
 
