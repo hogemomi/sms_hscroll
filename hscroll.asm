@@ -173,7 +173,10 @@ mapcolpr
     ld (loop_cnt),a
 
     ld hl,$3800 ;マップ初期設定時の最終アドレス
+    ld bc,2
+    add hl,bc
     ld (NextColVram),hl
+
     ld hl,(NextRawSrc)
     ld bc,$0bfe ;次カラムの先頭アドレスまでの値
     sbc hl,bc ;
