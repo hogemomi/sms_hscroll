@@ -172,9 +172,7 @@ mapcolpr
     ld a,24
     ld (loop_cnt),a
 
-    ld hl,$3800 ;マップ初期設定時の最終アドレス
-    ld bc,2
-    add hl,bc
+    ld hl,$3802 ;マップ初期設定時の最終アドレス
     ld (NextColVram),hl
 
     ld hl,(NextRawSrc)
