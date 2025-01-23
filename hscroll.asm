@@ -194,7 +194,7 @@ mapcolwr
     ld (NextRawVram),hl
 
     ld hl,(NextColSrc)
-    ld bc,$0bfe ;次カラムの先頭アドレスまでの値
+    ld bc,$0b7f ;次カラムの先頭アドレスまでの値
     sbc hl,bc
     ld (NextColSrc),hl
 
