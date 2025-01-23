@@ -175,7 +175,7 @@ mapcolpr
     ld hl,$3800 ;マップ初期設定時の最終アドレス
     ld (NextColVram),hl
     ld hl,(NextRawSrc)
-    ld bc,$0b7e ;次カラムの先頭アドレスまでの値
+    ld bc,$0bfe ;次カラムの先頭アドレスまでの値
     sbc hl,bc ;
     ld (NextColSrc),hl ;カラムアドレスをバッファに
 
@@ -193,7 +193,7 @@ mapcolwr
     ld (NextRawVram),hl
 
     ld hl,(NextColSrc)
-    ld bc,$0b7e ;次カラムの先頭アドレスまでの値
+    ld bc,$0bfe ;次カラムの先頭アドレスまでの値
     sbc hl,bc
     ld (NextColSrc),hl
 
