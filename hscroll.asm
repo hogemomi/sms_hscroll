@@ -176,7 +176,7 @@ mapcolpr
     ld (NextColVram),hl
 
     ld hl,(NextRawSrc)
-    ld bc,$0bfe ;次カラムの先頭アドレスまでの値
+    ld bc,3070 ;次カラムの先頭アドレスまでの値
     sbc hl,bc ;
     ld (NextColSrc),hl ;カラムアドレスをバッファに
 
@@ -194,7 +194,7 @@ mapcolwr
     ld (NextRawVram),hl
 
     ld hl,(NextColSrc)
-    ld bc,128 ;次カラムの先頭アドレスまでの値
+		ld bc,128 ;次行の先頭アドレスまでの値
     sbc hl,bc
     ld (NextColSrc),hl
 
