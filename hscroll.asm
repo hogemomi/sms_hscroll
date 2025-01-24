@@ -107,11 +107,11 @@ startmap
 
 ; Wriite mapdata
     ld hl,(NextRawSrc)
-    ld bc,64
+    ld bc,2
     call vramwr
 
 ; Map data address update
-    ld de,64
+    ld de,128
     Add hl,de
     ld (NextRawSrc),hl
 
@@ -194,7 +194,7 @@ mapcolwr
     ld (NextRawVram),hl
 
     ld hl,(NextColSrc)
-    ld bc,$0b7f ;次カラムの先頭アドレスまでの値
+    ld bc,128 ;次カラムの先頭アドレスまでの値
     sbc hl,bc
     ld (NextColSrc),hl
 
