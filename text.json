@@ -18,7 +18,7 @@
         },
         {  
             "name": "constant.character.hexadecimal.assembly",
-            "match": "\\b(0x)(?i)[A-F0-9]+\\b"
+            "match": "\\b($)(?i)[A-F0-9]+\\b"
         },
         {  
             "name": "constant.character.hexadecimal.assembly",
