@@ -167,7 +167,7 @@ mloop
     and %00000111
     jr nz, mloop
 
-mapcolpr
+mapcol_update
     ; Loop counter initialize
     ld a,24
     ld (loop_cnt),a
@@ -180,7 +180,7 @@ mapcolpr
     sbc hl,bc ;
     ld (NextColSrc),hl ;カラムアドレスをバッファに
 
-mapcol_wrigt
+mapcol_wrigtloop
     ld hl,(NextColVram)
     call vrampr
     ld hl,(NextColSrc)
