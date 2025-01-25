@@ -32,7 +32,7 @@
     NextColVram dw
     scroll db           ; vdp scroll register buffer.
     frame db            ; frame counter.
-
+    loopCount db
 .ende
 
 .bank 0 slot 0
@@ -98,7 +98,7 @@ inigam
        
 ; loop count set
     ld bc,24
-    ld (b_count),bc
+    ld (loopCount),bc
 
 ; start map configuration
 draw_startmap
@@ -122,9 +122,9 @@ draw_startmap
     ld (NextRawVram),hl
 
 ; loop count update
-    ld bc,(loop_cnt)
+    ld bc,(loopCont)
     dec c
-    ld (loop_cnt),bc
+    ld (loopCont),bc
     jr nz,startmap
 
     xor a               ; set A = 0.
@@ -170,7 +170,7 @@ mloop
 drawcolumn
     ; Loop counter initialize
     ld a,24
-    ld (loop_cnt),a
+    ld (loopCount),a
 
     ld hl,$3802 ;マップ初期設定時の最終アドレス
     ld (NextColVram),hl
@@ -199,9 +199,9 @@ drawcol_loop
     ld (NextColSrc),hl
 
 ; loop count update
-    ld bc,(loop_cnt)
+    ld bc,(loopCount)
     dec c
-    ld (loop_cnt),bc
+    ld (loopCount),bc
     jr nz,drawcol_loop
 
 ; --------------------------------------------------------------
