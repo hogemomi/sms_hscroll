@@ -101,7 +101,7 @@ inigam
     ld (b_count),bc
 
 ; start map configuration
-startmap
+draw_startmap
     ld hl,(NextRawVram) ; Write Vram Addressing
     call vrampr
 
@@ -167,7 +167,7 @@ mloop
     and %00000111
     jr nz, mloop
 
-mapcol_update
+drawcolumn
     ; Loop counter initialize
     ld a,24
     ld (loop_cnt),a
@@ -180,7 +180,7 @@ mapcol_update
     sbc hl,bc ;
     ld (NextColSrc),hl ;カラムアドレスをバッファに
 
-mapcol_wrigtloop
+drawcol_loop
     ld hl,(NextColVram)
     call vrampr
     ld hl,(NextColSrc)
@@ -202,7 +202,7 @@ mapcol_wrigtloop
     ld bc,(loop_cnt)
     dec c
     ld (loop_cnt),bc
-    jr nz,startmap
+    jr nz,drawcol_loop
 
 ; --------------------------------------------------------------
 ; SUBROUTINES
