@@ -180,7 +180,7 @@ mapcolpr
     sbc hl,bc ;
     ld (NextColSrc),hl ;カラムアドレスをバッファに
 
-mapcolwr
+mapcol_wrigt
     ld hl,(NextColVram)
     call vrampr
     ld hl,(NextColSrc)
