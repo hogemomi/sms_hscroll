@@ -173,23 +173,15 @@ mloop
     sub vspeed          ; subtract vertical speed.
     ld (scroll),a       ; update scroll buffer.
 
-    jp mloop            ; jump back for another round.
-
 ; Conditional branching
     and %00000111
     jr nz, mloop
 
-drawcolumn
-    ; Loop counter initialize
+; Loop counter initialize
     ld a,24
     ld (loopCount),a
 
-    ld hl,(NextRawSrc)
-    ld bc,$0b80 ;次カラムの先頭アドレスまでの値
-    sbc hl,bc ;
-    ld (NextColSrc),hl ;カラムアドレスをバッファに
-
-drawcol_loop
+drawcolumn
     ld hl,(NextColVram)
     call vrampr
     ld hl,(NextColSrc)
@@ -212,6 +204,11 @@ drawcol_loop
     dec c
     ld (loopCount),bc
     jr nz,drawcol_loop
+
+    ld hl,(NextRawSrc)
+    ld bc,$0b80 ;次カラムの先頭アドレスまでの値
+    sbc hl,bc ;
+    ld (NextColSrc),hl ;カラムアドレスをバッファに
 
     jr mloop
 
