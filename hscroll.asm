@@ -136,6 +136,9 @@ draw_startmap
     ld bc,$0bfe
     add hl,bc
     ld (NextColSrc),hl
+; vram address pre
+    ld hl,$3802
+    ld (NextColVram),hl
 
     ld a,%11100000      ; turn screen on - normal sprites.
     ld b,1
@@ -177,11 +180,6 @@ drawcolumn
     ; Loop counter initialize
     ld a,24
     ld (loopCount),a
-
-    ld hl,$3800 ;マップ初期設定時の最終アドレス
-    ld bc,2
-    add hl,bc
-    ld (NextColVram),hl
 
     ld hl,(NextRawSrc)
     ld bc,$0b80 ;次カラムの先頭アドレスまでの値
