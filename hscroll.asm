@@ -112,7 +112,7 @@ draw_startmap
     call vramwr
 
 ; Map data address update
-    ld de,128
+    ld de,$080
     Add hl,de
     ld (NextRawSrc),hl
 
