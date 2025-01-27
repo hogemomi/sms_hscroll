@@ -184,7 +184,7 @@ drawcolumn
     ld (NextColVram),hl
 
     ld hl,(NextRawSrc)
-    ld bc,$0bfe ;次カラムの先頭アドレスまでの値
+    ld bc,$0b80 ;次カラムの先頭アドレスまでの値
     sbc hl,bc ;
     ld (NextColSrc),hl ;カラムアドレスをバッファに
 
