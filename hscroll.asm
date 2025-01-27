@@ -132,11 +132,12 @@ draw_startmap
     xor a               ; set A = 0.
     ld (frame),a
     ld (scroll),a       ; reset scroll register buffer.
+    ; preset map columun address
     ld hl,(NextRawSrc)
     ld bc,$0bfe
     add hl,bc
     ld (NextColSrc),hl
-; vram address pre
+    ; prese vram address
     ld hl,$3802
     ld (NextColVram),hl
 
