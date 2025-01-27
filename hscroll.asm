@@ -128,9 +128,14 @@ draw_startmap
     ld (loopCont),bc
     jr nz,startmap
 
+; initialize buffer
     xor a               ; set A = 0.
     ld (frame),a
     ld (scroll),a       ; reset scroll register buffer.
+    ld hl,(NextRawSrc)
+    ld bc,$0bfe
+    add hl,bc
+    ld (NextRawSrc),hl
 
     ld a,%11100000      ; turn screen on - normal sprites.
     ld b,1
