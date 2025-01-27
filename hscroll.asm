@@ -175,6 +175,7 @@ drawcolumn
 
     ld hl,$3800 ;マップ初期設定時の最終アドレス
     ld bc,2
+    add hl,bc
     ld (NextColVram),hl
 
     ld hl,(NextRawSrc)
