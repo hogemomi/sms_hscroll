@@ -135,7 +135,7 @@ draw_startmap
     ld hl,(NextRawSrc)
     ld bc,$0bfe
     add hl,bc
-    ld (NextRawSrc),hl
+    ld (NextColSrc),hl
 
     ld a,%11100000      ; turn screen on - normal sprites.
     ld b,1
