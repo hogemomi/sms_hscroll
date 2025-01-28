@@ -1,4 +1,3 @@
-```asm
 ; -------------------------------------------------------------;
 ;                      hscroll                                 ;
 ; -------------------------------------------------------------;
@@ -33,7 +32,7 @@
     NextColVram dw
     scroll db           ; vdp scroll register buffer.
     frame db            ; frame counter.
-    loopCount db
+    LoopCount db
 .ende
 
 .bank 0 slot 0
@@ -73,18 +72,31 @@ inigam
     inc hl              ; inc. pointer to next byte of data.
     inc c               ; inc. command byte to next register.
     djnz -              ; jump back to '-' if b > 0.
+    
+;==============================================================
+; Clear VRAM
+;==============================================================
+; 1. Set VRAM write address to $0000
+    ld hl,$0000 | $4000
+    call vrampr
+; 2. Output 16KB of zeroes
+    ld bc,$4000     ; Counter for 16KB of VRAM
+-:  xor a
+    out ($be),a ; Output to VRAM address, which is auto-incremented after each write
+    dec bc
+    ld a,b
+    or c
+    jr nz,-
 
 ; Setup the background assets for the main loop.
 
     ld hl,$c000         ; color bank 1, color 0.
-    ld bc,1
     call vrampr         ; prepare vram.
     ld hl,bgpal         ; First value in bgpal
-    ld bc,4             ; 4 colors.
+    ld bc,16             ; 4 colors.
     call vramwr         ; set background palette.
        
     ld hl,$0000         ; first tile @ index 0.
-    ld bc,1
     call vrampr         ; prepare vram.
     ld hl,bgtile        ; background tile data (the road).
     ld bc,192*32          ; 2 tiles (!), each tile is 32 bytes.
@@ -92,41 +104,41 @@ inigam
 
 ; Map placement at start
 ; Initial buffer
-    ld hl,$3800
-    ld (NextRawVram),hl
-    ld hl,bgmap
-    ld (NextRawVram),hl
-       
+    ld hl,$3800
+    ld (NextRawVram),hl
+    ld hl,bgmap
+    ld (NextRawVram),hl
+
 ; loop count set
-    ld bc,24
-    ld (loopCount),bc
+    ld bc,24
+    ld (LoopCount),bc
 
 ; start map configuration
 draw_startmap
-    ld hl,(NextRawVram) ; Write Vram Addressing
+    ld hl,(NextRawVram) ; Write Vram Addressing
     call vrampr
 
 ; Wriite mapdata
-    ld hl,(NextRawSrc)
-    ld bc,2
-    call vramwr
+    ld hl,(NextRawSrc)
+    ld bc,2
+    call vramwr
 
 ; Vram address update
-    ld hl,(NextRawVram)
-    ld de,$0040
-    add hl,de
-    ld (NextRawVram),hl
+    ld hl,(NextRawVram)
+    ld de,$0040
+    add hl,de
+    ld (NextRawVram),hl
 
 ; Map data address update
-    ld de,$080
-    Add hl,de
-    ld (NextRawSrc),hl
+    ld de,$080
+    Add hl,de
+    ld (NextRawSrc),hl
 
 ; loop count update
-    ld bc,(loopCont)
-    dec c
-    ld (loopCont),bc
-    jr nz,startmap
+    ld bc,(LoopCount)
+    dec c
+    ld (LoopCount),bc
+    jr nz,draw_startmap
 
 ; initialize buffer
     xor a               ; set A = 0.
@@ -140,7 +152,7 @@ draw_startmap
     ld (NextColSrc),hl
 
     ; preset vram address
-    ld hl,$3802
+    ld hl,$3802
     ld (NextColVram),hl
 
     ld a,%11100000      ; turn screen on - normal sprites.
@@ -174,41 +186,41 @@ mloop
     ld (scroll),a       ; update scroll buffer.
 
 ; Conditional branching
-    and %00000111
-    jr nz, mloop
+    and %00000111
+    jr nz, mloop
 
 ; Loop counter initialize
-    ld a,24
-    ld (loopCount),a
+    ld a,24
+    ld (LoopCount),a
 
 drawcolumn
-    ld hl,(NextColVram)
-    call vrampr
-    ld hl,(NextColSrc)
-    ld bc,2
-    call vramwr
+    ld hl,(NextColVram)
+    call vrampr
+    ld hl,(NextColSrc)
+    ld bc,2
+    call vramwr
 
 ; Vram & Src update
-    ld hl,(NextColVram)
-    ld bc,$40
-    add hl,bc
-    ld (NextRawVram),hl
+    ld hl,(NextColVram)
+    ld bc,$40
+    add hl,bc
+    ld (NextRawVram),hl
 
-    ld hl,(NextColSrc)
+    ld hl,(NextColSrc)
 		ld bc,$0080 ;Next top Raw add
-    sbc hl,bc
-    ld (NextColSrc),hl
+    sbc hl,bc
+    ld (NextColSrc),hl
 
 ; loop count update
-    ld bc,(loopCount)
-    dec c
-    ld (loopCount),bc
-    jr nz,drawcol_loop
+    ld bc,(LoopCount)
+    dec c
+    ld (LoopCount),bc
+    jr nz,drawcolumn
 
     ld hl,(NextRawSrc)
-    ld bc,$0b7e ;Next column add
-    sbc hl,bc ;
-    ld (NextColSrc),hl ;save column add buffer
+    ld bc,$0b7e ;Next column add
+    sbc hl,bc ;
+    ld (NextColSrc),hl ;save column add buffer
 
     jr mloop
 
