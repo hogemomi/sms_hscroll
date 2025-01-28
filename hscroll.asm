@@ -131,7 +131,7 @@ draw_startmap
 
 ; Map data address update
     ld de,$0080
-    Add hl,de
+    add hl,de
     ld (NextRawSrc),hl
 
 ; loop count update
@@ -172,7 +172,7 @@ mloop
 ; Update vdp right when vblank begins!
 
     ld a,(scroll)       ; 1-byte scroll reg. buffer in ram.
-    ld b,9              ; target VDP register 9 (v-scroll).
+    ld b,8             ; target VDP register 9 (v-scroll).
     call setreg         ; now vdp register = buffer, and the
                         ; screen scrolls accordingly.
 
