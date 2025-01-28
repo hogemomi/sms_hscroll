@@ -135,7 +135,7 @@ draw_startmap
 
     ; preset map columun address
     ld hl,(NextRawSrc)
-    ld bc,$0bfc
+    ld bc,$0bfc ;map width screenx2
     add hl,bc
     ld (NextColSrc),hl
 
