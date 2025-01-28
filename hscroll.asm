@@ -202,7 +202,7 @@ drawcolumn
 
 ; Vram & Src update
     ld hl,(NextColVram)
-    ld bc,$40
+    ld bc,$0080
     add hl,bc
     ld (NextRawVram),hl
 
