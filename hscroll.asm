@@ -135,7 +135,7 @@ draw_startmap
 
     ; preset map columun address
     ld hl,(NextRawSrc)
-    ld bc,$0bfe
+    ld bc,$0bfc
     add hl,bc
     ld (NextColSrc),hl
 
@@ -195,7 +195,7 @@ drawcolumn
     ld (NextRawVram),hl
 
     ld hl,(NextColSrc)
-		ld bc,$0080 ;次行の先頭アドレスまでの値
+		ld bc,$0080 ;Next top Raw add
     sbc hl,bc
     ld (NextColSrc),hl
 
@@ -206,9 +206,9 @@ drawcolumn
     jr nz,drawcol_loop
 
     ld hl,(NextRawSrc)
-    ld bc,$0b80 ;次カラムの先頭アドレスまでの値
+    ld bc,$0b7e ;Next column add
     sbc hl,bc ;
-    ld (NextColSrc),hl ;カラムアドレスをバッファに
+    ld (NextColSrc),hl ;save column add buffer
 
     jr mloop
 
