@@ -111,16 +111,16 @@ draw_startmap
     ld bc,2
     call vramwr
 
-; Map data address update
-    ld de,$080
-    Add hl,de
-    ld (NextRawSrc),hl
-
 ; Vram address update
     ld hl,(NextRawVram)
     ld de,$0040
     add hl,de
     ld (NextRawVram),hl
+
+; Map data address update
+    ld de,$080
+    Add hl,de
+    ld (NextRawSrc),hl
 
 ; loop count update
     ld bc,(loopCont)
