@@ -107,7 +107,7 @@ inigam
     ld hl,$3800
     ld (NextRawVram),hl
     ld hl,bgmap
-    ld (NextRawVram),hl
+    ld (NextRawSrc),hl
 
 ; loop count set
     ld bc,24
@@ -130,7 +130,7 @@ draw_startmap
     ld (NextRawVram),hl
 
 ; Map data address update
-    ld de,$080
+    ld de,$0080
     Add hl,de
     ld (NextRawSrc),hl
 
