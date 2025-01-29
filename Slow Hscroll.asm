@@ -187,10 +187,10 @@ or b
 out ($bf),a         ; output command word 2/2.
 ret
 
-; -------------------------------------------------------------
-; DAT
-; -------------------------------------------------------------
-; Initial values for the 11 vdp registers
+; --------------------------------------------------------------
+; DATA
+; --------------------------------------------------------------
+; Initial values for the 11 vdp registers.
 
 regdat .db %00100110       ; reg. 0, display and interrupt mode
 ; bit 4 = line interrupt (disabled)
@@ -231,6 +231,6 @@ regdat .db %00100110       ; reg. 0, display and interrupt mode
 
 ; Background assets
 
-bgpal  .include "assets\background (palette).inc
-bgtile .include "assets\background (tiles).inc
+bgpal  .include "assets\background (palette).inc"
+bgtile .include "assets\background (tiles).inc"
 bgmap  .include "assets\background (tilemap).inc"	
