@@ -107,10 +107,10 @@ ld a,%11100000      	; turn screen on - normal sprites.
 ld b,
 call setreg         	; set register 1.
 
-ld hl,
-ld (fixed_point),h
-ld (vspeed),h
-e
+ld hl,0
+ld (fixed_point),hl
+ld (vspeed),hl
+ei
 
 ; This is the main loop
 
