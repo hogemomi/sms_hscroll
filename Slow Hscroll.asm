@@ -152,28 +152,28 @@ jr mloop
 ; PREPARE VRAM
 ; Set up vdp to recieve data at vram address in HL
 
-vrampr push a
-ld a,
-out ($bf),
-ld a,
-or $4
-out ($bf),
-pop a
-re
+vrampr push af
+ld a,l
+out ($bf),a
+ld a,h
+or $40
+out ($bf),a
+pop af
+ret
 
 ; -------------------------------------------------------------
-; WRITE TO VRA
-; Write BC amount of bytes from data source pointed to by HL
-; Tip: Use vrampr before calling
+; WRITE TO VRAM
+; Write BC amount of bytes from data source pointed to by HL.
+; Tip: Use vrampr before calling.
 
-vramwr ld a,(hl
-out ($be),
-inc h
-dec b
-ld a,
-or 
-jp nz,vramw
-re
+vramwr ld a,(hl)
+out ($be),a
+inc hl
+dec bc
+ld a,c
+or b
+jp nz,vramwr
+ret
 
 ; -------------------------------------------------------------
 ; SET VDP REGISTER
