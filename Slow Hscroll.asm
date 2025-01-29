@@ -176,16 +176,16 @@ jp nz,vramwr
 ret
 
 ; -------------------------------------------------------------
-; SET VDP REGISTER
-; Write to target register
-; A = byte to be loaded into vdp register
-; B = target register 0-10
+; SET VDP REGISTER.
+; Write to target register.
+; A = byte to be loaded into vdp register.
+; B = target register 0-10.
 
-setreg out ($bf),a         ; output command word 1/2
-ld a,$8
-or 
-out ($bf),a         ; output command word 2/2
-re
+setreg out ($bf),a         ; output command word 1/2.
+ld a,$80
+or b
+out ($bf),a         ; output command word 2/2.
+ret
 
 ; -------------------------------------------------------------
 ; DAT
