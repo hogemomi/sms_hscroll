@@ -75,10 +75,10 @@ call vramp
 ld bc,$4000     ; Counter for 16KB of VRA
 -:  xor 
 out ($be),a ; Output to VRAM address, which is auto-incremented after each writ
-dec b
-ld a,
-or 
-jr nz,
+dec bc
+ld a,b
+or c
+jr nz,-
 
 ; Setup the background assets for the main loop
 
@@ -104,7 +104,7 @@ xor a               	; set A = 0.
 ld (scroll),a       	; reset scroll register buffer.
 
 ld a,%11100000      	; turn screen on - normal sprites.
-ld b,
+ld b,1
 call setreg         	; set register 1.
 
 ld hl,0
