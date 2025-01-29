@@ -132,20 +132,20 @@ ld (fixed_point),hl
 
 ; scroll background update the scroll buffe
 ld a,(scroll)
-ld b,
-sub 
-ld (scroll),
-ld a,
-cp $0
-jr z,initialize_fixedpoin
+ld b,h
+sub b
+ld (scroll),a
+ld a,h
+cp $01
+jr z,initialize_fixedpoint
 
-jr mloo
+jr mloop
 
 ; Initialize fixed_point value
 initialize_fixedpoint
 ld hl,
-ld (fixed_point),h
-jr mloo
+ld (fixed_point),hl
+jr mloop
 ; -------------------------------------------------------------
 ; SUBROUTINE
 ; -------------------------------------------------------------
