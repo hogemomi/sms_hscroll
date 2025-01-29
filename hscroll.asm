@@ -1,13 +1,13 @@
 ; -------------------------------------------------------------;
-;                      hscroll                                 ;
+;  hscroll                                                     ;
 ; -------------------------------------------------------------;
 
-.sdsctag 0.1, "hscroll", "Step 1 - Scroller", "hogemomi"
+.sdsctag 0.1, "hscroll", "Step 1 - Scroller", "hogem"
 
 .memorymap                 ; create 2 x 16 kb slots for rom.
-    defaultslot 0
-    slotsize $4000
-    slot 0 $0000        ; rom bank 0 (0-16 kb).
+	defaultslot 0
+	slotsize $4000
+	slot 0 $0000        ; rom bank 0 (0-16 kb).
     slot 1 $4000        ; rom bank 1 (16-32 kb).
     slotsize $2000
     slot 2 $c000        ; ram.
@@ -204,10 +204,10 @@ drawcolumn
     ld hl,(NextColVram)
     ld bc,$0040
     add hl,bc
-    ld (NextRawVram),hl
+    ld (NextColVram),hl
 
     ld hl,(NextColSrc)
-		ld bc,$0080 ;Next top Raw add
+	ld bc,$0080 ;Next column add
     sbc hl,bc
     ld (NextColSrc),hl
 
@@ -219,8 +219,8 @@ drawcolumn
 
     ld hl,(NextRawSrc)
     ld bc,$0b7e ;Next column add
-    sbc hl,bc ;
-    ld (NextColSrc),hl ;save column add buffer
+    sbc hl,bc
+    ld (NextColSrc),hl ;save column src buffer
 
     jr mloop
 
