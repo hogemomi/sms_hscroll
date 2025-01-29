@@ -123,15 +123,15 @@ call setreg         	; now vdp register = buffer, and the
 ; screen scrolls accordingl
 ; fixed point mathmati
 ld hl,(fixed_point) 	; load Q8.8 fixed minority
-ld de,fractional_in
-add hl,d
-ld (vspeed),h
+ld de,fractional_inc
+add hl,de
+ld (vspeed),hl
 
 ; Update fixed point valu
-ld (fixed_point),h
+ld (fixed_point),hl
 
 ; scroll background update the scroll buffe
-ld a,(scroll
+ld a,(scroll)
 ld b,
 sub 
 ld (scroll),
