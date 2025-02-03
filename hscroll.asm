@@ -77,7 +77,7 @@ inigam
 ; Clear VRAM
 ;==============================================================
 ; 1. Set VRAM write address to $0000
-    ld hl,$0000 | $4000
+    ld hl,$4000
     call vrampr
 ; 2. Output 16KB of zeroes
     ld bc,$4000     ; Counter for 16KB of VRAM
