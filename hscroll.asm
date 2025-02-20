@@ -152,14 +152,13 @@ draw_startmap:
     ld b,1
     call setreg      ; set register 1.
 
-    ei
-
 ; This is the main loop.
 ; Of course it could be done without a buffer, but now we
 ; are building the scroll element the way it will look in the
 ; finished game....
 
 mloop
+    ei
     halt          ; start main loop with vblank.
 
 ; Update vdp right when vblank begins!
