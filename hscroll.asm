@@ -139,8 +139,8 @@ draw_startmap:
     ld (scroll),a    ; reset scroll register buffer.
 
     ; preset map columun address
-    ld hl,(NextRawSrc)
-    ld bc,$0bfc ;map width screenx2
+    ld hl,bgmap
+    ld bc,$0021 ;column of 33
     add hl,bc
     ld (NextColSrc),hl
 
