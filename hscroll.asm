@@ -164,7 +164,7 @@ mloop
 ; VBlankの間にしか動作しないようにする
     ld a,(VDPStatus)    
     bit 7,a             ; VBlankフラグを確認
-    jr z, Loop          ; VBlankでなければループに戻る
+    jr z, mloop          ; VBlankでなければループに戻る
 
     res 7,a             ; VBlankフラグをリセット
     ld (VDPStatus),a    
