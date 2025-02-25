@@ -19,10 +19,12 @@
     banks 2
 .endro
 
-.equ   vspeed 1         ; players' vertical speed.
+.equ   scrollspeed 1         ; players' vertical speed.
+       VDPControl $bf
+       VdpData $be
+
 
  ; Organize ram.
-
 .enum $c000 export      ; export labels to symbol file.
     NextRawSrc dw
     NextRawVram dw
