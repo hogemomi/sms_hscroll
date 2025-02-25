@@ -161,6 +161,15 @@ mloop
     ei
     halt          ; start main loop with vblank.
 
+    ; VBlankの間にしか動作しないようにする
+    ld a,(VDPStatus)    
+    bit 7,a             ; VBlankフラグを確認
+    jr z, Loop          ; VBlankでなければループに戻る
+
+    res 7,a             ; VBlankフラグをリセット
+    ld (VDPStatus),a    
+
+; ここでゲームの処理を実行
 ; Update vdp right when vblank begins!
     ld a,(scroll)    ; 1-byte scroll reg. buffer in ram.
     ld b,$08        ; target VDP register 9 (v-scroll).
