@@ -161,7 +161,7 @@ mloop
     ei
     halt          ; start main loop with vblank.
 
-    ; VBlankの間にしか動作しないようにする
+; VBlankの間にしか動作しないようにする
     ld a,(VDPStatus)    
     bit 7,a             ; VBlankフラグを確認
     jr z, Loop          ; VBlankでなければループに戻る
