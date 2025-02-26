@@ -20,7 +20,7 @@
 .endro
 
 .equ   scrollspeed 1         ; players' vertical speed.
-       VDPControl $bf
+       VdpControl $bf
        VdpData $be
 
 
@@ -64,9 +64,9 @@ inigam ld hl,regdat     ; point to register init data.
     ld c,$80         ; VDP register command byte.
 
 -:     ld a,(hl)        ; load one byte of data into A.
-    out ($bf),a      ; output data to VDP command port.
+    out (VdpControl),a      ; output data to VDP command port.
     ld a,c        ; load the command byte.
-    out ($bf),a      ; output it to the VDP command port.
+    out (VdpControl),a      ; output it to the VDP command port.
     inc hl        ; inc. pointer to next byte of data.
     inc c         ; inc. command byte to next register.
     djnz -        ; jump back to '-' if b > 0.
@@ -80,7 +80,7 @@ inigam ld hl,regdat     ; point to register init data.
 ; 2. Output 16KB of zeroes
     ld bc,$4000     ; Counter for 16KB of VRAM
 -:  xor a
-    out ($be),a ; Output to VRAM address, which is auto-incremented after each write
+    out (VdpData),a ; Output to VRAM address, which is auto-incremented after each write
     dec bc
     ld a,b
     or c
@@ -155,9 +155,6 @@ draw_startmap:
     call setreg      ; set register 1.
 
 ; This is the main loop.
-; Of course it could be done without a buffer, but now we
-; are building the scroll element the way it will look in the
-; finished game....
 
 mloop
     ei
@@ -233,10 +230,10 @@ drawcolumn
 
 vrampr push af
     ld a,l
-    out ($bf),a
+    out (VdpCntrol),a
     ld a,h
     or $40
-    out ($bf),a
+    out (VdpControl),a
     pop af
     ret
 
@@ -246,7 +243,7 @@ vrampr push af
 ; Tip: Use vrampr before calling.
 
 vramwr ld a,(hl)
-    out ($be),a
+    out (VdpData),a
     inc hl
     dec bc
     ld a,c
@@ -260,10 +257,10 @@ vramwr ld a,(hl)
 ; A = byte to be loaded into vdp register.
 ; B = target register 0-10.
 
-setreg out ($bf),a      ; output command word 1/2.
+setreg out (VdpControl),a      ; output command word 1/2.
     ld a,$80
     or b
-    out ($bf),a      ; output command word 2/2.
+    out (VdpControl),a      ; output command word 2/2.
     ret
 
 ; --------------------------------------------------------------
