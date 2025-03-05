@@ -189,7 +189,7 @@ mloop
     jr nz, mloop
     
 ; Loop counter initialize
-    ld a,24
+    ld a,12
     ld (LoopCount),a
 
 ; Vblank flag check
