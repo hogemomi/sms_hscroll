@@ -215,10 +215,15 @@ drawcolumn
     sbc hl,bc
     ld (NextColSrc),hl
 
+
+    ld a, (write_half_flag)
+    xor 1
+    ld (write_half_flag), a
+
 ; loop count update
-    ld bc,(LoopCount)
-    dec c
-    ld (LoopCount),bc
+    ld a,(LoopCount)
+    dec a
+    ld (LoopCount),a
     jr nz,drawcolumn
 
     ld hl,(NextRawSrc)
