@@ -192,6 +192,11 @@ mloop
     ld a,24
     ld (LoopCount),a
 
+; Vblank flag check
+    ld a, (write_half_flag)
+    and a
+    jr z, draw_first_half
+
 drawcolumn
     ld hl,(NextColVram)
     call vrampr
