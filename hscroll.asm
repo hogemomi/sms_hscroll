@@ -33,6 +33,7 @@
     LoopCount dw
     scroll db        ; vdp scroll register buffer.
     frame db         ; frame counter.
+    write_half_flag db  ; vblank flag
 .ende
 
 .bank 0 slot 0
