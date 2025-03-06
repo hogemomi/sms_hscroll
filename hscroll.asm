@@ -152,6 +152,10 @@ draw_startmap:
     ld hl,$3800
     ld (NextColVram),hl
 
+; draw map flag check intilaliz
+    xor a
+    ld (write_half_flag),a
+
     ld a,%11100000      ; turn screen on - normal sprites.
     ld b,1
     call setreg      ; set register 1.
@@ -169,10 +173,6 @@ mloop
 
     res 7,a             ; VBlankフラグをリセット
     ld (VDPStatus),a    
-
-; draw map flag check intilaliz
-    xor a
-    ld (write_half_flag),a
 
 ; Update vdp right when vblank begins!
     ld a,(scroll)    ; 1-byte scroll reg. buffer in ram.
