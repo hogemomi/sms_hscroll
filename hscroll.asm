@@ -152,7 +152,7 @@ draw_startmap:
     ld hl,$3800
     ld (NextColVram),hl
 
-; draw map flag check intilaliz
+; draw map flag check intialize
     xor a
     ld (write_half_flag),a
 
@@ -180,7 +180,7 @@ mloop
     call setreg      ; now vdp register = buffer, and the
                   ; screen scrolls accordingly.
 
-; Scroll background - update the vertical scroll buffer.
+; Scroll background - update the scroll buffer.
     ld a,(scroll)    ; get scroll buffer value.
     sub vspeed       ; subtract vertical speed.
     ld (scroll),a    ; update scroll buffer.
