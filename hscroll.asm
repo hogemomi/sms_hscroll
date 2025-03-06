@@ -143,7 +143,7 @@ draw_startmap:
 
     ; preset map columun address
     ld hl,bgmap
-    ld bc,$0021 ;column of 33
+    ld bc,64 ;column of 33
     add hl,bc
     ld (NextColSrc),hl
 
@@ -215,6 +215,11 @@ drawcolumn
     sbc hl,bc
     ld (NextColSrc),hl
 
+; map source update test
+    ld hl,bgmap
+    ld bc,64
+    add hl,bc
+    ld (NextColSrc),hl
 
     ld a, (write_half_flag)
     xor 1
