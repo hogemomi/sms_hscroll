@@ -149,7 +149,7 @@ draw_startmap:
     ld (NextColSrc),hl
 
     ; preset vram address
-    ld hl,$3802
+    ld hl,$3800
     ld (NextColVram),hl
 
     ld a,%11100000      ; turn screen on - normal sprites.
@@ -170,7 +170,6 @@ mloop
     res 7,a             ; VBlankフラグをリセット
     ld (VDPStatus),a    
 
-; ここでゲームの処理を実行
 ; Update vdp right when vblank begins!
     ld a,(scroll)    ; 1-byte scroll reg. buffer in ram.
     ld b,$08        ; target VDP register 9 (v-scroll).
@@ -189,6 +188,9 @@ mloop
 ; Loop counter initialize
     ld a,12
     ld (LoopCount),a
+
+; draw map flag check intilaliz
+    ld (write_half_flag),a
 
 ; draw map flag check
     ld a, (write_half_flag)
