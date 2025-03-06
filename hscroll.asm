@@ -136,6 +136,7 @@ draw_startmap:
     ld (LoopCount),bc
     jr nz,draw_startmap
 
+; main loop preset
 ; Initiarize buffer
     xor a         ; set A = 0.
     ld (frame),a
@@ -143,7 +144,7 @@ draw_startmap:
 
     ; preset map columun address
     ld hl,bgmap
-    ld bc,64 ;column of 33
+    ld bc,65 ;column of 33
     add hl,bc
     ld (NextColSrc),hl
 
@@ -161,7 +162,7 @@ mloop
     ei
     halt          ; start main loop with vblank.
 
-; VBlankの間にしか動作しないようにする
+; Vblank flag check
     ld a,(VDPStatus)    
     bit 7,a             ; VBlankフラグを確認
     jr z, mloop          ; VBlankでなければループに戻る
@@ -176,9 +177,6 @@ mloop
     call setreg      ; now vdp register = buffer, and the
                   ; screen scrolls accordingly.
 
-; Blah blah ... in the game, lots of stuff goes on here....
-; and then, towards the end...
-
 ; Scroll background - update the vertical scroll buffer.
     ld a,(scroll)    ; get scroll buffer value.
     sub vspeed       ; subtract vertical speed.
@@ -192,7 +190,7 @@ mloop
     ld a,12
     ld (LoopCount),a
 
-; Vblank flag check
+; draw map flag check
     ld a, (write_half_flag)
     and a
     jr z, draw_first_half
