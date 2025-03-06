@@ -170,6 +170,10 @@ mloop
     res 7,a             ; VBlankフラグをリセット
     ld (VDPStatus),a    
 
+; draw map flag check intilaliz
+    xor a
+    ld (write_half_flag),a
+
 ; Update vdp right when vblank begins!
     ld a,(scroll)    ; 1-byte scroll reg. buffer in ram.
     ld b,$08        ; target VDP register 9 (v-scroll).
@@ -188,9 +192,6 @@ mloop
 ; Loop counter initialize
     ld a,12
     ld (LoopCount),a
-
-; draw map flag check intilaliz
-    ld (write_half_flag),a
 
 ; draw map flag check
     ld a, (write_half_flag)
