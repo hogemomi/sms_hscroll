@@ -201,7 +201,7 @@ mloop
 draw_first_half:
     ld a, 12
     ld (LoopCount), a
-    jr start_draw
+    jr drawcolumn
 
 draw_second_half:
     ld a, 12
