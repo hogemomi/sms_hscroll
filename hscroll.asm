@@ -33,7 +33,7 @@
     LoopCount dw
     scroll db        ; vdp scroll register buffer.
     frame db         ; frame counter.
-    write_half_flag db  ; vblank flag
+    WriteHalfflag db  ; vblank flag
 .ende
 
 .bank 0 slot 0
@@ -154,7 +154,7 @@ draw_startmap:
 
 ; draw map flag check intialize
     xor a
-    ld (write_half_flag),a
+    ld (WriteHalfflag),a
 
     ld a,%11100000      ; turn screen on - normal sprites.
     ld b,1
@@ -194,7 +194,7 @@ mloop
     ld (LoopCount),a
 
 ; draw map flag check
-    ld a, (write_half_flag)
+    ld a, (WriteHalfflag)
     and a
     jr nz, draw_second_half
 
