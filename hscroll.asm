@@ -196,7 +196,16 @@ mloop
 ; draw map flag check
     ld a, (write_half_flag)
     and a
-    jr z, draw_first_half
+    jr nz, draw_second_half
+
+draw_first_half:
+    ld a, 12
+    ld (LoopCount), a
+    jr start_draw
+
+draw_second_half:
+    ld a, 12
+    ld (LoopCount), a
 
 drawcolumn
     ld hl,(NextColVram)
