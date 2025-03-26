@@ -289,6 +289,16 @@ setreg out (VdpControl),a      ; output command word 1/2.
     out (VdpControl),a      ; output command word 2/2.
     ret
 
+WaitVBlank:
+; Wait for vertical blanking phase.
+    in a,$bf           ; get VDP status flags
+    bit 7,a              ; get frame interrupt
+    jp z,WaitVBlank      ; keep looping if FI is set
+    res 7,a              ; reset bit 7 of VDP status flags
+    ld (VDPStatus),a     ; update VDP status flags
+    
+    ret
+
 ; --------------------------------------------------------------
 ; DATA
 ; --------------------------------------------------------------
