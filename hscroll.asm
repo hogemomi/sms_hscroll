@@ -146,7 +146,7 @@ draw_startmap:
     ; preset map columun address
     ld hl,bgmap
     ld bc,$0040 ;map width screenx2
-    sbc hl,bc
+    add hl,bc
     ld (NextColSrc),hl
 
     ; preset vram address
