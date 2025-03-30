@@ -2,7 +2,7 @@
 ;             Holizontal Scroll                    ;
 ; -------------------------------------------------------------;
 
-.sdsctag 0.1, "Hscroll", "Step 2 - Rewright mapdata", "hogel"
+.sdsctag 0.1, "Racer", "Step 1 - Scroller", "Anders S. Jensen"
 
 .memorymap           ; create 2 x 16 kb slots for rom.
     defaultslot 0
@@ -19,12 +19,11 @@
     banks 2
 .endro
 
-.equ   scrollspeed 1         ; players' vertical speed.
-       VdpControl $bf
-       VdpData $be
-
+.define   vspeed 1         ; players' vertical speed
+.define  VDPcontrol $bf
 
  ; Organize ram.
+
 .enum $c000 export      ; export labels to symbol file.
     NextRawSrc dw
     NextRawVram dw
@@ -32,8 +31,8 @@
     NextColVram dw
     LoopCount dw
     scroll db        ; vdp scroll register buffer.
-    frame db         ; frame counter.
-    WriteHalfflag db  ; vblank flag
+    frame db         ; frame counter
+    VDPstatus db
 .ende
 
 .bank 0 slot 0
@@ -45,12 +44,14 @@
 
 ; Read the vdp status flag at every frame interrupt.
 
-.orga $0038          ; frame interrupt address.
+.orga $0038          ; frame interrupt address
+    in a,(VDPcontrol)   ; read status flags from VDP control
+    ld (VDPstatus),a    ; save vdp status
     ex af,af'        ; save accumulator in its shadow reg.
-    in a,$bf         ; satisfy interrupt.
+    in a,(VDPcontrol)         ; satisfy interrupt.
     ex af,af'        ; restore accumulator.
-    ei            ; enable interrupts.
-    ret           ; return from interrupt.
+    ei
+    ret                ; return from interrupt
 
 ; Disable the pause button - this is an unforgiving game!
 
@@ -64,10 +65,11 @@ inigam ld hl,regdat     ; point to register init data.
     ld b,11          ; 11 bytes of register data.
     ld c,$80         ; VDP register command byte.
 
--:     ld a,(hl)        ; load one byte of data into A.
-    out (VdpControl),a      ; output data to VDP command port.
+-:
+    ld a,(hl)        ; load one byte of data into A.
+    out ($bf),a      ; output data to VDP command port.
     ld a,c        ; load the command byte.
-    out (VdpControl),a      ; output it to the VDP command port.
+    out ($bf),a      ; output it to the VDP command port.
     inc hl        ; inc. pointer to next byte of data.
     inc c         ; inc. command byte to next register.
     djnz -        ; jump back to '-' if b > 0.
@@ -81,7 +83,7 @@ inigam ld hl,regdat     ; point to register init data.
 ; 2. Output 16KB of zeroes
     ld bc,$4000     ; Counter for 16KB of VRAM
 -:  xor a
-    out (VdpData),a ; Output to VRAM address, which is auto-incremented after each write
+    out ($be),a ; Output to VRAM address, which is auto-incremented after each write
     dec bc
     ld a,b
     or c
@@ -136,7 +138,6 @@ draw_startmap:
     ld (LoopCount),bc
     jr nz,draw_startmap
 
-; main loop preset
 ; Initiarize buffer
     xor a         ; set A = 0.
     ld (frame),a
@@ -144,35 +145,21 @@ draw_startmap:
 
     ; preset map columun address
     ld hl,bgmap
-    ld bc,65 ;column of 33
-    add hl,bc
+    ld bc,$0040 ;map width screenx2
+    sbc hl,bc
     ld (NextColSrc),hl
 
     ; preset vram address
-    ld hl,$3800
+    ld hl,$3802
     ld (NextColVram),hl
-
-; draw map flag check intialize
-    xor a
-    ld (WriteHalfflag),a
 
     ld a,%11100000      ; turn screen on - normal sprites.
     ld b,1
     call setreg      ; set register 1.
 
-; This is the main loop.
-
-mloop
     ei
+mloop:
     halt          ; start main loop with vblank.
-
-; Vblank flag check
-    ld a,(VDPStatus)    
-    bit 7,a             ; VBlankフラグを確認
-    jr z, mloop          ; VBlankでなければループに戻る
-
-    res 7,a             ; VBlankフラグをリセット
-    ld (VDPStatus),a    
 
 ; Update vdp right when vblank begins!
     ld a,(scroll)    ; 1-byte scroll reg. buffer in ram.
@@ -180,7 +167,9 @@ mloop
     call setreg      ; now vdp register = buffer, and the
                   ; screen scrolls accordingly.
 
-; Scroll background - update the scroll buffer.
+    call WaitVblank
+
+; Scroll background - update the vertical scroll buffer.
     ld a,(scroll)    ; get scroll buffer value.
     sub vspeed       ; subtract vertical speed.
     ld (scroll),a    ; update scroll buffer.
@@ -193,21 +182,7 @@ mloop
     ld a,12
     ld (LoopCount),a
 
-; draw map flag check
-    ld a, (WriteHalfflag)
-    and a
-    jr nz, draw_second_half
-
-draw_first_half:
-    ld a, 12
-    ld (LoopCount), a
-    jr drawcolumn
-
-draw_second_half:
-    ld a, 12
-    ld (LoopCount), a
-
-drawcolumn
+drawcolumn:
     ld hl,(NextColVram)
     call vrampr
     ld hl,(NextColSrc)
@@ -222,23 +197,13 @@ drawcolumn
 
     ld hl,(NextColSrc)
     ld bc,$0080 ;Next column add
-    sbc hl,bc
-    ld (NextColSrc),hl
-
-; map source update test
-    ld hl,bgmap
-    ld bc,64
     add hl,bc
     ld (NextColSrc),hl
 
-    ld a, (write_half_flag)
-    xor 1
-    ld (write_half_flag), a
-
 ; loop count update
-    ld a,(LoopCount)
-    dec a
-    ld (LoopCount),a
+    ld bc,(LoopCount)
+    dec bc
+    ld (LoopCount),bc
     jr nz,drawcolumn
 
     ld hl,(NextRawSrc)
@@ -254,12 +219,13 @@ drawcolumn
 ; PREPARE VRAM.
 ; Set up vdp to recieve data at vram address in HL.
 
-vrampr push af
+vrampr:
+    push af
     ld a,l
-    out (VdpCntrol),a
+    out ($bf),a
     ld a,h
     or $40
-    out (VdpControl),a
+    out ($bf),a
     pop af
     ret
 
@@ -268,8 +234,9 @@ vrampr push af
 ; Write BC amount of bytes from data source pointed to by HL.
 ; Tip: Use vrampr before calling.
 
-vramwr ld a,(hl)
-    out (VdpData),a
+vramwr:
+    ld a,(hl)
+    out ($be),a
     inc hl
     dec bc
     ld a,c
@@ -283,22 +250,21 @@ vramwr ld a,(hl)
 ; A = byte to be loaded into vdp register.
 ; B = target register 0-10.
 
-setreg out (VdpControl),a      ; output command word 1/2.
+setreg:
+    out ($bf),a      ; output command word 1/2.
     ld a,$80
     or b
-    out (VdpControl),a      ; output command word 2/2.
+    out ($bf),a      ; output command word 2/2.
     ret
 
-WaitVBlank:
-; Wait for vertical blanking phase.
-    in a,$bf           ; get VDP status flags
-    bit 7,a              ; get frame interrupt
-    jp z,WaitVBlank      ; keep looping if FI is set
-    res 7,a              ; reset bit 7 of VDP status flags
-    ld (VDPStatus),a     ; update VDP status flags
+WaitVblank:
+    ld a,(VDPstatus)  ; get vdp status
+    bit 7,a  ; check vblank bit
+    jp z, WaitVblank  ; If not yet VBlank, wait
+    res 7,a
+    ld (VDPstatus),a
     
-    ret
-
+    ret                ; Return when VBlank occurs.
 ; --------------------------------------------------------------
 ; DATA
 ; --------------------------------------------------------------
@@ -343,6 +309,6 @@ regdat .db %00100110    ; reg. 0, display and interrupt mode.
 
 ; Background assets.
 
-bgpal   .include "Assets_colorbar\palette.inc"
-bgtile  .include "Assets_colorbar\tiles.inc"
-bgmap   .include "Assets_colorbar\tilemap3.inc"
+bgpal   .include "Assets_test\palette.inc"
+bgtile  .include "Assets_test\tiles.inc"
+bgmap   .include "Assets_test\tilemap.inc"
