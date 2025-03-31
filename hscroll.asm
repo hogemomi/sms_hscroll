@@ -61,7 +61,8 @@
 ; Initialize game.
 ; Initialize the VDP registers.
 
-inigam ld hl,regdat     ; point to register init data.
+inigam:
+    ld hl,regdat     ; point to register init data.
     ld b,11          ; 11 bytes of register data.
     ld c,$80         ; VDP register command byte.
 
