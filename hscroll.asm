@@ -2,7 +2,7 @@
 ;             Holizontal Scroll                    ;
 ; -------------------------------------------------------------;
 
-.sdsctag 0.1, "H Scroll", "hogemomi"
+.sdsctag 0.1, "Racer", "Step 1 - Scroller", "Anders S. Jensen"
 
 .memorymap           ; create 2 x 16 kb slots for rom.
     defaultslot 0
@@ -19,7 +19,7 @@
     banks 2
 .endro
 
-.define  vspeed 1         ; players' vertical speed
+.define   vspeed 1         ; players' vertical speed
 .define  VDPcontrol $bf
 
  ; Organize ram.
@@ -48,7 +48,8 @@
     ex af,af'        ; save accumulator in its shadow reg.
     in a,(VDPcontrol)   ; read status flags from VDP control
     ld (VDPstatus),a    ; save vdp status
-    ex af',af
+    ex af,af'        ; restore accumulator
+    ei
     ret                ; return from interrupt
 
 ; Disable the pause button - this is an unforgiving game!
@@ -59,8 +60,7 @@
 ; Initialize game.
 ; Initialize the VDP registers.
 
-inigam:
-    ld hl,regdat     ; point to register init data.
+inigam ld hl,regdat     ; point to register init data.
     ld b,11          ; 11 bytes of register data.
     ld c,$80         ; VDP register command byte.
 
@@ -160,13 +160,13 @@ draw_startmap:
 mloop:
     halt          ; start main loop with vblank.
 
+    call WaitVblank
+
 ; Update vdp right when vblank begins!
     ld a,(scroll)    ; 1-byte scroll reg. buffer in ram.
     ld b,$08        ; target VDP register 9 (v-scroll).
     call setreg      ; now vdp register = buffer, and the
                   ; screen scrolls accordingly.
-
-    call WaitVblank
 
 ; Scroll background - update the vertical scroll buffer.
     ld a,(scroll)    ; get scroll buffer value.
@@ -178,7 +178,7 @@ mloop:
     jr nz, mloop
     
 ; Loop counter initialize
-    ld a,12
+    ld a,24
     ld (LoopCount),a
 
 drawcolumn:
@@ -201,9 +201,9 @@ drawcolumn:
 
 ; loop count update
     ld bc,(LoopCount)
-    dec bc
+    dec c
     ld (LoopCount),bc
-    jr nz,drawcolumn
+    jp nz,drawcolumn
 
     ld hl,(NextRawSrc)
     ld bc,$0b7e ;Next column add
