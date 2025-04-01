@@ -2,7 +2,7 @@
 ;             Holizontal Scroll                    ;
 ; -------------------------------------------------------------;
 
-.sdsctag 0.1, "Racer", "Step 1 - Scroller", "Anders S. Jensen"
+.sdsctag 0.1, "H Scroll", "hogemomi"
 
 .memorymap           ; create 2 x 16 kb slots for rom.
     defaultslot 0
@@ -19,7 +19,7 @@
     banks 2
 .endro
 
-.define   vspeed 1         ; players' vertical speed
+.define  vspeed 1         ; players' vertical speed
 .define  VDPcontrol $bf
 
  ; Organize ram.
