@@ -45,12 +45,10 @@
 ; Read the vdp status flag at every frame interrupt.
 
 .orga $0038          ; frame interrupt address
+    ex af,af'        ; save accumulator in its shadow reg.
     in a,(VDPcontrol)   ; read status flags from VDP control
     ld (VDPstatus),a    ; save vdp status
-    ex af,af'        ; save accumulator in its shadow reg.
-    in a,(VDPcontrol)         ; satisfy interrupt.
-    ex af,af'        ; restore accumulator.
-    ei
+    ex af',af
     ret                ; return from interrupt
 
 ; Disable the pause button - this is an unforgiving game!
