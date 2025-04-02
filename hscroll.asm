@@ -49,8 +49,7 @@
     in a,(VDPcontrol)   ; read status flags from VDP control
     ld (VDPstatus),a    ; save vdp status
     ex af,af'        ; restore accumulator
-    ei
-    ret                ; return from interrupt
+    reti                ; return from interrupt
 
 ; Disable the pause button - this is an unforgiving game!
 
