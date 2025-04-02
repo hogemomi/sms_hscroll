@@ -151,6 +151,10 @@ draw_startmap:
     ld hl,$3802
     ld (NextColVram),hl
 
+; Loop counter initialize
+    ld a,24
+    ld (LoopCount),a
+
     ld a,%11100000      ; turn screen on - normal sprites.
     ld b,1
     call setreg      ; set register 1.
@@ -175,10 +179,6 @@ mloop:
 ; Conditional branching
     and %00000111
     jr nz, mloop
-    
-; Loop counter initialize
-    ld a,24
-    ld (LoopCount),a
 
 drawcolumn:
     ld hl,(NextColVram)
