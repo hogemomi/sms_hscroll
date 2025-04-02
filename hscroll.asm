@@ -155,8 +155,8 @@ draw_startmap:
     ld b,1
     call setreg      ; set register 1.
 
-    ei
 mloop:
+    ei
     halt          ; start main loop with vblank.
 
     call WaitVblank
