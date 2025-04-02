@@ -206,7 +206,8 @@ drawcolumn:
 
     ld hl,(NextRawSrc)
     ld bc,$0b7f ;Next column add
-    add hl,bc
+    or a
+    sbc hl,bc
     ld (NextColSrc),hl ;save column src buffer
 
     jp mloop
