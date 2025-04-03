@@ -204,6 +204,12 @@ drawcolumn:
     ld (LoopCount),bc
     jp nz,drawcolumn
 
+    ld hl,(NextColVram)
+    ld bc,$05bf ; Next column vramadd
+    or a
+    sbc hl,bc
+    ld (NextColVram),hl
+
     ld hl,(NextRawSrc)
     ld bc,$0b7e ;Next column add
     or a
