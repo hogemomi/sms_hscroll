@@ -205,7 +205,7 @@ drawcolumn:
     jp nz,drawcolumn
 
     ld hl,(NextRawSrc)
-    ld bc,$0b7f ;Next column add
+    ld bc,$0b7e ;Next column add
     or a
     sbc hl,bc
     ld (NextColSrc),hl ;save column src buffer
