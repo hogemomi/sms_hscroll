@@ -205,13 +205,13 @@ drawcolumn:
     jp nz,drawcolumn
 
     ld hl,(NextColVram)
-    ld bc,$05be ; Next column vramadd
+    ld bc,$05bf ; Next column vramadd
     or a
     sbc hl,bc
     ld (NextColVram),hl
 
     ld hl,(NextRawSrc)
-    ld bc,$05be ;Next column add
+    ld bc,$027f ;Next column add
     or a
     sbc hl,bc
     ld (NextColSrc),hl ;save column src buffer
