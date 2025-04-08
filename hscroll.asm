@@ -142,14 +142,14 @@ draw_startmap:
     ld (scroll),a    ; reset scroll register buffer.
 
     ; preset map columun address
+    ; preset vram address
+    ld hl,$3802
+    ld (NextColVram),hl
+
     ld hl,bgmap
     ld bc,$0040 ;map width screenx2
     add hl,bc
     ld (NextColSrc),hl
-
-    ; preset vram address
-    ld hl,$3802
-    ld (NextColVram),hl
 
 ; Loop counter initialize
     ld a,24
