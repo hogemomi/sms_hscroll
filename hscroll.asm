@@ -194,7 +194,7 @@ drawcolumn:
     ld (NextColVram),hl
 
     ld hl,(NextColSrc)
-    ld bc,$0080 ;Next column add
+    ld bc,$0040 ;Next column add
     add hl,bc
     ld (NextColSrc),hl
 
