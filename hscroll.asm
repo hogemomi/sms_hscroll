@@ -1,4 +1,4 @@
-; -------------------------------------------------------------;
+.; -------------------------------------------------------------;
 ;             Holizontal Scroll                    ;
 ; -------------------------------------------------------------;
 
@@ -187,6 +187,12 @@ drawcolumn:
     ld bc,2
     call vramwr
 
+; loop count update
+    ld bc,(LoopCount)
+    dec c
+    ld (LoopCount),bc
+    jp nz,drawcolumn
+
 ; Vram & Src update
     ld hl,(NextColVram)
     ld bc,$0040
@@ -197,12 +203,6 @@ drawcolumn:
     ld bc,$0040 ;Next column add
     add hl,bc
     ld (NextColSrc),hl
-
-; loop count update
-    ld bc,(LoopCount)
-    dec c
-    ld (LoopCount),bc
-    jp nz,drawcolumn
 
     ld hl,(NextColVram)
     ld bc,$05bf ; Next column vramadd
