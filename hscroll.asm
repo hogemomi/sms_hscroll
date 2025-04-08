@@ -151,10 +151,6 @@ draw_startmap:
     add hl,bc
     ld (NextColSrc),hl
 
-; Loop counter initialize
-    ld a,24
-    ld (LoopCount),a
-
     ld a,%11100000      ; turn screen on - normal sprites.
     ld b,1
     call setreg      ; set register 1.
@@ -180,13 +176,11 @@ mloop:
     and %00000111
     jr nz, mloop
 
-drawcolumn:
-; loop count update
-    ld bc,(LoopCount)
-    dec c
-    ld (LoopCount),bc
-    jp nz,drawcolumn
+; Loop counter initialize
+    ld a,24
+    ld (LoopCount),a
 
+drawcolumn:
     ld hl,(NextColVram)
     call vrampr
     ld hl,(NextColSrc)
@@ -215,6 +209,13 @@ drawcolumn:
     or a
     sbc hl,bc
     ld (NextColSrc),hl ;save column src buffer
+
+; loop count update
+    ld bc,(LoopCount)
+    dec bc
+    ld a,c
+    or b
+    jp nz,drawcolumn
 
     jp mloop
 
