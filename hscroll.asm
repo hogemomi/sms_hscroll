@@ -180,18 +180,18 @@ mloop:
     and %00000111
     jr nz, mloop
 
+; loop count update
+    ld bc,(LoopCount)
+    dec c
+    ld (LoopCount),bc
+    jp nz,drawcolumn
+
 drawcolumn:
     ld hl,(NextColVram)
     call vrampr
     ld hl,(NextColSrc)
     ld bc,2
     call vramwr
-
-; loop count update
-    ld bc,(LoopCount)
-    dec c
-    ld (LoopCount),bc
-    jp nz,drawcolumn
 
 ; Vram & Src update
     ld hl,(NextColVram)
