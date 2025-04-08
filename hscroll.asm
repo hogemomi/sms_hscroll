@@ -180,13 +180,13 @@ mloop:
     and %00000111
     jr nz, mloop
 
+drawcolumn:
 ; loop count update
     ld bc,(LoopCount)
     dec c
     ld (LoopCount),bc
     jp nz,drawcolumn
 
-drawcolumn:
     ld hl,(NextColVram)
     call vrampr
     ld hl,(NextColSrc)
