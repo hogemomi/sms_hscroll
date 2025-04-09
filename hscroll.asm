@@ -147,7 +147,7 @@ draw_startmap:
     ld (NextColVram),hl
 
     ld hl,bgmap
-    ld bc,$0040 ;map width screenx2
+    ld bc,$0020 ;map width screenx2
     add hl,bc
     ld (NextColSrc),hl
 
