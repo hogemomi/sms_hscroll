@@ -198,6 +198,13 @@ drawcolumn:
     add hl,bc
     ld (NextColSrc),hl
 
+; loop count update
+    ld bc,(LoopCount)
+    dec bc
+    ld a,c
+    or b
+    jp nz,drawcolumn
+
     ld hl,(NextColVram)
     ld bc,$fa42 ;Move to the next vram address
     add hl,bc
@@ -207,13 +214,6 @@ drawcolumn:
     ld bc,$fa42 ;Next column add
     add hl,bc
     ld (NextColSrc),hl ;save column src buffer
-
-; loop count update
-    ld bc,(LoopCount)
-    dec bc
-    ld a,c
-    or b
-    jp nz,drawcolumn
 
     jp mloop
 
