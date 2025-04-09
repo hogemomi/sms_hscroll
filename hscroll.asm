@@ -194,20 +194,18 @@ drawcolumn:
     ld (NextColVram),hl
 
     ld hl,(NextColSrc)
-    ld bc,$0040 ;Next column add
+    ld bc,$0040 ;Move to the next column source address
     add hl,bc
     ld (NextColSrc),hl
 
     ld hl,(NextColVram)
-    ld bc,$05bf ; Next column vramadd
-    or a
-    sbc hl,bc
+    ld bc,$fa42 ;Move to the next vram address
+    add hl,bc
     ld (NextColVram),hl
 
     ld hl,(NextRawSrc)
-    ld bc,$027f ;Next column add
-    or a
-    sbc hl,bc
+    ld bc,$fa42 ;Next column add
+    add hl,bc
     ld (NextColSrc),hl ;save column src buffer
 
 ; loop count update
