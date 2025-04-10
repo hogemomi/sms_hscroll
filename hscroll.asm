@@ -109,7 +109,7 @@ inigam ld hl,regdat     ; point to register init data.
     ld (NextRawSrc),hl
 
 ; loop count set
-    ld bc,24
+    ld de,24
     ld (LoopCount),bc
 
 ; start map configuration
@@ -131,9 +131,9 @@ draw_startmap:
     ld (NextRawVram),hl
 
 ; loop count update
-    ld bc,(LoopCount)
-    dec c
-    ld (LoopCount),bc
+    dec de
+    ld a,e
+    or d
     jr nz,draw_startmap
 
 ; Initiarize buffer
@@ -177,8 +177,7 @@ mloop:
     jr nz, mloop
 
 ; Loop counter initialize
-    ld a,24
-    ld (LoopCount),a
+    ld de,24
 
 drawcolumn:
     ld hl,(NextColVram)
@@ -199,10 +198,9 @@ drawcolumn:
     ld (NextColSrc),hl
 
 ; loop count update
-    ld bc,(LoopCount)
-    dec bc
-    ld a,c
-    or b
+    dec de
+    ld a,e
+    or d
     jp nz,drawcolumn
 
     ld hl,(NextColVram)
