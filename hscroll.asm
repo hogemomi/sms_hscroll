@@ -176,7 +176,7 @@ mloop:
     and %00000111
     jr nz, mloop
 
-; Loop counter initialize
+; Loop count set
     ld de,24
 
 drawcolumn:
@@ -197,7 +197,7 @@ drawcolumn:
     add hl,bc
     ld (NextColSrc),hl
 
-; loop count update
+; loop counter
     dec de
     ld a,e
     or d
