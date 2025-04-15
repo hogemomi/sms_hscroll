@@ -193,7 +193,7 @@ drawcolumn:
     ld (NextColVram),hl
 
     ld hl,(NextColSrc)
-    ld bc,$0040 ;Move to the next column source address
+    ld bc,$0080 ;Move to the next column source address
     add hl,bc
     ld (NextColSrc),hl
 
