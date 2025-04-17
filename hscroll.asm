@@ -20,6 +20,7 @@
 .endro
 
 .define  VDPcontrol $bf
+.define EndMapAdd $26c1
 
  ; Organize ram.
 
