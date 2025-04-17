@@ -19,7 +19,6 @@
     banks 2
 .endro
 
-.define   vspeed 1         ; players' vertical speed
 .define  VDPcontrol $bf
 
  ; Organize ram.
@@ -33,6 +32,7 @@
     scroll db        ; vdp scroll register buffer.
     frame db         ; frame counter
     VDPstatus db
+    Vspeed db
 .ende
 
 .bank 0 slot 0
@@ -140,6 +140,8 @@ draw_startmap:
     xor a         ; set A = 0.
     ld (frame),a
     ld (scroll),a    ; reset scroll register buffer.
+    ld a,1
+    ld (Vspeed),a
 
     ; preset map columun address
     ; preset vram address
@@ -169,7 +171,7 @@ mloop:
 
 ; Scroll background - update the vertical scroll buffer.
     ld a,(scroll)    ; get scroll buffer value.
-    sub vspeed       ; subtract vertical speed.
+    sub (vspeed)       ; subtract vertical speed.
     ld (scroll),a    ; update scroll buffer.
 
 ; Conditional branching
@@ -211,7 +213,7 @@ drawcolumn:
 
     stopscroll:
     ld a,0
-    ld (scroll),a
+    ld (vspeed),a
 
     ld hl,(NextColVram)
     ld bc,$fa42 ;Move to the next vram address
