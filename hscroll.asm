@@ -203,6 +203,16 @@ drawcolumn:
     or d
     jp nz,drawcolumn
 
+    ld hl,(NextColSrc)
+    ld de,(MapEndAdd)
+    or a
+    sbc hl,de
+    jr z,stopscroll
+
+    stopscroll:
+    ld a,0
+    ld (scroll),a
+
     ld hl,(NextColVram)
     ld bc,$fa42 ;Move to the next vram address
     add hl,bc
