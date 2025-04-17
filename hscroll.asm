@@ -19,6 +19,7 @@
     banks 2
 .endro
 
+.define Vspeed $01
 .define  VDPcontrol $bf
 .define EndMapAdd $26c1
 
@@ -172,8 +173,13 @@ mloop:
 
 ; Scroll background - update the vertical scroll buffer.
     ld a,(scroll)    ; get scroll buffer value.
-    sub (vspeed)       ; subtract vertical speed.
+    sub Vspeed       ; subtract vertical speed.
     ld (scroll),a    ; update scroll buffer.
+
+    stopscroll:
+    ld a,（scroll)
+    sub $00
+    ld (vspeed),a
 
 ; Conditional branching
     and %00000111
@@ -211,10 +217,6 @@ drawcolumn:
     or a
     sbc hl,de
     jr z,stopscroll
-
-    stopscroll:
-    ld a,0
-    ld (vspeed),a
 
     ld hl,(NextColVram)
     ld bc,$fa42 ;Move to the next vram address
