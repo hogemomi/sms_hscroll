@@ -2,7 +2,7 @@
 ;             Holizontal Scroll                    ;
 ; -------------------------------------------------------------;
 
-.sdsctag 0.1, "Racer", "Step 1 - Scroller", "Anders S. Jensen"
+.sdsctag 0.1, "Hscrool", "Step 1 - Scroller", "hogemomi"
 
 .memorymap           ; create 2 x 16 kb slots for rom.
     defaultslot 0
@@ -101,7 +101,7 @@ inigam ld hl,regdat     ; point to register init data.
     ld hl,$0000      ; first tile @ index 0.
     call vrampr      ; prepare vram.
     ld hl,bgtile     ; background tile data (the road).
-    ld bc,33*28*2       ; each tile is 32 bytes.
+    ld bc,192*32       ; each tile is 32 bytes.
     call vramwr      ; write background tiles to vram.
 
 ; Map placement at start
