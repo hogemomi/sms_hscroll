@@ -212,12 +212,6 @@ drawcolumn:
     add hl,bc
     ld (NextColSrc),hl
 
-    ld hl,(NextColSrc)
-    ld de,(MapEndAdd)
-    or a
-    sbc hl,de
-    jr z,stopscroll
-
     ld hl,(NextColVram)
     ld bc,$fa42 ;Move to the next vram address
     add hl,bc
