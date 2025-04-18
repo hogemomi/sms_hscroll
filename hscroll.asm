@@ -195,12 +195,6 @@ drawcolumn:
     ld bc,2
     call vramwr
 
-; loop counter
-    dec de
-    ld a,e
-    or d
-    jp nz,drawcolumn
-
 ; Vram & Src update
     ld hl,(NextColVram)
     ld bc,$0040
@@ -211,6 +205,12 @@ drawcolumn:
     ld bc,$0080 ;Move to the next column source address
     add hl,bc
     ld (NextColSrc),hl
+
+; loop counter
+    dec de
+    ld a,e
+    or d
+    jp nz,drawcolumn
 
     ld hl,(NextColVram)
     ld bc,$fa42 ;Move to the next vram address
