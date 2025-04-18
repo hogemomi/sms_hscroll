@@ -21,6 +21,7 @@
 
 .define Vspeed $01
 .define  VDPcontrol $bf
+.define MapHeight $1c
 .define EndMapAdd $26c1
 
  ; Organize ram.
@@ -100,7 +101,7 @@ inigam ld hl,regdat     ; point to register init data.
     ld hl,$0000      ; first tile @ index 0.
     call vrampr      ; prepare vram.
     ld hl,bgtile     ; background tile data (the road).
-    ld bc,192*32       ; each tile is 32 bytes.
+    ld bc,33*28*2       ; each tile is 32 bytes.
     call vramwr      ; write background tiles to vram.
 
 ; Map placement at start
@@ -111,7 +112,7 @@ inigam ld hl,regdat     ; point to register init data.
     ld (NextRawSrc),hl
 
 ; loop count set
-    ld de,24
+    ld de,MapHeight
     ld (LoopCount),bc
 
 ; start map configuration
@@ -186,7 +187,7 @@ mloop:
     jr nz, mloop
 
 ; Loop count set
-    ld de,24
+    ld de,MapHeight
 
 drawcolumn:
     ld hl,(NextColVram)
@@ -210,8 +211,10 @@ drawcolumn:
     dec de
     ld a,e
     or d
-    jp nz,drawcolumn
+    jp z,nextcolsrcadd
+    jp drawcolumn
 
+nextcolsrcadd:
     ld hl,(NextColVram)
     ld bc,$fa42 ;Move to the next vram address
     add hl,bc
