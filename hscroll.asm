@@ -156,6 +156,9 @@ draw_startmap:
     add hl,bc
     ld (NextColSrc),hl
 
+    ld a,$18
+    ld (LoopCount),a
+
     ld a,%11100000      ; turn screen on - normal sprites.
     ld b,1
     call setreg      ; set register 1.
@@ -200,11 +203,10 @@ drawcolumn:
     ld (NextColSrc),hl
 
 ; loop counter
-    dec de
-    ld a,e
-    or d
-    jp z,nextcolsrcadd
-    jp drawcolumn
+    ld a,(LoopCount)
+    dec a
+    ld (LoopCount),a
+    jp nz,drawcolumn
 
 nextcolsrcadd:
     ld hl,(NextColVram)
