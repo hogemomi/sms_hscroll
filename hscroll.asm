@@ -191,6 +191,12 @@ drawcolumn:
     ld bc,2
     call vramwr
 
+; loop counter
+    ld a,(LoopCount)
+    dec a
+    ld (LoopCount),a
+    jp nz,drawcolumn
+
 ; Vram & Src update
     ld hl,(NextColVram)
     ld bc,$0040
@@ -201,12 +207,6 @@ drawcolumn:
     ld bc,$0080 ;Move to the next column source address
     add hl,bc
     ld (NextColSrc),hl
-
-; loop counter
-    ld a,(LoopCount)
-    dec a
-    ld (LoopCount),a
-    jp nz,drawcolumn
 
 nextcolsrcadd:
     ld hl,(NextColVram)
