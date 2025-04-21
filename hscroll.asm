@@ -177,11 +177,6 @@ mloop:
     sub Vspeed       ; subtract vertical speed.
     ld (scroll),a    ; update scroll buffer.
 
-    stopscroll:
-    ld a,（scroll)
-    sub $00
-    ld (vspeed),a
-
 ; Conditional branching
     and %00000111
     jr nz, mloop
