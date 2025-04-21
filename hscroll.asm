@@ -181,9 +181,6 @@ mloop:
     and %00000111
     jr nz, mloop
 
-; Loop count set
-    ld de,MapHeight
-
 drawcolumn:
     ld hl,(NextColVram)
     call vrampr
