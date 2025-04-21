@@ -216,12 +216,12 @@ drawcolumn:
 
 nextcolsrcadd:
     ld hl,(NextColVram)
-    ld bc,$fa42 ;Move to the next vram address
+    ld bc,$1700 ;Move to the next vram address
     add hl,bc
     ld (NextColVram),hl
 
     ld hl,(NextRawSrc)
-    ld bc,$fa42 ;Next column add
+    ld bc,$f1700;Next column add
     add hl,bc
     ld (NextColSrc),hl ;save column src buffer
 
