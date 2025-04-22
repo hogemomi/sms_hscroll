@@ -1,8 +1,8 @@
-.; -------------------------------------------------------------;
+; -------------------------------------------------------------;
 ;             Holizontal Scroll                    ;
 ; -------------------------------------------------------------;
 
-.sdsctag 0.1, "Hscrool", "Step 1 - Scroller", "hogemomi"
+.sdsctag 0.1, "Hscroll", "Step 1 - Scroller", "Anders S. Jensen"
 
 .memorymap           ; create 2 x 16 kb slots for rom.
     defaultslot 0
@@ -19,10 +19,10 @@
     banks 2
 .endro
 
-.define Vspeed $01
+.define   vspeed 1         ; players' vertical speed
 .define  VDPcontrol $bf
-.define MapHeight $1c
-.define EndMapAdd $26c1
+.define  MapHeight $1b
+.define  MapWidth $0100
 
  ; Organize ram.
 
@@ -35,7 +35,6 @@
     scroll db        ; vdp scroll register buffer.
     frame db         ; frame counter
     VDPstatus db
-    Vspeed db
 .ende
 
 .bank 0 slot 0
@@ -112,7 +111,7 @@ inigam ld hl,regdat     ; point to register init data.
     ld (NextRawSrc),hl
 
 ; loop count set
-    ld de,MapHeight
+    ld bc,MapHeight
     ld (LoopCount),bc
 
 ; start map configuration
@@ -121,7 +120,7 @@ draw_startmap:
     call vrampr
 
     ld hl,(NextRawSrc)  ; Wriite mapdata
-    ld bc,64
+    ld bc,$0040
     call vramwr
 
     ld de,$0040        ; Map data address update
@@ -134,29 +133,28 @@ draw_startmap:
     ld (NextRawVram),hl
 
 ; loop count update
-    dec de
-    ld a,e
-    or d
+    ld bc,(LoopCount)
+    dec c
+    ld (LoopCount),bc
     jr nz,draw_startmap
 
 ; Initiarize buffer
     xor a         ; set A = 0.
     ld (frame),a
     ld (scroll),a    ; reset scroll register buffer.
-    ld a,1
-    ld (Vspeed),a
 
     ; preset map columun address
+    ld hl,bgmap
+    ld bc,$0040 ;map width screenx2
+    add hl,bc
+    ld (NextColSrc),hl
+
     ; preset vram address
     ld hl,$3802
     ld (NextColVram),hl
 
-    ld hl,bgmap
-    ld bc,$0020 ;map width screenx2
-    add hl,bc
-    ld (NextColSrc),hl
-
-    ld a,$18
+; Loop counter initialize
+    ld a,MapHeight
     ld (LoopCount),a
 
     ld a,%11100000      ; turn screen on - normal sprites.
@@ -177,7 +175,7 @@ mloop:
 
 ; Scroll background - update the vertical scroll buffer.
     ld a,(scroll)    ; get scroll buffer value.
-    sub Vspeed       ; subtract vertical speed.
+    sub vspeed       ; subtract vertical speed.
     ld (scroll),a    ; update scroll buffer.
 
 ; Conditional branching
@@ -198,24 +196,23 @@ drawcolumn:
     ld (NextColVram),hl
 
     ld hl,(NextColSrc)
-    ld bc,$0080 ;Move to the next column source address
+    ld bc,MapWidth ;Move to the next column source address
     add hl,bc
     ld (NextColSrc),hl
 
 ; loop counter
-    ld a,(LoopCount)
-    dec a
-    ld (LoopCount),a
+    dec de
+    ld a,e
+    or d
     jp nz,drawcolumn
 
-nextcolsrcadd:
     ld hl,(NextColVram)
     ld bc,$17fe ;Move to the next vram address
     add hl,bc
     ld (NextColVram),hl
 
-    ld hl,(NextRawSrc)
-    ld bc,$1700;Next column add
+    ld hl,(NextColSrc)
+    ld bc,$17fe ;Next column add
     add hl,bc
     ld (NextColSrc),hl ;save column src buffer
 
@@ -319,4 +316,4 @@ regdat .db %00100110    ; reg. 0, display and interrupt mode.
 
 bgpal   .include "Assets_test\palette.inc"
 bgtile  .include "Assets_test\tiles.inc"
-bgmap   .include "Assets_test\tilemap.inc"
+bgmap   .include "Assets_test\tilemap2.inc"
