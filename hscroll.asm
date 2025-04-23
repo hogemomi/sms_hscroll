@@ -21,7 +21,7 @@
 
 .define Vspeed $01
 .define  VDPcontrol $bf
-.define MapHeight $1c
+.define MapHeight $17
 .define EndMapAdd $26c1
 
  ; Organize ram.
@@ -119,12 +119,12 @@ inigam ld hl,regdat     ; point to register init data.
 draw_startmap:
     ld hl,(NextRawVram) ; Write Vram Addressing
     call vrampr
-
     ld hl,(NextRawSrc)  ; Wriite mapdata
     ld bc,$40
     call vramwr
 
-    ld de,$0040        ; Map data address update
+; Map data address update
+    ld de,$0040
     add hl,de
     ld (NextRawSrc),hl; Vram address update
 
@@ -156,7 +156,7 @@ draw_startmap:
     add hl,bc
     ld (NextColSrc),hl
 
-    ld a,$17
+    ld a,MapHeight
     ld (LoopCount),a
 
     ld a,%11100000      ; turn screen on - normal sprites.
