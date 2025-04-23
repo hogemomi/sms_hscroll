@@ -121,7 +121,7 @@ draw_startmap:
     call vrampr
 
     ld hl,(NextRawSrc)  ; Wriite mapdata
-    ld bc,64
+    ld bc,$40
     call vramwr
 
     ld de,$0040        ; Map data address update
