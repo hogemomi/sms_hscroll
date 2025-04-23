@@ -156,7 +156,7 @@ draw_startmap:
     add hl,bc
     ld (NextColSrc),hl
 
-    ld a,$18
+    ld a,$17
     ld (LoopCount),a
 
     ld a,%11100000      ; turn screen on - normal sprites.
