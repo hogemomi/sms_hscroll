@@ -215,7 +215,7 @@ nextcolsrcadd:
     ld (NextColVram),hl
 
     ld hl,(NextRawSrc)
-    ld bc,$1700;Next column add
+    ld bc,$17fe;Next column add
     add hl,bc
     ld (NextColSrc),hl ;save column src buffer
 
