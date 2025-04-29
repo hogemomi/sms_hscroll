@@ -1,8 +1,8 @@
-.; -------------------------------------------------------------;
+; -------------------------------------------------------------;
 ;             Holizontal Scroll                    ;
 ; -------------------------------------------------------------;
 
-.sdsctag 0.1, "Hscrool", "Step 1 - Scroller", "hogemomi"
+.sdsctag 0.1, "Hscroll", "Step 1 - Scroller", "Anders S. Jensen"
 
 .memorymap           ; create 2 x 16 kb slots for rom.
     defaultslot 0
@@ -19,10 +19,10 @@
     banks 2
 .endro
 
-.define Vspeed $01
+.define   scrollspeed 1
 .define  VDPcontrol $bf
-.define MapHeight $17
-.define EndMapAdd $26c1
+.define  MapHeight 23
+.define  MapWidth $0100
 
  ; Organize ram.
 
@@ -35,7 +35,6 @@
     scroll db        ; vdp scroll register buffer.
     frame db         ; frame counter
     VDPstatus db
-    Vspeed db
 .ende
 
 .bank 0 slot 0
@@ -100,7 +99,7 @@ inigam ld hl,regdat     ; point to register init data.
     
     ld hl,$0000      ; first tile @ index 0.
     call vrampr      ; prepare vram.
-    ld hl,bgtile     ; background tile data (the road).
+    ld hl,bgtile     ; background tile data
     ld bc,192*32       ; each tile is 32 bytes.
     call vramwr      ; write background tiles to vram.
 
@@ -112,52 +111,53 @@ inigam ld hl,regdat     ; point to register init data.
     ld (NextRawSrc),hl
 
 ; loop count set
-    ld de,MapHeight
+    ld bc,MapHeight
     ld (LoopCount),bc
 
 ; start map configuration
+
+; Write Vram Addressing
+
 draw_startmap:
-    ld hl,(NextRawVram) ; Write Vram Addressing
+    ld hl,(NextRawVram)
     call vrampr
-    ld hl,(NextRawSrc)  ; Wriite mapdata
-    ld bc,$40
+; Wriite mapdata
+    ld hl,(NextRawSrc)
+    ld bc,$0040
     call vramwr
 
-; Map data address update
-    ld de,$0040
-    add hl,de
-    ld (NextRawSrc),hl; Vram address update
-
+; Vram address update
     ld hl,(NextRawVram)
     ld de,$0040
     add hl,de
     ld (NextRawVram),hl
 
+; Map source add update
+    ld hl,(NextRawSrc)
+    ld bc,$0100
+    add hl,bc
+    ld (NextRawSrc),hl
+
 ; loop count update
-    dec de
-    ld a,e
-    or d
+    ld bc,(LoopCount)
+    dec c
+    ld (LoopCount),bc
     jr nz,draw_startmap
 
 ; Initiarize buffer
     xor a         ; set A = 0.
     ld (frame),a
     ld (scroll),a    ; reset scroll register buffer.
-    ld a,1
-    ld (Vspeed),a
 
     ; preset map columun address
-    ; preset vram address
-    ld hl,$3802
-    ld (NextColVram),hl
-
     ld hl,bgmap
     ld bc,$0040 ;map width screenx2
     add hl,bc
     ld (NextColSrc),hl
 
-    ld a,MapHeight
-    ld (LoopCount),a
+    ; preset vram address
+    ld hl,$3802
+    ld (NextColVram),hl
 
     ld a,%11100000      ; turn screen on - normal sprites.
     ld b,1
@@ -169,6 +169,10 @@ mloop:
 
     call WaitVblank
 
+; Loop counter initialize
+    ld a,MapHeight
+    ld (LoopCount),a
+
 ; Update vdp right when vblank begins!
     ld a,(scroll)    ; 1-byte scroll reg. buffer in ram.
     ld b,$08        ; target VDP register 9 (v-scroll).
@@ -177,8 +181,8 @@ mloop:
 
 ; Scroll background - update the vertical scroll buffer.
     ld a,(scroll)    ; get scroll buffer value.
-    sub Vspeed       ; subtract vertical speed.
-    ld (scroll),a    ; update scroll buffer.
+    sub scrollspeed       ; subtract vertical speed.
+    ld (scroll),a    ; update scroll buffer
 
 ; Conditional branching
     and %00000111
@@ -198,7 +202,7 @@ drawcolumn:
     ld (NextColVram),hl
 
     ld hl,(NextColSrc)
-    ld bc,$0080 ;Move to the next column source address
+    ld bc,$0100
     add hl,bc
     ld (NextColSrc),hl
 
@@ -208,15 +212,14 @@ drawcolumn:
     ld (LoopCount),a
     jp nz,drawcolumn
 
-nextcolsrcadd:
     ld hl,(NextColVram)
-    ld bc,$17fe ;Move to the next vram address
-    add hl,bc
+    ld bc,$05be ;Move to the next vram address
+    sbc hl,bc
     ld (NextColVram),hl
 
-    ld hl,(NextRawSrc)
-    ld bc,$17fe;Next column add
-    add hl,bc
+    ld hl,(NextColSrc)
+    ld bc,$16fe ;Next column add
+    sbc hl,bc
     ld (NextColSrc),hl ;save column src buffer
 
     jp mloop
@@ -319,4 +322,4 @@ regdat .db %00100110    ; reg. 0, display and interrupt mode.
 
 bgpal   .include "Assets_test\palette.inc"
 bgtile  .include "Assets_test\tiles.inc"
-bgmap   .include "Assets_test\tilemap.inc"
+bgmap   .include "Assets_test\tilemap2.inc"
