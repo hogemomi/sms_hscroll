@@ -19,9 +19,9 @@
     banks 2
 .endro
 
-.define   scrollspeed 1
+.define  scrollspeed 1
 .define  VDPcontrol $bf
-.define  MapHeight 23
+.define  MapHeight 24
 .define  MapWidth $0100
 
  ; Organize ram.
@@ -31,7 +31,7 @@
     NextRawVram dw
     NextColSrc dw
     NextColVram dw
-    LoopCount dw
+    LoopCount db
     scroll db        ; vdp scroll register buffer.
     frame db         ; frame counter
     VDPstatus db
@@ -212,13 +212,27 @@ drawcolumn:
     ld (LoopCount),a
     jp nz,drawcolumn
 
+; Next column add update
     ld hl,(NextColVram)
-    ld bc,$05be ;Move to the next vram address
+    ld bc,$05be
     sbc hl,bc
     ld (NextColVram),hl
 
     ld hl,(NextColSrc)
-    ld bc,$16fe ;Next column add
+    ld bc,$16fe
+    sbc hl,bc
+    ld (NextColSrc),hl
+
+; Stop Scroll
+    ld de,(NextColSrc)
+    ld hl,bgmap
+    ld bc,18fe
+    add hl,bc
+    ld a,l
+    cp e
+    
+
+    
     sbc hl,bc
     ld (NextColSrc),hl ;save column src buffer
 
