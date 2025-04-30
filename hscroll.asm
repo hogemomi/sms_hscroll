@@ -166,7 +166,6 @@ draw_startmap:
 mloop:
     ei
     halt          ; start main loop with vblank.
-
     call WaitVblank
 
 ; Loop counter initialize
