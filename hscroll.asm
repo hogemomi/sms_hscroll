@@ -214,6 +214,8 @@ drawcolumn:
 
 ; Next column add update
     ld hl,(NextColVram)
+
+    ld hl,(NextColVram)
     ld bc,$05be
     sbc hl,bc
     ld (NextColVram),hl
