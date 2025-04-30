@@ -217,17 +217,19 @@ drawcolumn:
     ld (LoopCount),a
     jp nz,drawcolumn
 
+;Move to the next vram address
     ld hl,(NextColVram)
-    ld bc,$05fe ;Move to the next vram address
+    ld bc,$05fe
     or a
     sbc hl,bc
     ld (NextColVram),hl
 
+;Next column add
     ld hl,(NextColSrc)
-    ld bc,$17fe ;Next column add
+    ld bc,$17fe
     or a
     sbc hl,bc
-    ld (NextColSrc),hl ;save column src buffer
+    ld (NextColSrc),hl
     
     jp mloop
     
