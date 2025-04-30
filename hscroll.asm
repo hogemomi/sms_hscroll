@@ -230,6 +230,11 @@ drawcolumn:
     add hl,bc
     ld a,l
     cp e
+    jp nz,mloop
+
+    ld a,h
+    cp d
+    jp nz,mloop
     
 
     
