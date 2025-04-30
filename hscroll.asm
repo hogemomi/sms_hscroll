@@ -19,7 +19,7 @@
     banks 2
 .endro
 
-.define  scrollspeed 1
+.define   scrollspeed 1
 .define  VDPcontrol $bf
 .define  MapHeight 24
 .define  MapWidth $0100
@@ -31,7 +31,7 @@
     NextRawVram dw
     NextColSrc dw
     NextColVram dw
-    LoopCount db
+    LoopCount dw
     scroll db        ; vdp scroll register buffer.
     frame db         ; frame counter
     VDPstatus db
@@ -183,6 +183,11 @@ mloop:
     ld a,(scroll)    ; get scroll buffer value.
     sub scrollspeed       ; subtract vertical speed.
     ld (scroll),a    ; update scroll buffer
+    
+; Scroll count check
+    ld a,(scroll)
+    cp 0
+    jp z,movefirstvramadd
 
 ; Conditional branching
     and %00000111
@@ -212,37 +217,28 @@ drawcolumn:
     ld (LoopCount),a
     jp nz,drawcolumn
 
-; Next column add update
     ld hl,(NextColVram)
-
-    ld hl,(NextColVram)
-    ld bc,$05be
+    ld bc,$05fe ;Move to the next vram address
+    or a
     sbc hl,bc
     ld (NextColVram),hl
 
     ld hl,(NextColSrc)
-    ld bc,$16fe
-    sbc hl,bc
-    ld (NextColSrc),hl
-
-; Stop Scroll
-    ld de,(NextColSrc)
-    ld hl,bgmap
-    ld bc,18fe
-    add hl,bc
-    ld a,l
-    cp e
-    jp nz,mloop
-
-    ld a,h
-    cp d
-    jp nz,mloop
-    
-
-    
+    ld bc,$17fe ;Next column add
+    or a
     sbc hl,bc
     ld (NextColSrc),hl ;save column src buffer
-
+    
+    jp mloop
+    
+; Move first vram address
+    movefirstvramadd:
+    ld hl,(NextColVram)
+    ld bc,$063e
+    or a
+    sbc hl,bc
+    ld (NextColVram),hl
+    
     jp mloop
 
 ; --------------------------------------------------------------
