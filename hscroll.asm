@@ -221,13 +221,13 @@ drawcolumn:
     ld hl,(NextColVrmAdd)
     ld a,l
     cp l,e
-    jp z,cp_msb
-cp_msb:
+    jp nz,next_coladd
     ld a,h
     cp h,d
-    jp z,jump1stvram
+    jp nz,next_coladd
 
 ; Move to the next vram address
+next_coladd
     ld hl,(NextColVram)
     ld bc,$05fe
     or a
