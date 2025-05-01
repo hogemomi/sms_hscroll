@@ -233,7 +233,7 @@ drawcolumn:
     jp mloop
     
 ; Move first vram address
-jumpfirstcolvram:
+jump1stcolvram:
     ld hl,(NextColVram)
     ld bc,$063e
     or a
