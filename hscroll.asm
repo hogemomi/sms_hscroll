@@ -240,7 +240,7 @@ drawcolumn:
     sbc hl,bc
     ld (NextColVram),hl
     
-    jp mloop
+    jp drawcolumn
 
 ; --------------------------------------------------------------
 ; SUBROUTINES
