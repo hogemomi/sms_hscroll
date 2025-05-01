@@ -221,8 +221,8 @@ drawcolumn:
     ld hl,(NextColVrmAdd)
     ld a,l
     cp l,e
-    jp z,cpmsb
-cpmsb:
+    jp z,cp_msb
+cp_msb:
     ld a,h
     cp h,d
     jp z,jump1stvram
