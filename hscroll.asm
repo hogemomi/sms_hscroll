@@ -183,11 +183,6 @@ mloop:
     sub scrollspeed       ; subtract vertical speed.
     ld (scroll),a    ; update scroll buffer
     
-; Scroll count check
-    ld a,(scroll)
-    cp 0
-    jp z,movefirstvramadd
-
 ; Conditional branching
     and %00000111
     jr nz, mloop
@@ -224,7 +219,7 @@ next_coladd
     sbc hl,bc
     ld (NextColVram),hl
 
-; Next column add
+; Next column source add
     ld hl,(NextColSrc)
     ld bc,$17fe
     or a
