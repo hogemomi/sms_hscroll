@@ -216,16 +216,6 @@ drawcolumn:
     ld (LoopCount),a
     jp nz,drawcolumn
 
-; Move to vram add $3800
-    ld de,$3dbf
-    ld hl,(NextColVrmAdd)
-    ld a,l
-    cp l,e
-    jp nz,next_coladd
-    ld a,h
-    cp h,d
-    jp nz,next_coladd
-
 ; Move to the next vram address
 next_coladd
     ld hl,(NextColVram)
@@ -240,6 +230,16 @@ next_coladd
     or a
     sbc hl,bc
     ld (NextColSrc),hl
+
+; Move to vram add $3800
+    ld de,$3dbf
+    ld hl,(NextColVrmAdd)
+    ld a,l
+    cp l,e
+    jp nz,next_coladd
+    ld a,h
+    cp h,d
+    jp nz,next_coladd
     
     jp mloop
     
