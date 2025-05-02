@@ -166,6 +166,7 @@ draw_startmap:
 mloop:
     ei
     halt          ; start main loop with vblank.
+
     call WaitVblank
 
 ; Loop counter initialize
@@ -182,7 +183,7 @@ mloop:
     ld a,(scroll)    ; get scroll buffer value.
     sub scrollspeed       ; subtract vertical speed.
     ld (scroll),a    ; update scroll buffer
-    
+
 ; Conditional branching
     and %00000111
     jr nz, mloop
@@ -211,8 +212,9 @@ drawcolumn:
     ld (LoopCount),a
     jp nz,drawcolumn
 
-; Move to the next vram address
-next_coladd
+; Move to Next column address
+next_col_add:
+; Next column vram add
     ld hl,(NextColVram)
     ld bc,$05fe
     or a
@@ -227,26 +229,25 @@ next_coladd
     ld (NextColSrc),hl
 
 ; Move to vram add $3800
-    ld de,$3dfe
-    ld hl,(NextColVrmAdd)
+    ld de,$3e3e
+    ld hl,(NextColVram)
     ld a,l
-    cp l,e
-    jp nz,next_coladd
+    cp e
+    jp nz,mloop
+
     ld a,h
-    cp h,d
-    jp nz,next_coladd
-    
-    jp mloop
-    
+    cp d
+    jr z,move_1st_vramadd
+
 ; Move first vram address
-jump1stvram:
+move_1st_vramadd:
     ld hl,(NextColVram)
     ld bc,$063e
     or a
     sbc hl,bc
     ld (NextColVram),hl
-    
-    jp drawcolumn
+
+    jp mloop
 
 ; --------------------------------------------------------------
 ; SUBROUTINES
