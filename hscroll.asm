@@ -227,7 +227,7 @@ next_coladd
     ld (NextColSrc),hl
 
 ; Move to vram add $3800
-    ld de,$3dbf
+    ld de,$3dfe
     ld hl,(NextColVrmAdd)
     ld a,l
     cp l,e
