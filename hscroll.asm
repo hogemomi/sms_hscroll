@@ -2,27 +2,28 @@
 ;             Holizontal Scroll                    ;
 ; -------------------------------------------------------------;
 
-.sdsctag 0.1, "Hscroll", "Step 1 - Scroller", "Anders S. Jensen"
+.sdsctag 0.1, "Hscroll", "Step 1 - Scroller", "hogel"
 
 .memorymap           ; create 2 x 16 kb slots for rom.
     defaultslot 0
-    slotsize $4000
+    slotsize $8000
     slot 0 $0000     ; rom bank 0 (0-16 kb).
-    slot 1 $4000     ; rom bank 1 (16-32 kb).
+    slot 1 $4000     ; rom bank 1 (16-32 kb)
     slotsize $2000
     slot 2 $c000     ; ram.
 .endme
 
 .rombankmap          ; map rom to 2 x 16 kb banks.
     bankstotal 2
-    banksize $4000
+    banksize $8000
     banks 2
 .endro
 
-.define   scrollspeed 1
+.define  Hspeed 1
 .define  VDPcontrol $bf
 .define  MapHeight 24
 .define  MapWidth $0100
+.define  ScreenBottomVram $3e3e
 
  ; Organize ram.
 
@@ -89,19 +90,18 @@ inigam ld hl,regdat     ; point to register init data.
     or c
     jr nz,-
 
-    ; Setup the background assets for the main loop.
-
-    ld hl,$c000      ; color bank 1, color 0.
-    call vrampr      ; prepare vram.
-    ld hl,bgpal      ; background palette.
-    ld bc,16          ; 4 colors.
-    call vramwr      ; set background palette.
+; Setup the background assets for the main loop.
+    ld hl,$c000   ; color bank 1, color 0
+    call vrampr
+    ld hl,bgpal
+    ld bc,16   ; 16 colors
+    call vramwr
     
     ld hl,$0000      ; first tile @ index 0.
-    call vrampr      ; prepare vram.
-    ld hl,bgtile     ; background tile data
-    ld bc,192*32       ; each tile is 32 bytes.
-    call vramwr      ; write background tiles to vram.
+    call vrampr
+    ld hl,bgtile
+    ld bc,192*32   ; each tile is 32 bytes.
+    call vramwr
 
 ; Map placement at start
 ; Initial buffer
@@ -115,9 +115,6 @@ inigam ld hl,regdat     ; point to register init data.
     ld (LoopCount),bc
 
 ; start map configuration
-
-; Write Vram Addressing
-
 draw_startmap:
     ld hl,(NextRawVram)
     call vrampr
@@ -134,7 +131,7 @@ draw_startmap:
 
 ; Map source add update
     ld hl,(NextRawSrc)
-    ld bc,$0100
+    ld bc,$0200
     add hl,bc
     ld (NextRawSrc),hl
 
@@ -145,9 +142,9 @@ draw_startmap:
     jr nz,draw_startmap
 
 ; Initiarize buffer
-    xor a         ; set A = 0.
+    xor a         ; set A = 0
     ld (frame),a
-    ld (scroll),a    ; reset scroll register buffer.
+    ld (scroll),a
 
     ; preset map columun address
     ld hl,bgmap
@@ -159,13 +156,13 @@ draw_startmap:
     ld hl,$3802
     ld (NextColVram),hl
 
-    ld a,%11100000      ; turn screen on - normal sprites.
+    ld a,%11100000  ; turn screen on - normal sprites
     ld b,1
-    call setreg      ; set register 1.
+    call setreg  ; set register 1
 
 mloop:
     ei
-    halt          ; start main loop with vblank.
+    halt   ; start main loop with vblank
 
     call WaitVblank
 
@@ -174,15 +171,14 @@ mloop:
     ld (LoopCount),a
 
 ; Update vdp right when vblank begins!
-    ld a,(scroll)    ; 1-byte scroll reg. buffer in ram.
-    ld b,$08        ; target VDP register 9 (v-scroll).
-    call setreg      ; now vdp register = buffer, and the
-                  ; screen scrolls accordingly.
+    ld a,(scroll)
+    ld b,$08
+    call setreg
 
-; Scroll background - update the vertical scroll buffer.
-    ld a,(scroll)    ; get scroll buffer value.
-    sub scrollspeed       ; subtract vertical speed.
-    ld (scroll),a    ; update scroll buffer
+; Scroll background
+    ld a,(scroll)
+    sub Hspeed
+    ld (scroll),a
 
 ; Conditional branching
     and %00000111
@@ -195,14 +191,14 @@ drawcolumn:
     ld bc,2
     call vramwr
 
-; Vram & Src update
+; Row Vram add update
     ld hl,(NextColVram)
     ld bc,$0040
     add hl,bc
     ld (NextColVram),hl
-
+; Row Source add
     ld hl,(NextColSrc)
-    ld bc,$0100
+    ld bc,$0200
     add hl,bc
     ld (NextColSrc),hl
 
@@ -211,9 +207,7 @@ drawcolumn:
     dec a
     ld (LoopCount),a
     jp nz,drawcolumn
-
-; Move to Next column address
-next_col_add:
+    
 ; Next column vram add
     ld hl,(NextColVram)
     ld bc,$05fe
@@ -223,29 +217,33 @@ next_col_add:
 
 ; Next column source add
     ld hl,(NextColSrc)
-    ld bc,$17fe
+    ld bc,$2ffe
     or a
     sbc hl,bc
     ld (NextColSrc),hl
 
-; Move to vram add $3800
-    ld de,$3e3e
     ld hl,(NextColVram)
+    ld bc,$05fe
+    add hl,bc
+    ld de,ScreenBottomVram
     ld a,l
     cp e
     jp nz,mloop
 
     ld a,h
-    cp d
-    jr z,move_1st_vramadd
+    cp e
+    jp nz,mloop
 
-; Move first vram address
-move_1st_vramadd:
-    ld hl,(NextColVram)
-    ld bc,$063e
-    or a
-    sbc hl,bc
+; Return first vram address
+ret_1st_vramadd
+    ld hl,$3800
     ld (NextColVram),hl
+
+; Next column source add
+    ld hl,(NextColSrc)
+    inc hl
+    inc hl
+    ld (NextColSrc),hl
 
     jp mloop
 
@@ -347,4 +345,4 @@ regdat .db %00100110    ; reg. 0, display and interrupt mode.
 
 bgpal   .include "Assets_test\palette.inc"
 bgtile  .include "Assets_test\tiles.inc"
-bgmap   .include "Assets_test\tilemap2.inc"
+bgmap   .include "Assets_test\tilemap3.inc"
