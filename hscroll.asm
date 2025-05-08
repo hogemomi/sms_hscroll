@@ -186,6 +186,11 @@ scrollcount:
     ld a,(ScrollCnt)
     inc a
     ld (ScrooCnt),a
+    cp $08
+    jp stop_scroll
+
+stop_scroll:
+    
 
 ; Conditional branching
     and %00000111
