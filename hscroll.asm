@@ -168,7 +168,7 @@ mloop:
 
 ; Loop counter initialize
     ld a,MapHeight
-    ld (LoopCount),a
+    ld (LoopCount),a ; Row tile rewrite count
 
 ; Update vdp right when vblank begins!
     ld a,(scroll)
