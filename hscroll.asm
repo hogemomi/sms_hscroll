@@ -145,6 +145,7 @@ draw_startmap:
     xor a         ; set A = 0
     ld (frame),a
     ld (scroll),a
+    ld (ScrooCnt),a
 
     ; preset map columun address
     ld hl,bgmap
@@ -179,6 +180,12 @@ mloop:
     ld a,(scroll)
     sub Hspeed
     ld (scroll),a
+    cp &00
+    jr z,scrollcount
+scrollcount:
+    ld a,(ScrollCnt)
+    inc a
+    ld (ScrooCnt),a
 
 ; Conditional branching
     and %00000111
