@@ -197,7 +197,8 @@ scrollcount:
     jp stop_scroll
 
 stop_scroll:
-    
+    sub $00
+    ld (scroll),a
 
 ; Conditional branching
     and %00000111
