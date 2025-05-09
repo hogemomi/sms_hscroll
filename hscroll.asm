@@ -172,12 +172,6 @@ mloop:
     ld (LoopCount),a ; Row tile rewrite count
 
 ; Update vdp right when vblank begins!
-scrollcount:
-    ld a,(ScrollCnt)
-    inc a
-    ld (ScrooCnt),a
-    cp $08
-    jp stop_scroll
 
     ld a,(scroll)
     ld b,$08
@@ -189,6 +183,7 @@ scrollcount:
     ld (scroll),a
     cp &00
     jr z,scrollcount
+
 scrollcount:
     ld a,(ScrollCnt)
     inc a
@@ -197,6 +192,7 @@ scrollcount:
     jp stop_scroll
 
 stop_scroll:
+    ld a,(
     sub $00
     ld (scroll),a
 
