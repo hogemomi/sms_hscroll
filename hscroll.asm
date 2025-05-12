@@ -234,18 +234,7 @@ drawcolumn:
     or a
     sbc hl,bc
     ld (NextColSrc),hl
-
-    ld hl,(NextColVram)
-    ld bc,$05fe
-    add hl,bc
-    ld de,ScreenBottomVram
-    ld a,l
-    cp e
-    jp nz,mainloop
-
-    ld a,h
-    cp e
-    jp nz,mainloop
+    jp mainloop
 
 ; Return first vram address
 ret_1st_vramadd
