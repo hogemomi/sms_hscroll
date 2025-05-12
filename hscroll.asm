@@ -32,7 +32,7 @@
     NextRawVram dw
     NextColSrc dw
     NextColVram dw
-    LoopCount dw
+    DrawLoopCount dw
     scroll db        ; vdp scroll register buffer.
     frame db         ; frame counter
     VDPstatus db
@@ -110,9 +110,9 @@ inigam ld hl,regdat     ; point to register init data.
     ld hl,bgmap
     ld (NextRawSrc),hl
 
-; loop count set
+; Draw loop count set
     ld bc,MapHeight
-    ld (LoopCount),bc
+    ld (DrawLoopCount),bc
 
 ; start map configuration
 draw_startmap:
@@ -136,16 +136,16 @@ draw_startmap:
     ld (NextRawSrc),hl
 
 ; loop count update
-    ld bc,(LoopCount)
+    ld bc,(DrawLoopCount)
     dec c
-    ld (LoopCount),bc
+    ld (DrawLoopCount),bc
     jr nz,draw_startmap
 
 ; Initiarize buffer
     xor a         ; set A = 0
     ld (frame),a
     ld (scroll),a
-    ld (ScrooCnt),a
+    ld (ScrooCount),a
 
     ; preset map columun address
     ld hl,bgmap
@@ -161,7 +161,7 @@ draw_startmap:
     ld b,1
     call setreg  ; set register 1
 
-mloop:
+mainloop:
     ei
     halt   ; start main loop with vblank
 
@@ -169,7 +169,7 @@ mloop:
 
 ; Loop counter initialize
     ld a,MapHeight
-    ld (LoopCount),a ; Row tile rewrite count
+    ld (DrawLoopCount),a ; Row tile rewrite count
 
 ; Update vdp right when vblank begins!
 
@@ -181,24 +181,21 @@ mloop:
     ld a,(scroll)
     sub Hspeed
     ld (scroll),a
-    cp &00
-    jr z,scrollcount
+    cp $00
+    jp nz,mloop
 
-scrollcount:
-    ld a,(ScrollCnt)
+; Scroll one screen count
+    ld a,(ScrollCount)
     inc a
-    ld (ScrooCnt),a
-    cp $08
-    jp stop_scroll
-
-stop_scroll:
-    ld a,(scrool
-    sub $00
-    ld (scroll),a
+    ld (ScrooCount),a
+    sub $08
+    cp $00
+    jp z,stop_scroll
 
 ; Conditional branching
+mloop:
     and %00000111
-    jr nz, mloop
+    jr nz, mainloop
 
 drawcolumn:
     ld hl,(NextColVram)
@@ -218,10 +215,10 @@ drawcolumn:
     add hl,bc
     ld (NextColSrc),hl
 
-; loop counter
-    ld a,(LoopCount)
+; Draw loop counter
+    ld a,(DrawLoopCount)
     dec a
-    ld (LoopCount),a
+    ld (DrawLoopCount),a
     jp nz,drawcolumn
     
 ; Next column vram add
@@ -244,11 +241,11 @@ drawcolumn:
     ld de,ScreenBottomVram
     ld a,l
     cp e
-    jp nz,mloop
+    jp nz,mainloop
 
     ld a,h
     cp e
-    jp nz,mloop
+    jp nz,mainloop
 
 ; Return first vram address
 ret_1st_vramadd
@@ -261,7 +258,12 @@ ret_1st_vramadd
     inc hl
     ld (NextColSrc),hl
 
-    jp mloop
+stop_scroll:
+    ld a,(scrool)
+    sub $00
+    ld (scroll),a
+
+    jp mainloop
 
 ; --------------------------------------------------------------
 ; SUBROUTINES
