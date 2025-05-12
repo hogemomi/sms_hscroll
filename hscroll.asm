@@ -192,7 +192,7 @@ scrollcount:
     jp stop_scroll
 
 stop_scroll:
-    ld a,(
+    ld a,(scrool
     sub $00
     ld (scroll),a
 
