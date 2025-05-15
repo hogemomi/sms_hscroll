@@ -33,8 +33,9 @@
     NextColSrc dw
     NextColVram dw
     DrawLoopCount dw
-    scroll db        ; vdp scroll register buffer.
-    frame db         ; frame counter
+    Scroll db        ; vdp scroll register buffer
+    ScrollCount db
+    Frame db         ; frame counter
     VDPstatus db
 .ende
 
@@ -110,7 +111,7 @@ inigam ld hl,regdat     ; point to register init data.
     ld hl,bgmap
     ld (NextRawSrc),hl
 
-; Draw loop count set
+; loop count set
     ld bc,MapHeight
     ld (DrawLoopCount),bc
 
@@ -143,9 +144,9 @@ draw_startmap:
 
 ; Initiarize buffer
     xor a         ; set A = 0
-    ld (frame),a
-    ld (scroll),a
-    ld (ScrooCount),a
+    ld (Frame),a
+    ld (Scroll),a
+    ld (ScrollCount),a
 
     ; preset map columun address
     ld hl,bgmap
@@ -165,29 +166,28 @@ mainloop:
     ei
     halt   ; start main loop with vblank
 
-    call WaitVblank
+    call wait_vblank
 
 ; Loop counter initialize
     ld a,MapHeight
-    ld (DrawLoopCount),a ; Row tile rewrite count
+    ld (DrawLoopCount),a
 
 ; Update vdp right when vblank begins!
-
-    ld a,(scroll)
+    ld a,(Scroll)
     ld b,$08
     call setreg
 
 ; Scroll background
-    ld a,(scroll)
+    ld a,(Scroll)
     sub Hspeed
-    ld (scroll),a
-    cp $00
+    ld (Scroll),a
+    cp &00
     jp nz,mloop
 
 ; Scroll one screen count
     ld a,(ScrollCount)
     inc a
-    ld (ScrooCount),a
+    ld (ScrollCount),a
     sub $08
     cp $00
     jp z,stop_scroll
@@ -215,7 +215,7 @@ drawcolumn:
     add hl,bc
     ld (NextColSrc),hl
 
-; Draw loop counter
+; loop counter
     ld a,(DrawLoopCount)
     dec a
     ld (DrawLoopCount),a
@@ -234,7 +234,18 @@ drawcolumn:
     or a
     sbc hl,bc
     ld (NextColSrc),hl
-    jp mainloop
+
+    ld hl,(NextColVram)
+    ld bc,$05fe
+    add hl,bc
+    ld de,ScreenBottomVram
+    ld a,l
+    cp e
+    jp nz,mainloop
+
+    ld a,h
+    cp e
+    jp nz,mainloop
 
 ; Return first vram address
 ret_1st_vramadd
@@ -248,9 +259,9 @@ ret_1st_vramadd
     ld (NextColSrc),hl
 
 stop_scroll:
-    ld a,(scrool)
+    ld a,(Scroll)
     sub $00
-    ld (scroll),a
+    ld (Scroll),a
 
     jp mainloop
 
@@ -298,10 +309,10 @@ setreg:
     out ($bf),a      ; output command word 2/2.
     ret
 
-WaitVblank:
+wait_vblank:
     ld a,(VDPstatus)  ; get vdp status
     bit 7,a  ; check vblank bit
-    jp z, WaitVblank  ; If not yet VBlank, wait
+    jp z, wait_vblank  ; If not yet VBlank, wait
     res 7,a
     ld (VDPstatus),a
     
