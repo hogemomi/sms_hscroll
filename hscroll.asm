@@ -191,6 +191,14 @@ mainloop:
     sub $08
     cp $00
     jp z,stop_scroll
+    
+    jp mloop
+
+stop_scroll:
+    ld a,(Scroll)
+    sub $00
+    ld (Scroll),a
+
 
 ; Conditional branching
 mloop:
@@ -257,11 +265,6 @@ ret_1st_vramadd
     inc hl
     inc hl
     ld (NextColSrc),hl
-
-stop_scroll:
-    ld a,(Scroll)
-    sub $00
-    ld (Scroll),a
 
     jp mainloop
 
