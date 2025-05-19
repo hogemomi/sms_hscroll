@@ -158,6 +158,10 @@ draw_startmap:
     ld hl,$3802
     ld (NextColVram),hl
 
+; Loop counter initialize
+    ld a,MapHeight
+    ld (DrawLoopCount),a
+
     ld a,%11100000  ; turn screen on - normal sprites
     ld b,1
     call setreg  ; set register 1
@@ -167,10 +171,6 @@ mainloop:
     halt   ; start main loop with vblank
 
     call wait_vblank
-
-; Loop counter initialize
-    ld a,MapHeight
-    ld (DrawLoopCount),a
 
 ; Update vdp right when vblank begins!
     ld a,(Scroll)
