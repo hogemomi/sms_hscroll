@@ -188,8 +188,7 @@ mainloop:
     ld a,(ScrollCount)
     inc a
     ld (ScrollCount),a
-    sub $08
-    cp $00
+    cp $08
     jp z,stop_scroll
     
     jp mloop
