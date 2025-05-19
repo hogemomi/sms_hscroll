@@ -173,10 +173,6 @@ mainloop:
     ld b,$08
     call setreg
 
-; Loop counter initialize
-    ld a,MapHeight
-    ld (DrawLoopCount),a
-
 ; Scroll background
     ld a,(Scroll)
     sub Hspeed
@@ -203,6 +199,10 @@ stop_scroll:
 mloop:
     and %00000111
     jr nz, mainloop
+
+; Loop counter initialize
+    ld a,MapHeight
+    ld (DrawLoopCount),a
 
 drawcolumn:
     ld hl,(NextColVram)
