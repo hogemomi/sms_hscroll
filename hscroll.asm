@@ -193,7 +193,7 @@ stop_scroll:
     ld a,(Scroll)
     sub $00
     ld (Scroll),a
-
+    jp mainloop
 
 ; Conditional branching
 mloop:
