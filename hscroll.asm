@@ -132,7 +132,7 @@ draw_startmap:
 
 ; Map source add update
     ld hl,(NextRawSrc)
-    ld bc,$0200
+    ld bc,MapWidth
     add hl,bc
     ld (NextRawSrc),hl
 
@@ -218,7 +218,7 @@ drawcolumn:
     ld (NextColVram),hl
 ; Row Source add
     ld hl,(NextColSrc)
-    ld bc,$0200
+    ld bc,MapWidth
     add hl,bc
     ld (NextColSrc),hl
 
