@@ -22,7 +22,7 @@
 .define  Hspeed 1
 .define  VDPcontrol $bf
 .define  MapHeight 24
-.define  MapWidth $0100
+.define  MapWidth $0200
 .define  ScreenBottomVram $3e3e
 
  ; Organize ram.
