@@ -33,6 +33,7 @@
     NextColSrc dw
     NextColVram dw
     DrawLoopCount dw
+    Hspeed db
     Scroll db        ; vdp scroll register buffer
     ScrollCount db
     Frame db         ; frame counter
@@ -143,6 +144,8 @@ draw_startmap:
     jr nz,draw_startmap
 
 ; Initiarize buffer
+    ld a,1
+    ld (Hspeed),a
     xor a         ; set A = 0
     ld (Frame),a
     ld (Scroll),a
@@ -175,7 +178,8 @@ mainloop:
 
 ; Scroll background
     ld a,(Scroll)
-    sub Hspeed
+    ld b,(Hspeed)
+    sub b
     ld (Scroll),a
     cp &00
     jp nz,mloop
