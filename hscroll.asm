@@ -197,7 +197,7 @@ stop_scroll:
 
 ; Conditional branching
 mloop:
-    and %00000111
+    and %00001000
     jr nz, mainloop
 
 ; Loop counter initialize
