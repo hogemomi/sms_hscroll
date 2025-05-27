@@ -190,8 +190,6 @@ mainloop:
     ld (Scroll),a
     cp &00
     jp nz,mloop
-  
-    jp mloop
 
 stop_scroll:
     ld a,(Scroll)
