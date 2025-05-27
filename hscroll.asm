@@ -182,10 +182,10 @@ mainloop:
     ld (ScrollCount),hl
     ld a,l
     cp $00
-    jr z,Next
+    jr nz,mloop
     ld a,h
     cp $08
-    jp z,stop_scroll
+    jp nz,mloop
 
 stop_scroll:
     ld a,(Scroll)
@@ -196,7 +196,7 @@ stop_scroll:
 
 ; Conditional branching
 mloop:
-    ; Scroll buffer update
+; Scroll buffer update
     ld a,(Scroll)
     ld b,1
     sub b
@@ -204,6 +204,7 @@ mloop:
     cp &00
     jp nz,mloop
 
+; Draw Column Timing check
     and %00001000
     jr nz, mainloop
 
