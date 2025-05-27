@@ -195,7 +195,7 @@ mainloop:
 
 stop_scroll:
     ld a,(Scroll)
-    sub $00
+    sub 0
     ld (Scroll),a
     jp mainloop
 
