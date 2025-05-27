@@ -187,14 +187,6 @@ mainloop:
     cp $08
     jp z,stop_scroll
 
-; Scroll background
-    ld a,(Scroll)
-    ld b,1
-    sub b
-    ld (Scroll),a
-    cp &00
-    jp nz,mloop
-
 stop_scroll:
     ld a,(Scroll)
     ld b,0
@@ -204,6 +196,14 @@ stop_scroll:
 
 ; Conditional branching
 mloop:
+    ; Scroll buffer update
+    ld a,(Scroll)
+    ld b,1
+    sub b
+    ld (Scroll),a
+    cp &00
+    jp nz,mloop
+
     and %00001000
     jr nz, mainloop
 
