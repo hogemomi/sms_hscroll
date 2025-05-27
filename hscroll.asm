@@ -177,10 +177,10 @@ mainloop:
     call setreg
 
 ; Scroll one screen count
-    ld a,(ScrollCount)
-    inc a
-    ld (ScrollCount),a
-    cp $08
+    ld hl,(ScrollCount)
+    inc hl
+    ld (ScrollCount),hl
+    cp $0800
     jp z,stop_scroll
 
 ; Scroll background
