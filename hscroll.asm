@@ -178,7 +178,7 @@ mainloop:
 
 ; Scroll background
     ld a,(Scroll)
-    ld b,(Hspeed)
+    ld b,1
     sub b
     ld (Scroll),a
     cp &00
