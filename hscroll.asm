@@ -176,6 +176,13 @@ mainloop:
     ld b,$08
     call setreg
 
+; Scroll one screen count
+    ld a,(ScrollCount)
+    inc a
+    ld (ScrollCount),a
+    cp $08
+    jp z,stop_scroll
+
 ; Scroll background
     ld a,(Scroll)
     ld b,1
@@ -183,14 +190,7 @@ mainloop:
     ld (Scroll),a
     cp &00
     jp nz,mloop
-
-; Scroll one screen count
-    ld a,(ScrollCount)
-    inc a
-    ld (ScrollCount),a
-    cp $08
-    jp z,stop_scroll
-    
+  
     jp mloop
 
 stop_scroll:
