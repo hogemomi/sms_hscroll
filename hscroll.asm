@@ -182,7 +182,7 @@ mainloop:
     ld (ScrollCount),hl
     ld a,l
     cp $00
-    jr z,stop_scroll
+    jr nz,mloop
     ld b,1
     sub b
     ld (Scroll),a
