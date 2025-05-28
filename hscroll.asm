@@ -202,7 +202,6 @@ mloop:
     sub b
     ld (Scroll),a
     cp &00
-    jp nz,mloop
 
 ; Draw Column Timing check
     and %00001000
