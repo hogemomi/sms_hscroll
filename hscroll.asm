@@ -168,7 +168,6 @@ draw_startmap:
 mainloop:
     ei
     halt   ; start main loop with vblank
-
     call wait_vblank
 
 ; Update vdp right when vblank begins!
@@ -180,6 +179,13 @@ mainloop:
     ld a,(ScrollCount)
     add a,8
     ld (ScrollCount),a
+    cp $ff
+    jr ScreenCount
+
+screen_cnt:
+    ld a,(ScreenCount)
+    inc a
+
     cp $00
     jr nz,mloop
 
@@ -187,20 +193,6 @@ mainloop:
     ld b,1
     sub b
     ld (Scroll),a
-
-; Scroll count
-    ld hl,(ScrollCount)
-    inc hl
-    ld (ScrollCount),hl
-    ld a,l
-    cp $00
-    jr nz,mloop
-    ld b,1
-    sub b
-    ld (Scroll),a
-    ld a,h
-    cp $08
-    jp nz,mloop
 
 stop_scroll:
     ld a,(Scroll)
