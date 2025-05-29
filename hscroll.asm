@@ -176,6 +176,11 @@ mainloop:
     ld b,$08
     call setreg
 
+    ld a,(Scroll)
+    ld b,1
+    sub b
+    ld (Scroll),a
+
 ; Scroll count
     ld hl,(ScrollCount)
     inc hl
