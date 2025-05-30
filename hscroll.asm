@@ -150,6 +150,7 @@ draw_startmap:
     ld (Frame),a
     ld (Scroll),a
     ld (ScrollCount),a
+    ld (ScreenCount),a
 
     ; preset map columun address
     ld hl,bgmap
@@ -180,17 +181,14 @@ mainloop:
     add a,8
     ld (ScrollCount),a
     cp $ff
-    jr ScreenCount
+    jr screen_cnt
 
 screen_cnt:
     ld a,(ScreenCount)
     inc a
-
-    cp $00
+    ld (ScreenCount),a
+    cp $08
     jr nz,mloop
-
-    ld a,(Scroll)
-    ld b,1
     sub b
     ld (Scroll),a
 
