@@ -180,8 +180,9 @@ mainloop:
     ld a,(ScrollCount)
     add a,8
     ld (ScrollCount),a
+    sub 1
     cp $ff
-    jr z,screen_count
+    jr nz,screen_count
 
 screen_count:
     ld a,(ScreenCount)
