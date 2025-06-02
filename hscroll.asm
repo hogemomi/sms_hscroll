@@ -189,9 +189,6 @@ screen_count:
     ld (ScreenCount),a
     cp $08
     jr nz,mloop
-    ld b,1
-    sub b
-    ld (Scroll),a
 
 stop_scroll:
     ld a,(Scroll)
@@ -202,6 +199,9 @@ stop_scroll:
 
 ; Conditional branching
 mloop:
+    ld b,1
+    sub b
+    ld (Scroll),a
 ; Draw Column Timing check
     and %00001000
     jr nz, mainloop
