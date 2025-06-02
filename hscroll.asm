@@ -189,6 +189,7 @@ screen_count:
     ld (ScreenCount),a
     cp $08
     jr nz,mloop
+    ld b,1
     sub b
     ld (Scroll),a
 
