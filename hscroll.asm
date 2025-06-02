@@ -198,6 +198,7 @@ stop_scroll:
 
 ; Conditional branching
 mloop:
+    ld a,(Scroll)
     ld b,1
     sub b
     ld (Scroll),a
