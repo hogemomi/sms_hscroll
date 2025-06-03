@@ -190,7 +190,9 @@ mloop:
     ld (Scroll),a
 ; Draw Column Timing check
     and %00001000
-    jr nz, mainloop
+    jr z,drowcolumn
+
+    jp mainloop
 
 screen_count:
     ld a,(ScreenCount)
