@@ -183,7 +183,7 @@ mainloop:
     jr c,screen_count
 
 ; Conditional branching
-mloop:
+scrollcntloop:
     ld a,(Scroll)
     ld b,1
     sub b
@@ -199,7 +199,7 @@ screen_count:
     inc a
     ld (ScreenCount),a
     cp $08
-    jr nz,mloop
+    jr nz,scrollcntloop
 
 stop_scroll:
     ld a,(Scroll)
