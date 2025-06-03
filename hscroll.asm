@@ -176,12 +176,6 @@ mainloop:
     ld b,$08
     call setreg
 
-; Scroll count
-    ld a,(ScrollCount)
-    add a,8
-    ld (ScrollCount),a
-    jr c,screen_count
-
 ; Conditional branching
 scrollcntloop:
     ld a,(Scroll)
@@ -191,6 +185,12 @@ scrollcntloop:
 ; Draw Column Timing check
     and %00001000
     jr z,drowcolumn
+
+; Scroll count
+    ld a,(ScrollCount)
+    add a,8
+    ld (ScrollCount),a
+    jr c,screen_count
 
     jp mainloop
 
