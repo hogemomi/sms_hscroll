@@ -182,6 +182,16 @@ mainloop:
     ld (ScrollCount),a
     jr c,screen_count
 
+; Conditional branching
+mloop:
+    ld a,(Scroll)
+    ld b,1
+    sub b
+    ld (Scroll),a
+; Draw Column Timing check
+    and %00001000
+    jr nz, mainloop
+
 screen_count:
     ld a,(ScreenCount)
     inc a
@@ -195,16 +205,6 @@ stop_scroll:
     sub b
     ld (Scroll),a
     jp mainloop
-
-; Conditional branching
-mloop:
-    ld a,(Scroll)
-    ld b,1
-    sub b
-    ld (Scroll),a
-; Draw Column Timing check
-    and %00001000
-    jr nz, mainloop
 
 ; Loop counter initialize
     ld a,MapHeight
