@@ -203,8 +203,7 @@ screen_count:
 
 stop_scroll:
     ld a,(Scroll)
-    ld b,0
-    sub b
+    xor a
     ld (Scroll),a
     jp mainloop
 
