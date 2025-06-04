@@ -261,6 +261,19 @@ drawcolumn_loop:
     sbc hl,bc
     ld (NextColSrc),hl
 
+; Check Vramadd of final
+    ld hl,(NextColVram)
+    ld bc,$05fe
+    add hl,bc
+    ld de,ScreenBottomVram
+    ld a,l
+    cp e
+    jp nz,mainloop
+
+    ld a,h
+    cp e
+    jp nz,mainloop
+
 ; Return first vram address
 ret_1st_vramadd
     ld hl,$3800
