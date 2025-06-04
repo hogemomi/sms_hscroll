@@ -184,7 +184,7 @@ scrollcntloop:
     ld (Scroll),a
 ; Draw Column Timing check
     and %00001000
-    jr z,drowcolumn
+    jr z,drawcolumn
 
 ; Scroll count
     ld a,(ScrollCount)
