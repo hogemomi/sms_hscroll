@@ -203,7 +203,7 @@ screen_count:
 
     jp,mainloop
 
-stop_scroll:
+stopscroll_loop:
     ei
     halt   ; start main loop with vblank
     call wait_vblank
