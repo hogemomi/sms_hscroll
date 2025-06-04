@@ -199,13 +199,24 @@ screen_count:
     inc a
     ld (ScreenCount),a
     cp $08
-    jp nz,mainloop
+    jp z,stop_scroll
+
+    jp,mainloop
 
 stop_scroll:
+    ei
+    halt   ; start main loop with vblank
+    call wait_vblank
+
+    ld a,(Scroll)
+    ld b,$08
+    call setreg
+
     ld a,(Scroll)
     xor a
     ld (Scroll),a
-    jp mainloop
+
+    jp stopscroll_loop
 
 drawcolumn:
 ; Loop counter initialize
