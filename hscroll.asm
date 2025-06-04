@@ -199,7 +199,7 @@ screen_count:
     inc a
     ld (ScreenCount),a
     cp $08
-    jr nz,scrollcntloop
+    jp nz,mainloop
 
 stop_scroll:
     ld a,(Scroll)
