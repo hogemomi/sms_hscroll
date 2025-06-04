@@ -207,11 +207,12 @@ stop_scroll:
     ld (Scroll),a
     jp mainloop
 
+drawcolumn:
 ; Loop counter initialize
     ld a,MapHeight
     ld (DrawLoopCount),a
 
-drawcolumn:
+drawcolumn_loop:
     ld hl,(NextColVram)
     call vrampr
     ld hl,(NextColSrc)
@@ -233,7 +234,7 @@ drawcolumn:
     ld a,(DrawLoopCount)
     dec a
     ld (DrawLoopCount),a
-    jp nz,drawcolumn
+    jp nz,drawcolumn_loop
     
 ; Next column vram add
     ld hl,(NextColVram)
