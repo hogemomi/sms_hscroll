@@ -189,7 +189,6 @@ mainloop:
     add a,8  ; 8bot
     ld (ScrollCount),a
     jr c,screen_count
-
     jp mainloop
 
 screen_count:
@@ -198,7 +197,6 @@ screen_count:
     ld (ScreenCount),a
     cp $08
     jp z,stop_scroll
-
     jp,mainloop
 
 drawcolumn:
@@ -229,7 +227,6 @@ drawcolumn_loop:
     dec a
     ld (DrawLoopCount),a
     jp nz,drawcolumn_loop
-
     jr return_rawvram
 
 return_rawvram:
@@ -270,7 +267,6 @@ ret_1st_vramadd
     inc hl
     inc hl
     ld (NextColSrc),hl
-
     jp mainloop
 
 stopscroll_loop:
@@ -285,7 +281,6 @@ stopscroll_loop:
     ld a,(Scroll)
     xor a
     ld (Scroll),a
-
     jp stopscroll_loop
 
 ; --------------------------------------------------------------
