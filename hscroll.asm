@@ -203,21 +203,6 @@ screen_count:
 
     jp,mainloop
 
-stopscroll_loop:
-    ei
-    halt   ; start main loop with vblank
-    call wait_vblank
-
-    ld a,(Scroll)
-    ld b,$08
-    call setreg
-
-    ld a,(Scroll)
-    xor a
-    ld (Scroll),a
-
-    jp stopscroll_loop
-
 drawcolumn:
 ; Loop counter initialize
     ld a,MapHeight
@@ -262,7 +247,6 @@ drawcolumn_loop:
     cp e
     jp nz,mainloop
 
-
 return_rawvram:
 ; Next column vram add
     ld hl,(NextColVram)
@@ -290,6 +274,21 @@ ret_1st_vramadd
     ld (NextColSrc),hl
 
     jp mainloop
+
+stopscroll_loop:
+    ei
+    halt   ; start main loop with vblank
+    call wait_vblank
+
+    ld a,(Scroll)
+    ld b,$08
+    call setreg
+
+    ld a,(Scroll)
+    xor a
+    ld (Scroll),a
+
+    jp stopscroll_loop
 
 ; --------------------------------------------------------------
 ; SUBROUTINES
