@@ -180,16 +180,12 @@ mainloop:
     ld b,1
     sub b
     ld (Scroll),a
-; Draw Column Timing check
-    and %00001000
-    jr z,drawcolumn
 
 ; Scroll count
     ld a,(ScrollCount)
     add a,8  ; 8bot
     ld (ScrollCount),a
     jr c,screen_count
-    jp mainloop
 
 screen_count:
     ld a,(ScreenCount)
@@ -197,7 +193,12 @@ screen_count:
     ld (ScreenCount),a
     cp $08
     jp z,stop_scroll
-    jp,mainloop
+
+; Draw Column Timing check
+    ld a,(Scroll)
+    and %00001000
+    jr z,drawcolumn
+    jp mainloop
 
 drawcolumn:
 ; Loop counter initialize
