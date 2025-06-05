@@ -329,7 +329,8 @@ wait_vblank:
 
 ; Scroll count
     ld a,(ScrollCount)
-    add a,8  ; 
+    add a,8  ; 8dot
+    ld (ScrollCount),a
     jr c,screen_count
 
 screen_count:
