@@ -205,6 +205,7 @@ drawcolumn:
     ld (DrawLoopCount),a
 
 drawcolumn_loop:
+; write to vram
     ld hl,(NextColVram)
     call vrampr
     ld hl,(NextColSrc)
