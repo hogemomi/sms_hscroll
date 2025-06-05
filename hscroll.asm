@@ -188,7 +188,7 @@ scrollcntloop:
 
 ; Scroll count
     ld a,(ScrollCount)
-    add a,8
+    add a,8  ; 8bot
     ld (ScrollCount),a
     jr c,screen_count
 
