@@ -181,7 +181,11 @@ mainloop:
     sub b
     ld (Scroll),a
 
-
+; Scroll count
+    ld a,(ScrollCount)
+    add a,8  ; 8dot
+    ld (ScrollCount),a
+    call screen_count
 
 ; Draw Column Timing check
     ld a,(Scroll)
@@ -327,12 +331,11 @@ wait_vblank:
     
     ret                ; Return when VBlank occurs.
 
-; Scroll count
+screen_count_check:
     ld a,(ScrollCount)
-    add a,8  ; 8dot
-    ld (ScrollCount),a
-    jr c,screen_count
-
+    cp $ff
+    jr z,screen_count
+    
 screen_count:
     ld a,(ScreenCount)
     inc a
