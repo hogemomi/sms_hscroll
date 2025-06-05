@@ -175,7 +175,6 @@ mainloop:
     ld a,(Scroll)
     ld b,$08
     call setreg
-
 ; Scroll buffer update
     ld a,(Scroll)
     ld b,1
