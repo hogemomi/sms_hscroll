@@ -181,18 +181,7 @@ mainloop:
     sub b
     ld (Scroll),a
 
-; Scroll count
-    ld a,(ScrollCount)
-    add a,8  ; 8bot
-    ld (ScrollCount),a
-    jr c,screen_count
 
-screen_count:
-    ld a,(ScreenCount)
-    inc a
-    ld (ScreenCount),a
-    cp $08
-    jp z,stop_scroll
 
 ; Draw Column Timing check
     ld a,(Scroll)
@@ -337,6 +326,19 @@ wait_vblank:
     ld (VDPstatus),a
     
     ret                ; Return when VBlank occurs.
+
+; Scroll count
+    ld a,(ScrollCount)
+    add a,8  ; 
+    jr c,screen_count
+
+screen_count:
+    ld a,(ScreenCount)
+    inc a
+    ld (ScreenCount),a
+    cp $08
+    jp z,stop_scroll
+
 ; --------------------------------------------------------------
 ; DATA
 ; --------------------------------------------------------------
