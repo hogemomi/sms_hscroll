@@ -234,19 +234,6 @@ drawcolumn_loop:
 
     jr return_rawvram
 
-; Check Vramadd of final
-    ld hl,(NextColVram)
-    ld bc,$05fe
-    add hl,bc
-    ld de,ScreenBottomVram
-    ld a,l
-    cp e
-    jp nz,mainloop
-
-    ld a,h
-    cp e
-    jp nz,mainloop
-
 return_rawvram:
 ; Next column vram add
     ld hl,(NextColVram)
@@ -261,6 +248,19 @@ return_rawvram:
     or a
     sbc hl,bc
     ld (NextColSrc),hl
+
+; Check Vramadd of final
+    ld hl,(NextColVram)
+    ld bc,$05fe
+    add hl,bc
+    ld de,ScreenBottomVram
+    ld a,l
+    cp e
+    jp nz,mainloop
+
+    ld a,h
+    cp e
+    jp nz,mainloop
 
 ; Return first vram address
 ret_1st_vramadd
