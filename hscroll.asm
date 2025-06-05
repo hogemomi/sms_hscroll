@@ -176,8 +176,7 @@ mainloop:
     ld b,$08
     call setreg
 
-; Conditional branching
-scrollcntloop:
+; Scroll buffer update
     ld a,(Scroll)
     ld b,1
     sub b
