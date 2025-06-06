@@ -182,9 +182,8 @@ mainloop:
     sub b
     ld (Scroll),a
 
-; Scroll count
-    ld a,(Scroll)
-    call screen_count_check
+; Scroll count check
+    call screen_cnt_ck
 
 ; loop counter
     ld a,(DrawLoopCount)
@@ -300,13 +299,13 @@ wait_vblank:
     ret                ; Return when VBlank occurs.
 
 ; --------------------------
-screen_count_check:
-    ld a,(ScrollCount)
+screen_cnt_ck:
+    ld a,(Scroll)
     cp $ff
-    jr z,screen_count
+    jr z,screen_cnt
     ret
 
-screen_count:
+screen_cnt:
     ld a,(ScreenCount)
     inc a
     ld (ScreenCount),a
