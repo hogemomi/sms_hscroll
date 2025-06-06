@@ -175,6 +175,7 @@ mainloop:
     ld a,(Scroll)
     ld b,$08
     call setreg
+
 ; Scroll buffer update
     ld a,(Scroll)
     ld b,1
@@ -182,40 +183,8 @@ mainloop:
     ld (Scroll),a
 
 ; Scroll count
-    ld a,(ScrollCount)
-    add a,8  ; 8dot
-    ld (ScrollCount),a
-    call screen_count
-
-; Draw Column Timing check
     ld a,(Scroll)
-    and %00001000
-    jr z,drawcolumn
-    jp mainloop
-
-drawcolumn:
-; Loop counter initialize
-    ld a,MapHeight
-    ld (DrawLoopCount),a
-
-drawcolumn_loop:
-; write to vram
-    ld hl,(NextColVram)
-    call vrampr
-    ld hl,(NextColSrc)
-    ld bc,2
-    call vramwr
-
-; Row Vram add update
-    ld hl,(NextColVram)
-    ld bc,$0040
-    add hl,bc
-    ld (NextColVram),hl
-; Row Source add
-    ld hl,(NextColSrc)
-    ld bc,MapWidth
-    add hl,bc
-    ld (NextColSrc),hl
+    call screen_count_check
 
 ; loop counter
     ld a,(DrawLoopCount)
@@ -328,22 +297,54 @@ wait_vblank:
     jp z, wait_vblank  ; If not yet VBlank, wait
     res 7,a
     ld (VDPstatus),a
-    
     ret                ; Return when VBlank occurs.
 
+; --------------------------
 screen_count_check:
     ld a,(ScrollCount)
     cp $ff
     jr z,screen_count
-    
+    ret
+
 screen_count:
     ld a,(ScreenCount)
     inc a
     ld (ScreenCount),a
     cp $08
     jp z,stop_scroll
-
     ret
+
+; ---------------------------
+draw_column:
+; Draw Column Timing check
+    ld a,(Scroll)
+    and %00001000
+    jr z,drawcolumn
+    jp mainloop
+
+drawcolumn:
+; Loop counter initialize
+    ld a,MapHeight
+    ld (DrawLoopCount),a
+
+drawcolumn_loop:
+; write to vram
+    ld hl,(NextColVram)
+    call vrampr
+    ld hl,(NextColSrc)
+    ld bc,2
+    call vramwr
+
+; Row Vram add update
+    ld hl,(NextColVram)
+    ld bc,$0040
+    add hl,bc
+    ld (NextColVram),hl
+; Row Source add
+    ld hl,(NextColSrc)
+    ld bc,MapWidth
+    add hl,bc
+    ld (NextColSrc),hl
 
 ; --------------------------------------------------------------
 ; DATA
