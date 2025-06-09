@@ -36,6 +36,7 @@
     ScrollCount dw
     Hspeed db
     Scroll db        ; vdp scroll register buffer
+    Scroll_speed db
     Frame db         ; frame counter
     VDPstatus db
 .ende
@@ -178,7 +179,7 @@ mainloop:
 
 ; Scroll buffer update
     ld a,(Scroll)
-    ld b,1
+    ld b,(Scroll_speed)
     sub b
     ld (Scroll),a
 
@@ -197,7 +198,7 @@ stopscroll_loop:
     ld a,(Scroll)
     xor a
     ld (Scroll),a
-    jp stopscroll_loop
+    jp mainloop
 
 ; --------------------------------------------------------------
 ; SUBROUTINES
