@@ -187,17 +187,8 @@ mainloop:
     call screen_cnt_ck
 
 stopscroll_loop:
-    ei
-    halt   ; start main loop with vblank
-    call wait_vblank
-
-    ld a,(Scroll)
-    ld b,$08
-    call setreg
-
-    ld a,(Scroll)
-    xor a
-    ld (Scroll),a
+    ld a,0
+    ld (Scroll_speed),a
     jp mainloop
 
 ; --------------------------------------------------------------
