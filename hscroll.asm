@@ -233,6 +233,8 @@ setreg:
     out ($bf),a      ; output command word 2/2.
     ret
 
+; ---------------
+; Wait Vblank
 wait_vblank:
     ld a,(VDPstatus)  ; get vdp status
     bit 7,a  ; check vblank bit
