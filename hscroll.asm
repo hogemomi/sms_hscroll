@@ -189,11 +189,6 @@ mainloop:
 ; Scroll count check
     call screen_cnt_ck
 
-stopscroll_loop:
-    ld a,0
-    ld (Scroll_speed),a
-    jp mainloop
-
 ; --------------------------------------------------------------
 ; SUBROUTINES
 ; --------------------------------------------------------------
@@ -337,6 +332,14 @@ ret_1st_vramadd
     inc hl
     inc hl
     ld (NextColSrc),hl
+    jp mainloop
+
+; --------------
+; Scroll stop
+; --------------
+stopscroll_loop:
+    ld a,0
+    ld (Scroll_speed),a
     jp mainloop
 
 ; --------------------------------------------------------------
