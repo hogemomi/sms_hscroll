@@ -188,7 +188,6 @@ mainloop:
 
 ; Scroll count check
     call screen_cnt_ck
-    jp mainloop
 
 ; Draw Column Timing check
     ld a,(Scroll)
