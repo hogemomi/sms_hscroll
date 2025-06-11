@@ -266,8 +266,8 @@ screen_cnt:
 
 ; ----------------------
 draw_column:
-; ----------------------
-; Loop counter initialize
+
+; Loop counter
     ld a,MapHeight
     ld (DrawLoopCount),a
 
