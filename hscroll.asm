@@ -190,6 +190,12 @@ mainloop:
     call screen_cnt_ck
     jp mainloop
 
+; Draw Column Timing check
+    ld a,(Scroll)
+    and %00001000
+    jp z,draw_column
+    jp mainloop
+
 ; --------------------------------------------------------------
 ; SUBROUTINES
 ; --------------------------------------------------------------
@@ -259,14 +265,9 @@ screen_cnt:
     jp z,stopscroll_loop
     ret
 
-; ---------------------------
+; ----------------------
 draw_column:
-; Draw Column Timing check
-    ld a,(Scroll)
-    and %00001000
-    jr z,drawcolumn
-    jp mainloop
-
+; ----------------------
 ; Loop counter initialize
     ld a,MapHeight
     ld (DrawLoopCount),a
