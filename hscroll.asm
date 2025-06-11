@@ -343,7 +343,7 @@ ret_1st_vramadd
 stopscroll_loop:
     ld a,0
     ld (Scroll_speed),a
-    jp mainloop
+    ret
 
 ; --------------------------------------------------------------
 ; DATA
