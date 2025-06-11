@@ -188,6 +188,7 @@ mainloop:
 
 ; Scroll count check
     call screen_cnt_ck
+    jp mainloop
 
 ; --------------------------------------------------------------
 ; SUBROUTINES
