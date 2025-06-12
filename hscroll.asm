@@ -295,9 +295,7 @@ drawcolumn_loop:
     dec a
     ld (DrawLoopCount),a
     jp nz,drawcolumn_loop
-    jr return_rawvram
 
-return_rawvram:
 ; Next column vram add
     ld hl,(NextColVram)
     ld bc,$05fe
