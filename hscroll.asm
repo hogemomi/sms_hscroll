@@ -298,7 +298,7 @@ drawcolumn_loop:
 
 ; Next column vram add
     ld hl,(NextColVram)
-    ld bc,$05fe
+    ld bc,$063e
     or a
     sbc hl,bc
     ld (NextColVram),hl
