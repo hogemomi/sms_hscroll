@@ -314,7 +314,7 @@ drawcolumn_loop:
 
 ; Check Vramadd of final
     ld hl,(NextColVram)
-    ld bc,$05fe
+    ld bc,$063e
     add hl,bc
     ld de,ScreenBottomVram
     ld a,l
