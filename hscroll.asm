@@ -160,7 +160,7 @@ draw_startmap:
     ld (NextColSrc),hl
 
     ; preset vram address
-    ld hl,$3802
+    ld hl,$3800
     ld (NextColVram),hl
 
     ld a,%11100000  ; turn screen on - normal sprites
@@ -298,7 +298,7 @@ drawcolumn_loop:
 
 ; Next column vram add
     ld hl,(NextColVram)
-    ld bc,$05fe
+    ld bc,$063e
     or a
     sbc hl,bc
     ld (NextColVram),hl
