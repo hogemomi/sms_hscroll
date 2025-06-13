@@ -117,6 +117,7 @@ inigam ld hl,regdat     ; point to register init data.
     ld bc,MapHeight
     ld (DrawLoopCount),bc
 
+; ---------------
 ; start map configuration
 draw_startmap:
     ld hl,(NextRawVram)
@@ -144,6 +145,7 @@ draw_startmap:
     ld (DrawLoopCount),bc
     jr nz,draw_startmap
 
+; --------------------
 ; Initiarize buffer
     ld a,1
     ld (Hspeed),a
