@@ -175,6 +175,12 @@ mainloop:
     halt   ; start main loop with vblank
     call wait_vblank
 
+; Draw Column Timing check
+    ld a,(Scroll)
+    and %00001000
+    jp z,draw_column
+    jp mainloop
+
 ; Update vdp right when vblank begins!
     ld a,(Scroll)
     ld b,$08
@@ -188,12 +194,6 @@ mainloop:
 
 ; Scroll count check
     call screen_cnt_ck
-
-; Draw Column Timing check
-    ld a,(Scroll)
-    and %00001000
-    jp z,draw_column
-    jp mainloop
 
 ; --------------------------------------------------------------
 ; SUBROUTINES
