@@ -1,6 +1,6 @@
-; -------------------------------------------------------------;
-;             Holizontal Scroll                    ;
-; -------------------------------------------------------------;
+; ------------------------------------;
+;        Holizontal Scroll            ;
+; ------------------------------------;
 
 .sdsctag 0.1, "Hscroll", "Step 1 - Scroller", "hogel"
 
@@ -22,7 +22,7 @@
 .define  Hspeed 1
 .define  VDPcontrol $bf
 .define  MapHeight 24
-.define  MapWidth $0200
+.define  MapWidth 512
 .define  ScreenBottomVram $3e3e
 
  ; Organize ram.
@@ -34,7 +34,7 @@
     NextColVram dw
     DrawLoopCount dw
     ScrollCount dw
-    Hspeed db
+    ScreenCount db
     Scroll db        ; vdp scroll register buffer
     Scroll_speed db
     Frame db         ; frame counter
@@ -189,8 +189,9 @@ mainloop:
     call setreg
 
 ; Scroll buffer update
+    ld a,(Scroll_speed)
+    ld b,a
     ld a,(Scroll)
-    ld b,(Scroll_speed)
     sub b
     ld (Scroll),a
 
@@ -241,17 +242,17 @@ setreg:
     out ($bf),a      ; output command word 2/2.
     ret
 
-; ---------------
+; ----------------------
 ; Wait Vblank
 wait_vblank:
-    ld a,(VDPstatus)  ; get vdp status
+    ld a,(VDPstatus)
     bit 7,a  ; check vblank bit
-    jp z, wait_vblank  ; If not yet VBlank, wait
+    jp z, wait_vblank
     res 7,a
     ld (VDPstatus),a
-    ret                ; Return when VBlank occurs.
+    ret
 
-; --------------------------
+; ----------------------
 screen_cnt_ck:
     ld a,(Scroll)
     cp $ff
@@ -300,7 +301,7 @@ drawcolumn_loop:
 
 ; Next column vram add
     ld hl,(NextColVram)
-    ld bc,$063e
+    ld bc,$05fe
     or a
     sbc hl,bc
     ld (NextColVram),hl
@@ -337,9 +338,8 @@ ret_1st_vramadd
     ld (NextColSrc),hl
     jp mainloop
 
-; --------------
+; ----------------------
 ; Scroll stop
-; --------------
 stopscroll_loop:
     ld a,0
     ld (Scroll_speed),a
