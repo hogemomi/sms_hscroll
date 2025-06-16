@@ -265,7 +265,7 @@ screen_cnt:
     ld (ScreenCount),a
     cp $08
     jp z,stopscroll_loop
-    ret
+    jp mainloop
 
 ; ----------------------
 draw_column:
@@ -343,7 +343,7 @@ ret_1st_vramadd
 stopscroll_loop:
     ld a,0
     ld (Scroll_speed),a
-    ret
+    jp mainloop
 
 ; --------------------------------------------------------------
 ; DATA
