@@ -336,7 +336,8 @@ ret_1st_vramadd
     inc hl
     inc hl
     ld (NextColSrc),hl
-    jp mainloop
+
+    ret
 
 ; ----------------------
 ; Scroll stop
