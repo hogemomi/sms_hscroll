@@ -196,6 +196,7 @@ mainloop:
 
 ; Scroll count check
     call screen_cnt_ck
+    jp mainloop
 
 ; --------------------------------------------------------------
 ; SUBROUTINES
@@ -256,7 +257,7 @@ screen_cnt_ck:
     ld a,(Scroll)
     cp $ff
     jr z,screen_cnt
-    jp mainloop
+    ret
 
 screen_cnt:
     ld a,(ScreenCount)
