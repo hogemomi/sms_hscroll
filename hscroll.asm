@@ -314,17 +314,17 @@ drawcolumn_loop:
     ld (NextColSrc),hl
 
 ; Check Vramadd of final
-    ld hl,(NextColVram)
-    ld bc,$063e
-    add hl,bc
-    ld de,ScreenBottomVram
-    ld a,l
-    cp e
-    jp nz,mainloop
+;    ld hl,(NextColVram)
+;    ld bc,$063e
+;    add hl,bc
+;    ld de,ScreenBottomVram
+;    ld a,l
+;    cp e
+;    jp nz,mainloop
 
-    ld a,h
-    cp e
-    jp nz,mainloop
+;    ld a,h
+;    cp e
+;    jp nz,mainloop
 
 ; Return first vram address
 ret_1st_vramadd
