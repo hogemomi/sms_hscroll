@@ -181,7 +181,6 @@ mainloop:
     ld a,(Scroll)
     and %00001000
     jp z,draw_column
-    jp mainloop
 
 ; Update vdp right when vblank begins!
     ld a,(Scroll)
