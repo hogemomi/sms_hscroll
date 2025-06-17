@@ -336,8 +336,7 @@ drawcolumn_loop:
 ;    inc hl
 ;    inc hl
 ;    ld (NextColSrc),hl
-
-    ret
+;    ret
 
 ; ----------------------
 ; Scroll stop
