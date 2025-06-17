@@ -326,15 +326,15 @@ drawcolumn_loop:
 ;    jp nz,mainloop
 
 ; Return first vram address
-ret_1st_vramadd
-    ld hl,$3800
-    ld (NextColVram),hl
+; ret_1st_vramadd
+;    ld hl,$3800
+;    ld (NextColVram),hl
 
 ; Next column source add
-    ld hl,(NextColSrc)
-    inc hl
-    inc hl
-    ld (NextColSrc),hl
+;    ld hl,(NextColSrc)
+;    inc hl
+;    inc hl
+;    ld (NextColSrc),hl
 
     ret
 
