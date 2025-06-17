@@ -255,7 +255,7 @@ wait_vblank:
 ; ----------------------
 screen_cnt_ck:
     ld a,(Scroll)
-    cp $00
+    cp $ff
     jr z,screen_cnt
     ret
 
