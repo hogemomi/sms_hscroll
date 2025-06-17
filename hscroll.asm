@@ -282,12 +282,11 @@ drawcolumn_loop:
     ld bc,2
     call vramwr
 
-; Row Vram add update
+; Row Vram Source update
     ld hl,(NextColVram)
     ld bc,$0040
     add hl,bc
     ld (NextColVram),hl
-; Row Source add update
     ld hl,(NextColSrc)
     ld bc,MapWidth
     add hl,bc
