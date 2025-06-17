@@ -311,6 +311,7 @@ drawcolumn_loop:
     or a
     sbc hl,bc
     ld (NextColSrc),hl
+    ret
 
 ; Check Vramadd of final
 ;    ld hl,(NextColVram)
