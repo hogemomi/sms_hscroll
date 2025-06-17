@@ -287,7 +287,7 @@ drawcolumn_loop:
     ld bc,$0040
     add hl,bc
     ld (NextColVram),hl
-; Row Source add
+; Row Source add update
     ld hl,(NextColSrc)
     ld bc,MapWidth
     add hl,bc
