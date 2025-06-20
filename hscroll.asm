@@ -240,8 +240,9 @@ wait_vblank:
     ld (VDPstatus),a
     ret
 
+; -------------------
 ; Horizontal scroll
-; Draw Column Timing check
+; Draw Column Timing check every 8px scroll
     ld a,(Scroll)
     and %00001000
     jp z,draw_column
@@ -257,6 +258,7 @@ wait_vblank:
     ld a,(Scroll)
     sub b
     ld (Scroll),a
+    ret
 
 ; ----------------------
 screen_cnt_ck:
