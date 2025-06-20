@@ -177,6 +177,11 @@ mainloop:
     halt   ; start main loop with vblank
     call wait_vblank
 
+; Map end check
+    ld a,(Screen_Count)
+    cp $08
+    jp nz,Hscroll
+
 ; Draw Column Timing check
     ld a,(Scroll)
     and %00001000
