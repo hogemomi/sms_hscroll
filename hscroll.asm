@@ -181,6 +181,7 @@ mainloop:
     ld a,(Screen_Count)
     cp $08
     jp nz,Hscroll
+    jp Stop_scroll
 
 ; Scroll count check
     call screen_cnt_ck
