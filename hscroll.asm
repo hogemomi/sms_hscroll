@@ -180,8 +180,8 @@ mainloop:
 ; Map end check
     ld a,(Screen_Count)
     cp $08
-    jp nz,Hscroll
-    jp Stop_scroll
+    jp z,Stop_scroll
+    jp Hscroll
 
 ; Scroll count check
     call screen_cnt_ck
