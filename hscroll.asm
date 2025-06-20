@@ -244,15 +244,15 @@ wait_vblank:
 ; -------------------
 ; Horizontal scroll
 Hscroll
-; Draw Column Timing check every 8px scroll
-    ld a,(Scroll)
-    and %00001000
-    jp z,draw_column
-
 ; Update vdp right when vblank begins!
     ld a,(Scroll)
     ld b,$08
     call setreg
+
+; Draw Column Timing check every 8px scroll
+    ld a,(Scroll)
+    and %00001000
+    jp z,draw_column
 
 ; Scroll buffer update
     ld a,(Scroll_speed)
