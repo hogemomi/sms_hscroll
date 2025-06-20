@@ -182,23 +182,6 @@ mainloop:
     cp $08
     jp nz,Hscroll
 
-; Draw Column Timing check
-    ld a,(Scroll)
-    and %00001000
-    jp z,draw_column
-
-; Update vdp right when vblank begins!
-    ld a,(Scroll)
-    ld b,$08
-    call setreg
-
-; Scroll buffer update
-    ld a,(Scroll_speed)
-    ld b,a
-    ld a,(Scroll)
-    sub b
-    ld (Scroll),a
-
 ; Scroll count check
     call screen_cnt_ck
     jp mainloop
@@ -256,6 +239,24 @@ wait_vblank:
     res 7,a
     ld (VDPstatus),a
     ret
+
+; Horizontal scroll
+; Draw Column Timing check
+    ld a,(Scroll)
+    and %00001000
+    jp z,draw_column
+
+; Update vdp right when vblank begins!
+    ld a,(Scroll)
+    ld b,$08
+    call setreg
+
+; Scroll buffer update
+    ld a,(Scroll_speed)
+    ld b,a
+    ld a,(Scroll)
+    sub b
+    ld (Scroll),a
 
 ; ----------------------
 screen_cnt_ck:
