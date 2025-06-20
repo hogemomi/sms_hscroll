@@ -243,6 +243,7 @@ wait_vblank:
 
 ; -------------------
 ; Horizontal scroll
+Hscroll
 ; Draw Column Timing check every 8px scroll
     ld a,(Scroll)
     and %00001000
