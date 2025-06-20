@@ -187,6 +187,20 @@ mainloop:
     call screen_cnt_ck
     jp mainloop
 
+screen_cnt_ck:
+    ld a,(Scroll)
+    cp $ff
+    jr z,screen_cnt
+    ret
+
+screen_cnt:
+    ld a,(ScreenCount)
+    inc a
+    ld (ScreenCount),a
+    cp $08
+    jp z,stopscroll_loop
+    jp mainloop
+
 ; --------------------------------------------------------------
 ; SUBROUTINES
 ; --------------------------------------------------------------
@@ -261,21 +275,6 @@ Hscroll
     sub b
     ld (Scroll),a
     ret
-
-; ----------------------
-screen_cnt_ck:
-    ld a,(Scroll)
-    cp $ff
-    jr z,screen_cnt
-    ret
-
-screen_cnt:
-    ld a,(ScreenCount)
-    inc a
-    ld (ScreenCount),a
-    cp $08
-    jp z,stopscroll_loop
-    jp mainloop
 
 ; ----------------------
 draw_column:
