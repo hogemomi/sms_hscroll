@@ -177,6 +177,27 @@ mainloop:
     halt   ; start main loop with vblank
     call wait_vblank
 
+; -------------------
+; Horizontal scroll
+Hscroll
+; Update vdp right when vblank begins!
+    ld a,(Scroll)
+    ld b,$08
+    call setreg
+
+; Draw Column Timing check every 8px scroll
+    ld a,(Scroll)
+    and %00001000
+    jp z,draw_column
+
+; Scroll buffer update
+    ld a,(Scroll_speed)
+    ld b,a
+    ld a,(Scroll)
+    sub b
+    ld (Scroll),a
+    ret
+
 ; Map end check
 ;    ld a,(Screen_Count)
 ;    cp $08
@@ -260,27 +281,6 @@ wait_vblank:
     jp z, wait_vblank
     res 7,a
     ld (VDPstatus),a
-    ret
-
-; -------------------
-; Horizontal scroll
-Hscroll
-; Update vdp right when vblank begins!
-    ld a,(Scroll)
-    ld b,$08
-    call setreg
-
-; Draw Column Timing check every 8px scroll
-    ld a,(Scroll)
-    and %00001000
-    jp z,draw_column
-
-; Scroll buffer update
-    ld a,(Scroll_speed)
-    ld b,a
-    ld a,(Scroll)
-    sub b
-    ld (Scroll),a
     ret
 
 ; ----------------------
