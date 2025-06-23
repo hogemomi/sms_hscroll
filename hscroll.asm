@@ -184,8 +184,8 @@ mainloop:
 ;    jp Hscroll
 
 ; Scroll count check
-    call screen_cnt_ck
-    jp mainloop
+;    call screen_cnt_ck
+;    jp mainloop
 
 screen_cnt_ck:
     ld a,(Scroll)
