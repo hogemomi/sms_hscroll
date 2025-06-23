@@ -180,7 +180,7 @@ mainloop:
 ; Map end check
     ld a,(Screen_Count)
     cp $08
-    jp z,Stop_scroll
+    jp z,stopscroll_loop
     jp Hscroll
 
 ; Scroll count check
@@ -199,6 +199,13 @@ screen_cnt:
     ld (ScreenCount),a
     cp $08
     jp z,stopscroll_loop
+    jp mainloop
+
+; ----------------------
+; Scroll stop
+stopscroll_loop:
+    ld a,0
+    ld (Scroll_speed),a
     jp mainloop
 
 ; --------------------------------------------------------------
@@ -346,13 +353,6 @@ drawcolumn_loop:
 ;    inc hl
 ;    ld (NextColSrc),hl
 ;    ret
-
-; ----------------------
-; Scroll stop
-stopscroll_loop:
-    ld a,0
-    ld (Scroll_speed),a
-    jp mainloop
 
 ; --------------------------------------------------------------
 ; DATA
