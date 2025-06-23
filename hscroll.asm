@@ -178,10 +178,10 @@ mainloop:
     call wait_vblank
 
 ; Map end check
-    ld a,(Screen_Count)
-    cp $08
-    jp z,stopscroll_loop
-    jp Hscroll
+;    ld a,(Screen_Count)
+;    cp $08
+;    jp z,stopscroll_loop
+;    jp Hscroll
 
 ; Scroll count check
     call screen_cnt_ck
