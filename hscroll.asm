@@ -197,20 +197,18 @@ mainloop:
     ld (Scroll),a
 
 ; Map end check
-;    ld a,(Screen_Count)
-;    cp $08
-;    jp z,stopscroll_loop
-;    jp Hscroll
-
-; Scroll count check
-;    call screen_cnt_ck
-;    jp mainloop
-
 screen_cnt_ck:
     ld a,(Scroll)
     cp $ff
     jr z,screen_cnt
-    ret
+
+;    ld a,(Screen_Count)
+;    cp $08
+;    jp z,stopscroll_loop
+
+; Scroll count check
+;    call screen_cnt_ck
+;    jp mainloop
 
 screen_cnt:
     ld a,(ScreenCount)
