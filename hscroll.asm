@@ -179,7 +179,6 @@ mainloop:
 
 ; -------------------
 ; Horizontal scroll
-Hscroll
 ; Update vdp right when vblank begins!
     ld a,(Scroll)
     ld b,$08
