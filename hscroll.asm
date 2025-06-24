@@ -200,7 +200,8 @@ mainloop:
 screen_cnt_ck:
     ld a,(Scroll)
     cp $ff
-    jp nz,main_loop
+    jr z,screen_cnt
+    jp main_loop
 
 ;    ld a,(Screen_Count)
 ;    cp $08
