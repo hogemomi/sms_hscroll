@@ -195,7 +195,6 @@ mainloop:
     ld a,(Scroll)
     sub b
     ld (Scroll),a
-    ret
 
 ; Map end check
 ;    ld a,(Screen_Count)
