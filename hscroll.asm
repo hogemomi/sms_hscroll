@@ -184,6 +184,12 @@ mainloop:
     ld b,$08
     call setreg
 
+; Map end check
+screen_cnt_ck:
+    ld a,(Scroll)
+    cp $ff
+    jr z,screen_cnt
+
 ; Draw Column Timing check every 8px scroll
     ld a,(Scroll)
     and %00001000
@@ -195,13 +201,7 @@ mainloop:
     ld a,(Scroll)
     sub b
     ld (Scroll),a
-
-; Map end check
-screen_cnt_ck:
-    ld a,(Scroll)
-    cp $00
-    jr z,screen_cnt
-    jp main_loop
+    jp mainloop
 
 ;    ld a,(Screen_Count)
 ;    cp $08
