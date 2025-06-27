@@ -199,7 +199,7 @@ mainloop:
 ; Map end check
 screen_cnt_ck:
     ld a,(Scroll)
-    cp $ff
+    cp $00
     jr z,screen_cnt
     jp main_loop
 
