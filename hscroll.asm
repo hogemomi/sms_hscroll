@@ -36,7 +36,7 @@
     ScrollCount dw
     ScreenCount db
     Scroll db        ; vdp scroll register buffer
-    Scroll_speed db
+    ScrollSpeed db
     Frame db         ; frame counter
     VDPstatus db
 .ende
@@ -148,7 +148,7 @@ draw_startmap:
 ; --------------------
 ; Initiarize buffer
     ld a,1
-    ld (Hspeed),a
+    ld (ScrollSpeed),a
     xor a         ; set A = 0
     ld (Frame),a
     ld (Scroll),a
@@ -184,32 +184,25 @@ mainloop:
     ld b,$08
     call setreg
 
+; Scroll buffer update
+scrollbuf_ud
+    ld a,(ScrollSpeed)
+    ld b,a
+    ld a,(Scroll)
+    sub b
+    ld (Scroll),a
+
 ; Map end check
 screen_cnt_ck:
     ld a,(Scroll)
-    cp $ff
+    cp $00
     jr z,screen_cnt
 
 ; Draw Column Timing check every 8px scroll
     ld a,(Scroll)
     and %00001000
     jp z,draw_column
-
-; Scroll buffer update
-    ld a,(Scroll_speed)
-    ld b,a
-    ld a,(Scroll)
-    sub b
-    ld (Scroll),a
     jp mainloop
-
-;    ld a,(Screen_Count)
-;    cp $08
-;    jp z,stopscroll_loop
-
-; Scroll count check
-;    call screen_cnt_ck
-;    jp mainloop
 
 screen_cnt:
     ld a,(ScreenCount)
@@ -222,8 +215,8 @@ screen_cnt:
 ; ----------------------
 ; Scroll stop
 stopscroll_loop:
-    ld a,0
-    ld (Scroll_speed),a
+    xor a
+    ld (ScrollSpeed),a
     jp mainloop
 
 ; --------------------------------------------------------------
@@ -282,7 +275,6 @@ wait_vblank:
 
 ; ----------------------
 draw_column:
-
 ; Loop counter
     ld a,MapHeight
     ld (DrawLoopCount),a
@@ -313,7 +305,7 @@ drawcolumn_loop:
 
 ; Next column vram add
     ld hl,(NextColVram)
-    ld bc,$05fe
+    ld bc,$0600
     or a
     sbc hl,bc
     ld (NextColVram),hl
@@ -324,32 +316,7 @@ drawcolumn_loop:
     or a
     sbc hl,bc
     ld (NextColSrc),hl
-    ret
-
-; Check Vramadd of final
-;    ld hl,(NextColVram)
-;    ld bc,$063e
-;    add hl,bc
-;    ld de,ScreenBottomVram
-;    ld a,l
-;    cp e
-;    jp nz,mainloop
-
-;    ld a,h
-;    cp e
-;    jp nz,mainloop
-
-; Return first vram address
-; ret_1st_vramadd
-;    ld hl,$3800
-;    ld (NextColVram),hl
-
-; Next column source add
-;    ld hl,(NextColSrc)
-;    inc hl
-;    inc hl
-;    ld (NextColSrc),hl
-;    ret
+    jp mainloop
 
 ; --------------------------------------------------------------
 ; DATA
