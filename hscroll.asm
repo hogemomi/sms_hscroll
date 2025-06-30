@@ -311,7 +311,7 @@ drawcolumn_loop:
 
 ; Next column source add
     ld hl,(NextColSrc)
-    ld bc,$2ffe
+    ld bc,$2e00
     or a
     sbc hl,bc
     ld (NextColSrc),hl
