@@ -19,7 +19,6 @@
     banks 2
 .endro
 
-.define  Hspeed 1
 .define  VDPcontrol $bf
 .define  MapHeight 24
 .define  MapWidth 512
