@@ -184,7 +184,6 @@ mainloop:
     call setreg
 
 ; Scroll buffer update
-scrollbuf_ud
     ld a,(ScrollSpeed)
     ld b,a
     ld a,(Scroll)
