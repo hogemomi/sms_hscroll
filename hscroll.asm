@@ -192,8 +192,6 @@ scrollbuf_ud
     ld (Scroll),a
 
 ; Map end check
-screen_cnt_ck:
-    ld a,(Scroll)
     cp $00
     jr z,screen_cnt
 
