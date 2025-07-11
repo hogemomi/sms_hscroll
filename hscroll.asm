@@ -20,8 +20,8 @@
 .endro
 
 .define  VDPcontrol $bf
-.define  MapHeight 24
-.define  MapWidth 512
+.define  MapHeight $18
+.define  MapWidth $200
 .define  ScreenBottomVram $3e3e
 
  ; Organize ram.
