@@ -318,7 +318,7 @@ drawcolumn_loop:
 
 ; Vram reset
 ld hl,$3800
-ld (NextColVram)
+ld (NextColVram),hl
 
 ; Next column source add
     +:
