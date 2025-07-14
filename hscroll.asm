@@ -311,9 +311,9 @@ drawcolumn_loop:
     ld a,h
     cp $3e
     jr nz,+
-ld a,l
-cp $3e
-jp nz,+
+    ld a,l
+    cp $3e
+    jp nz,+
 
 ; Vram reset
 ld hl,$3800
