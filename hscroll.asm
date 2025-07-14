@@ -275,19 +275,6 @@ draw_column:
     ld a,MapHeight
     ld (DrawLoopCount),a
 
-; Vram add reset
-ld hl,(NextColVram)
-ld a,h
-cp $3e
-jr nz,drawcolumn_loop
-ld a,l
-cp $3e
-jp nz,drawcolumn_loop
-
-; Vram reset
-ld hl,$3800
-ld (NextColVram)
-
 drawcolumn_loop:
 ; write to vram
     ld hl,(NextColVram)
@@ -319,7 +306,21 @@ drawcolumn_loop:
     sbc hl,bc
     ld (NextColVram),hl
 
+; Vram add reset
+    ld hl,(NextColVram)
+    ld a,h
+    cp $3e
+    jr nz,+
+ld a,l
+cp $3e
+jp nz,+
+
+; Vram reset
+ld hl,$3800
+ld (NextColVram)
+
 ; Next column source add
+    +:
     ld hl,(NextColSrc)
     ld bc,$2ffe
     or a
