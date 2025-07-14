@@ -177,6 +177,11 @@ mainloop:
     call wait_vblank
 
 ; -------------------
+; Draw Column Timing check every 8px scroll
+    ld a,(Scroll)
+    and %00000111
+    jp z,draw_column
+
 ; Horizontal scroll
 ; Update vdp right when vblank begins!
     ld a,(Scroll)
@@ -193,11 +198,6 @@ mainloop:
 ; Map end check
     cp $00
     jr z,screen_cnt
-
-; Draw Column Timing check every 8px scroll
-    ld a,(Scroll)
-    and %00000111
-    jp z,draw_column
     jp mainloop
 
 screen_cnt:
