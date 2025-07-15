@@ -317,11 +317,11 @@ drawcolumn_loop:
     ld (NextColVram),hl
 
 ; Vram reset
-ld hl,$3800
-ld (NextColVram),hl
+        +:
+    ld hl,$3800
+    ld (NextColVram),hl
 
 ; Next column source add
-    +:
     ld hl,(NextColSrc)
     ld bc,$2ffe
     or a
