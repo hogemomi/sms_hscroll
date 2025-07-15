@@ -316,11 +316,6 @@ drawcolumn_loop:
     sbc hl,bc
     ld (NextColVram),hl
 
-; Vram reset
-        +:
-    ld hl,$3800
-    ld (NextColVram),hl
-
 ; Next column source add
     ld hl,(NextColSrc)
     ld bc,$2ffe
@@ -328,6 +323,11 @@ drawcolumn_loop:
     sbc hl,bc
     ld (NextColSrc),hl
     jp mainloop
+
+; Vram reset
+    +:
+    ld hl,$3800
+    ld (NextColVram),hl
 
 ; --------------------------------------------------------------
 ; DATA
