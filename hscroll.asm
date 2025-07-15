@@ -294,6 +294,12 @@ drawcolumn_loop:
     add hl,bc
     ld (NextColSrc),hl
 
+; loop counter
+    ld a,(DrawLoopCount)
+    dec a
+    ld (DrawLoopCount),a
+    jp nz,drawcolumn_loop
+
 ; Vram add reset
     ld hl,(NextColVram)
     ld a,h
@@ -302,12 +308,6 @@ drawcolumn_loop:
     ld a,l
     cp $3e
     jp nz,+
-
-; loop counter
-    ld a,(DrawLoopCount)
-    dec a
-    ld (DrawLoopCount),a
-    jp nz,drawcolumn_loop
 
 ; Next column vram add
     ld hl,(NextColVram)
