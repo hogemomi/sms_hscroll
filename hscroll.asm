@@ -319,7 +319,7 @@ drawcolumn_loop:
 ; Move top vram add
     ld hl,$3800
     ld (NextColVram),hl
-    jp mainloop
+    ret
 
 ; Next column vram add
     next_colvramadd:
@@ -328,8 +328,7 @@ drawcolumn_loop:
     or a
     sbc hl,bc
     ld (NextColVram),hl
-    jp mainloop
-
+    ret
 ; --------------------------------------------------------------
 ; DATA
 ; --------------------------------------------------------------
