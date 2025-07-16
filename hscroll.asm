@@ -311,17 +311,18 @@ drawcolumn_loop:
     ld hl,(NextColVram)
     ld a,h
     cp $3e
-    jr nz,+
+    jr nz,next_colvramadd
     ld a,l
     cp $3e
-    jp nz,+
+    jp nz,next_colvramadd
 
-; Vram reset
+; Move top vram add
     ld hl,$3800
     ld (NextColVram),hl
     jp mainloop
 
 ; Next column vram add
+    next_colvramadd:
     ld hl,(NextColVram)
     ld bc,$05fe
     or a
