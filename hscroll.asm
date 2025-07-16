@@ -298,7 +298,7 @@ drawcolumn_loop:
     ld a,(DrawLoopCount)
     dec a
     ld (DrawLoopCount),a
-    jp nz,drawcolumn_loop
+    jr nz,drawcolumn_loop
 
 ; Next column source add
     ld hl,(NextColSrc)
@@ -314,7 +314,7 @@ drawcolumn_loop:
     jr nz,next_colvramadd
     ld a,l
     cp $3e
-    jp nz,next_colvramadd
+    jr nz,next_colvramadd
 
 ; Move top vram add
     ld hl,$3800
