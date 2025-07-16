@@ -300,6 +300,14 @@ drawcolumn_loop:
     ld (DrawLoopCount),a
     jp nz,drawcolumn_loop
 
+; Next column source add
+    ld hl,(NextColSrc)
+    ld bc,$2ffe
+    or a
+    sbc hl,bc
+    ld (NextColSrc),hl
+    jp mainloop
+
 ; Vram add reset
     ld hl,(NextColVram)
     ld a,h
@@ -315,14 +323,6 @@ drawcolumn_loop:
     or a
     sbc hl,bc
     ld (NextColVram),hl
-
-; Next column source add
-    ld hl,(NextColSrc)
-    ld bc,$2ffe
-    or a
-    sbc hl,bc
-    ld (NextColSrc),hl
-    jp mainloop
 
 ; Vram reset
     +:
