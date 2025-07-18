@@ -213,6 +213,8 @@ screen_cnt:
 stopscroll_loop:
     xor a
     ld (ScrollSpeed),a
+    ld a,$01
+    ld (Scrool),a
     jp mainloop
 
 ; --------------------------------------------------------------
