@@ -35,6 +35,7 @@
     DrawLoopCount dw
     ScrollCount dw
     ScreenCount db
+    fixed_point dw
     Scroll db        ; vdp scroll register buffer
     ScrollSpeed db
     Frame db         ; frame counter
