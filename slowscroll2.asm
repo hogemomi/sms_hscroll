@@ -155,6 +155,8 @@ draw_startmap:
     ld (Scroll),a
     ld (ScrollCount),a
     ld (ScreenCount),a
+    ld hl,$0000
+    ld (fixed_point),hl
 
     ; preset map columun address
     ld hl,bgmap
