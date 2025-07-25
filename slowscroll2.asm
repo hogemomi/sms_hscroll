@@ -198,10 +198,24 @@ mainloop:
     add hl,de
     ld (ScrollSpeed),hl
 
-    ld b,a
-    ld a,(Scroll)
+; Update fixed point value
+    ld (fixed_point),hl
+
+; scroll background update the scroll buffer
+    ld a,(scroll)
+    ld b,h
     sub b
     ld (Scroll),a
+    ld a,h
+    cp $01
+    jr z,initialize_fixedpoint
+    jr mloop
+
+; Initialize fixed_point values
+initialize_fixedpoint:
+    ld hl,0
+    ld (fixed_point),hl
+    jr mloop
 
 ; Map end check
     cp $00
