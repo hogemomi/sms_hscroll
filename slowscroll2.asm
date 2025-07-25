@@ -36,8 +36,8 @@
     ScrollCount dw
     ScreenCount db
     fixed_point dw
+    ScrollSpeed dw
     Scroll db        ; vdp scroll register buffer
-    ScrollSpeed db
     Frame db         ; frame counter
     VDPstatus db
 .ende
@@ -193,7 +193,11 @@ mainloop:
     call setreg
 
 ; Scroll buffer update
-    ld a,(ScrollSpeed)
+    ld hl,(fixed_point) 
+    ld de,fractional_inc
+    add hl,de
+    ld (ScrollSpeed),hl
+
     ld b,a
     ld a,(Scroll)
     sub b
