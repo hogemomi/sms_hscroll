@@ -208,7 +208,7 @@ mainloop:
     ld (Scroll),a
     ld a,h
     cp $01
-    jr z,initialize_fixedpoint
+    call z,initialize_fixedpoint
 
 ; Map end check
     cp $00
