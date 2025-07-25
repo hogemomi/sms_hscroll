@@ -192,7 +192,7 @@ mainloop:
     ld b,$08
     call setreg
 
-; Scroll buffer update
+; fixed point mathmatic
     ld hl,(fixed_point) 
     ld de,fractional_inc
     add hl,de
