@@ -181,6 +181,13 @@ mainloop:
     call wait_vblank
 
 ; -------------------
+; Map end check
+    ld a,(Scroll)
+    cp $00
+    jr z,screen_cnt
+    jp mainloop
+
+; -------------------
 ; Draw Column Timing check every 8px scroll
     ld a,(Scroll)
     and %00000111
@@ -209,12 +216,6 @@ mainloop:
     ld a,h
     cp $01
     call z,initialize_fixedpoint
-
-; Map end check
-    ld a,(Scroll)
-    cp $00
-    jr z,screen_cnt
-    jp mainloop
 
 screen_cnt:
     ld a,(ScreenCount)
