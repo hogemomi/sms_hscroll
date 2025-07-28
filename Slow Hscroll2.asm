@@ -212,10 +212,7 @@ mainloop:
 
 ; -------------------
 ; Map end check
-    ld hl,(Scroll)
-    ld a,l
-    cp $00
-    ld a,h
+    ld a,(Scroll)
     cp $00
     jp nz,mainloop
 
