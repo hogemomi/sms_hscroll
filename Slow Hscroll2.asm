@@ -202,7 +202,7 @@ mainloop:
     ld (fixed_point),hl
 
 ; scroll background update the scroll buffer
-    ld a,(scroll)
+    ld a,(Scroll)
     ld b,h
     sub b
     ld (Scroll),a
@@ -211,6 +211,7 @@ mainloop:
     call z,initialize_fixedpoint
 
 ; Map end check
+    ld a,(Scroll)
     cp $00
     jr z,screen_cnt
     jp mainloop
