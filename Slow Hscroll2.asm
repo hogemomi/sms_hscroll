@@ -202,19 +202,21 @@ mainloop:
     ld (Scroll),a
     ld a,h
     cp $01
-    jp nz,mainloop
+    jp z,drawcoltime
+
+; -------------------
+; Draw Column Timing check every 8px scroll
+drawciltime:
+    ld a,(Scroll)
+    and %00000111
+    call z,draw_column
 
 ; ----------------------
 ; Initialize fixed_point values
 initialize_fixedpoint:
     ld hl,0
     ld (fixed_point),hl
-
-; -------------------
-; Draw Column Timing check every 8px scroll
-    ld a,(Scroll)
-    and %00000111
-    call z,draw_column
+    jp mainloop
 
 ; -------------------
 ; Map end check
