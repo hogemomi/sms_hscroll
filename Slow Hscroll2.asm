@@ -180,12 +180,6 @@ mainloop:
     halt   ; start main loop with vblank
     call wait_vblank
 
-; -------------------
-; Draw Column Timing check every 8px scroll
-    ld a,(Scroll)
-    and %00000111
-    call z,draw_column
-
 ; Horizontal scroll
 ; Update vdp right when vblank begins!
     ld a,(Scroll)
@@ -215,6 +209,12 @@ mainloop:
 initialize_fixedpoint:
     ld hl,0
     ld (fixed_point),hl
+
+; -------------------
+; Draw Column Timing check every 8px scroll
+    ld a,(Scroll)
+    and %00000111
+    call z,draw_column
 
 ; -------------------
 ; Map end check
