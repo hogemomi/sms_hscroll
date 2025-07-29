@@ -208,7 +208,13 @@ mainloop:
     ld (Scroll),a
     ld a,h
     cp $01
-    call z,initialize_fixedpoint
+    jp nz,mainloop
+
+; ----------------------
+; Initialize fixed_point values
+initialize_fixedpoint:
+    ld hl,0
+    ld (fixed_point),hl
 
 ; -------------------
 ; Map end check
@@ -216,6 +222,7 @@ mainloop:
     cp $00
     jp nz,mainloop
 
+; -------------------
 screen_cnt:
     ld a,(ScreenCount)
     inc a
@@ -285,13 +292,6 @@ wait_vblank:
     jp z, wait_vblank
     res 7,a
     ld (VDPstatus),a
-    ret
-
-; ----------------------
-; Initialize fixed_point values
-initialize_fixedpoint:
-    ld hl,0
-    ld (fixed_point),hl
     ret
 
 ; ----------------------
