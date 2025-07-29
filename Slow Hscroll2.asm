@@ -216,7 +216,6 @@ drawciltime:
 initialize_fixedpoint:
     ld hl,0
     ld (fixed_point),hl
-    jp mainloop
 
 ; -------------------
 ; Map end check
