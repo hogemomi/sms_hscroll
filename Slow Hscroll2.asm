@@ -207,7 +207,7 @@ mainloop:
 
 ; -------------------
 ; Draw Column Timing check every 8px scroll
-drawciltime:
+drawcoltime:
     ld a,(Scroll)
     and %00000111
     call z,draw_column
@@ -239,7 +239,7 @@ stopscroll_loop:
     xor a
     ld (ScrollSpeed),a
     ld a,$01
-    ld (Scrool),a
+    ld (Scroll),a
     jp mainloop
 
 ; --------------------------------------------------------------
