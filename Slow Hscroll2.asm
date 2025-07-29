@@ -203,6 +203,7 @@ mainloop:
     ld a,h
     cp $01
     jp z,drawcoltime
+    jp mainloop
 
 ; -------------------
 ; Draw Column Timing check every 8px scroll
