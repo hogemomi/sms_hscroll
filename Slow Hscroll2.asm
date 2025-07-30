@@ -223,7 +223,7 @@ initialize_fixedpoint:
     ld a,(Scroll)
     cp $00
     jp z,screen_cnt
-    jp nz,mainloop
+    jp mainloop
 
 ; -------------------
 screen_cnt:
