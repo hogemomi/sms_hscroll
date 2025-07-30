@@ -35,7 +35,7 @@
     DrawLoopCount dw
     ScrollCount dw
     ScreenCount db
-    fixed_point dw
+    fixedPoint dw
     ScrollSpeed dw
     Scroll db        ; vdp scroll register buffer
     Frame db         ; frame counter
@@ -156,7 +156,7 @@ draw_startmap:
     ld (ScrollCount),a
     ld (ScreenCount),a
     ld hl,$0000
-    ld (fixed_point),hl
+    ld (fixedPoint),hl
 
     ; preset map columun address
     ld hl,bgmap
@@ -187,11 +187,11 @@ mainloop:
     call setreg
 
 ; fixed point mathmatic
-    ld hl,(fixed_point) 
+    ld hl,(fixedPoint) 
     ld de,fractional_inc
     add hl,de
 ; Update fixed point value
-    ld (fixed_point),hl
+    ld (fixedPoint),hl
 
 ; scroll background update the scroll buffer
     ld a,(Scroll)
@@ -214,7 +214,7 @@ drawcoltime:
 ; Initialize fixed_point values
 initialize_fixedpoint:
     ld hl,0
-    ld (fixed_point),hl
+    ld (fixedPoint),hl
 
 ; -------------------
 ; Map end check
@@ -236,7 +236,7 @@ screen_cnt:
 ; Scroll stop
 stopscroll_loop:
     xor a
-    ld (ScrollSpeed),a
+    ld (FixedPoint),a
     ld a,$01
     ld (Scroll),a
     jp mainloop
