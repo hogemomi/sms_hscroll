@@ -190,8 +190,6 @@ mainloop:
     ld hl,(fixed_point) 
     ld de,fractional_inc
     add hl,de
-    ld (ScrollSpeed),hl
-
 ; Update fixed point value
     ld (fixed_point),hl
 
