@@ -186,6 +186,13 @@ mainloop:
     ld b,$08
     call setreg
 
+; -------------------
+; Map end check
+    ld a,(Scroll)
+    cp $01
+    jp z,screen_cnt
+
+; -------------------
 ; fixed point mathmatic
     ld hl,(fixedPoint) 
     ld de,fractional_inc
@@ -216,12 +223,6 @@ initialize_fixedpoint:
     ld hl,0
     ld (fixedPoint),hl
 
-; -------------------
-; Map end check
-    ld a,(Scroll)
-    cp $00
-    jp z,screen_cnt
-    jp mainloop
 
 ; -------------------
 screen_cnt:
