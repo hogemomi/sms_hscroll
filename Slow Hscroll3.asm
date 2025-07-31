@@ -223,7 +223,6 @@ initialize_fixedpoint:
     ld hl,0
     ld (fixedPoint),hl
 
-
 ; -------------------
 screen_cnt:
     ld a,(ScreenCount)
