@@ -188,10 +188,7 @@ mainloop:
 
 ; ----------------------
 ; Scroll stop
-stopscroll_loop:
-    xor a
-    ld b,$08
-    call setreg
+stopscroll:
     jp mainloop
 
 ; ----------------------
@@ -200,12 +197,6 @@ hscroll:
     ld a,(Scroll)
     ld b,$08
     call setreg
-
-; -------------------
-; Map end check
-    ld a,(Scroll)
-    cp $01
-    jp z,screen_cnt
 
 ; -------------------
 ; fixed point mathmatic
@@ -222,12 +213,12 @@ hscroll:
     ld (Scroll),a
     ld a,h
     cp $01
-    jp z,drawcoltime
+    jp z,drawcoltiming
     jp mainloop
 
 ; -------------------
 ; Draw Column Timing check every 8px scroll
-drawcoltime:
+drawcoltiming:
     ld a,(Scroll)
     and %00000111
     call z,draw_column
@@ -237,6 +228,12 @@ drawcoltime:
 initialize_fixedpoint:
     ld hl,0
     ld (fixedPoint),hl
+
+; -------------------
+; Map end check
+    ld a,(Scroll)
+    cp $01
+    jp z,screen_cnt
 
 ; -------------------
 screen_cnt:
