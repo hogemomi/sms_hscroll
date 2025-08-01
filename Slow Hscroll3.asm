@@ -181,7 +181,22 @@ mainloop:
     call wait_vblank
 
 ; ----------------------
+; Scroll count check
+    ld a,(ScrollCount)
+    cp $07
+    jp nz,hscroll
+
+; ----------------------
+; Scroll stop
+stopscroll_loop:
+    xor a
+    ld b,$08
+    call setreg
+    jp mainloop
+
+; ----------------------
 ; Update vdp right when vblank begins!
+hscroll:
     ld a,(Scroll)
     ld b,$08
     call setreg
@@ -230,15 +245,6 @@ screen_cnt:
     ld (ScreenCount),a
     cp $07
     jp z,stopscroll_loop
-    jp mainloop
-
-; ----------------------
-; Scroll stop
-stopscroll_loop:
-    xor a
-    ld (FixedPoint),a
-    ld a,$01
-    ld (Scroll),a
     jp mainloop
 
 ; --------------------------------------------------------------
