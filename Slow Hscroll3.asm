@@ -241,7 +241,7 @@ screen_cnt:
     inc a
     ld (ScreenCount),a
     cp $07
-    jp z,stopscroll_loop
+    jp z,stopscroll
     jp mainloop
 
 ; --------------------------------------------------------------
