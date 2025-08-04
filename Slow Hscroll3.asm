@@ -180,16 +180,17 @@ mainloop:
     halt   ; start main loop with vblank
     call wait_vblank
 
-; ----------------------
+; -------------------
 ; Scroll count check
     ld a,(ScrollCount)
     cp $07
-    jp nz,hscroll
+    jp z,stopscroll
 
-; ----------------------
-; Scroll stop
-stopscroll:
-    jp mainloop
+; -------------------
+; Map end check
+    ld a,(Scroll)
+    cp $01
+    jp z,screen_cnt
 
 ; ----------------------
 ; Update vdp right when vblank begins!
@@ -242,6 +243,11 @@ screen_cnt:
     ld (ScreenCount),a
     cp $07
     jp z,stopscroll
+    jp mainloop
+
+; ----------------------
+; Scroll stop
+stopscroll:
     jp mainloop
 
 ; --------------------------------------------------------------
