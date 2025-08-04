@@ -186,12 +186,6 @@ mainloop:
     cp $07
     jp z,stopscroll
 
-; -------------------
-; Map end check
-    ld a,(Scroll)
-    cp $01
-    jp z,screen_cnt
-
 ; ----------------------
 ; Update vdp right when vblank begins!
 hscroll:
@@ -235,6 +229,7 @@ initialize_fixedpoint:
     ld a,(Scroll)
     cp $01
     jp z,screen_cnt
+    jp mainloop
 
 ; -------------------
 screen_cnt:
