@@ -236,8 +236,6 @@ screen_cnt:
     ld a,(ScreenCount)
     inc a
     ld (ScreenCount),a
-    cp $07
-    jp z,stopscroll
     jp mainloop
 
 ; ----------------------
