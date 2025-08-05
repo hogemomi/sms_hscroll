@@ -107,6 +107,12 @@ inigam ld hl,regdat     ; point to register init data.
     ld bc,192*32   ; each tile is 32 bytes.
     call vramwr
 
+       ld hl,$c010         ; color bank 2, color 0 (sprites).
+       call vrampr         ; prepare vram.
+       ld hl,palspr        ; sprite palette data.
+       ld bc,5             ; 5 colors.
+       call vramwr         ; set sprite palette.
+
 ; Map placement at start
 ; Initial buffer
     ld hl,$3800
@@ -180,6 +186,12 @@ mainloop:
     halt   ; start main loop with vblank
     call wait_vblank
 
+; -------------------
+; My charactor
+
+
+; load sat buffer to vram. The cars
+    call ldsat
 ; -------------------
 ; Scroll count check
     ld a,(ScrollCount)
