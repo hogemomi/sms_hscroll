@@ -94,6 +94,13 @@ inigam ld hl,regdat     ; point to register init data.
     or c
     jr nz,-
 
+; Load various assets into vram. 
+    ld hl,$c010         ; color bank 2, color 0 (sprites).
+    call vrampr         ; prepare vram.
+    ld hl,sprpal        ; sprite palette data.
+    ld bc,16             ; 5 colors.
+    call vramwr         ; set sprite palette.
+
 ; Setup the background assets for the main loop.
     ld hl,$c000   ; color bank 1, color 0
     call vrampr
@@ -106,12 +113,6 @@ inigam ld hl,regdat     ; point to register init data.
     ld hl,bgtile
     ld bc,192*32   ; each tile is 32 bytes.
     call vramwr
-
-       ld hl,$c010         ; color bank 2, color 0 (sprites).
-       call vrampr         ; prepare vram.
-       ld hl,palspr        ; sprite palette data.
-       ld bc,5             ; 5 colors.
-       call vramwr         ; set sprite palette.
 
 ; Map placement at start
 ; Initial buffer
@@ -413,6 +414,7 @@ regdat .db %00100110    ; reg. 0, display and interrupt mode.
 
 ; Background assets.
 
-bgpal   .include "Assets_test\palette.inc"
+sprpal  .include "Assets_test\sprite(pal).inc"
+bgpal   .include "Assets_test\bg(pal)pal.inc"
 bgtile  .include "Assets_test\tiles.inc"
 bgmap   .include "Assets_test\tilemap3.inc"
