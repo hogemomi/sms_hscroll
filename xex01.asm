@@ -94,9 +94,9 @@ inigam ld hl,regdat     ; point to register init data.
     or c
     jr nz,-
 
-;=====================================================
+;==============================
 ; Load Assete
-; Load various assets into vram. 
+; Load palette into vram. 
     ld hl,$c010         ; color bank 2, color 0 (sprites).
     call vrampr         ; prepare vram.
     ld hl,sprpal        ; sprite palette data.
