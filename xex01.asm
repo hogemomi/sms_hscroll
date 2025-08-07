@@ -113,16 +113,16 @@ inigam ld hl,regdat     ; point to register init data.
 ; =============
 ; Load tiles
 
-    ld hl,$4000      ; first tile @ index 0.
+    ld hl,$0000      ; first tile @ index 0.
     call vrampr
     ld hl,bgtile
-    ld bc,192*32   ; each tile is 32 bytes.
+    ld bc,256*32   ; each tile is 32 bytes.
     call vramwr
 
     ld hl,$2000         ; first tile @ index 256.
     call vrampr         ; prepare vram.
     ld hl,pltile        ; player car tile data.
-    ld bc,16*32         ; 16 tiles, 32 bytes each.
+    ld bc,192*32         ; 16 tiles, 32 bytes each.
     call vramwr         ; write player car tiles to vram.
 
 
