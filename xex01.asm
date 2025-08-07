@@ -110,8 +110,8 @@ inigam ld hl,regdat     ; point to register init data.
     ld bc,16             ; 5 colors.
     call vramwr         ; set sprite palette.
 
-; ==============================================================
-; Load tiles (font)
+; =============
+; Load tiles
 
     ld hl,$4000      ; first tile @ index 0.
     call vrampr
@@ -130,7 +130,7 @@ inigam ld hl,regdat     ; point to register init data.
     ld bc,MapHeight
     ld (DrawLoopCount),bc
 
-; ---------------
+; =============
 ; start map configuration
 draw_startmap:
     ld hl,(NextRawVram)
