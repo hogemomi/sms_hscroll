@@ -125,7 +125,14 @@ inigam ld hl,regdat     ; point to register init data.
     ld bc,192*32         ; 16 tiles, 32 bytes each.
     call vramwr         ; write player car tiles to vram.
 
+; Put a shining new player car in the buffer.
 
+    ld de,plrcc         ; point to player cc in buffer.
+    ld hl,plrcar        ; point to player car graphics.
+    call carcc          ; set the char codes for player car.
+
+    ld a,79             ; player starts at the road's center.
+    ld (plx),a          ; set x-coordinate.
 
 ; Map placement at start
 ; Initial buffer
@@ -311,6 +318,19 @@ setreg:
     ld a,$80
     or b
     out ($bf),a      ; output command word 2/2.
+    ret
+
+; --------------------------------------------------------------
+; LOAD SPRITE ATTRIBUTE TABLE
+; Load data into sprite attribute table (SAT) from the buffer.
+
+ldsat:
+    ld hl,$3f00         ; point to start of SAT in vram.
+    call vrampr         ; prepare vram to recieve data.
+    ld b,255            ; amount of bytes to output.
+    ld c,$be            ; destination is vdp data port.
+    ld hl,satbuf        ; source is start of sat buffer.
+    otir                ; output buffer to vdp.
     ret
 
 ; ----------------------
