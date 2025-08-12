@@ -95,7 +95,7 @@ inigam ld hl,regdat     ; point to register init data.
     jr nz,-
 
 ;==============================
-; Load Assete
+; Load Palette
 
 ; Load palette into vram. 
     ld hl,$c000   ; color bank 1, color 0
