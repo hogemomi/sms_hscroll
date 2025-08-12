@@ -125,15 +125,6 @@ inigam ld hl,regdat     ; point to register init data.
     ld bc,192*32         ; 16 tiles, 32 bytes each.
     call vramwr         ; write player car tiles to vram.
 
-; Put a shining new player car in the buffer.
-
-    ld de,plrcc         ; point to player cc in buffer.
-    ld hl,plrcar        ; point to player car graphics.
-    call carcc          ; set the char codes for player car.
-
-    ld a,79             ; player starts at the road's center.
-    ld (plx),a          ; set x-coordinate.
-
 ; Map placement at start
 ; Initial buffer
     ld hl,$3800
