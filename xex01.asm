@@ -28,6 +28,7 @@
  ; Organize ram.
 
 .enum $c000 export      ; export labels to symbol file.
+    satbuf dsb 256      ; sprite attribute table buffer.
     NextRawSrc dw
     NextRawVram dw
     NextColSrc dw
