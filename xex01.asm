@@ -27,8 +27,8 @@
 
  ; Organize ram.
 
-.enum $c000 export      ; export labels to symbol file.
-    satbuf dsb 256      ; sprite attribute table buffer.
+.enum $c000 export    ; export labels to symbol file.
+    satbuf dsb 256    ; sprite attribute table buffer.
     NextRawSrc dw
     NextRawVram dw
     NextColSrc dw
@@ -38,9 +38,12 @@
     ScreenCount db
     fixedPoint dw
     ScrollSpeed dw
-    Scroll db        ; vdp scroll register buffer
-    Frame db         ; frame counter
-    VDPstatus db
+    Scroll db      ; vdp scroll register buffer
+    Frame db       ; frame counter
+	  VDPstatus db   ; vdp status (for collision detect.).
+    input db       ; input from player 1 controller.
+    ply db         ; Player y.
+    plx db         ; Player x.
 .ende
 
 .bank 0 slot 0
