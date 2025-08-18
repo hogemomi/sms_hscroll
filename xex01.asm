@@ -129,6 +129,7 @@ inigam ld hl,regdat     ; point to register init data.
     ld bc,192*32         ; 16 tiles, 32 bytes each.
     call vramwr         ; write player car tiles to vram.
 
+; -------------------
 ; Map placement at start
 ; Initial buffer
     ld hl,$3800
