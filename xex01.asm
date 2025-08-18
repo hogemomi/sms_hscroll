@@ -40,7 +40,7 @@
     ScrollSpeed dw
     Scroll db      ; vdp scroll register buffer
     Frame db       ; frame counter
-	  VDPstatus db   ; vdp status (for collision detect.).
+    VDPstatus db   ; vdp status (for collision detect.).
     input db       ; input from player 1 controller.
     ply db         ; Player y.
     plx db         ; Player x.
