@@ -444,9 +444,10 @@ drawcolumn_loop:
 ; GET KEYS.
 ; Read player 1 keys (port $dc) into ram mirror (input).
 
-getkey in a,$dc            ; read player 1 input port $dc.
-       ld (input),a        ; let variable mirror port status.
-       ret
+getkey:
+    in a,$dc            ; read player 1 input port $dc.
+    ld (input),a        ; let variable mirror port status.
+    ret
 
 ; --------------------------------------------------------------
 ; DATA
