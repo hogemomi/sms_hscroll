@@ -24,7 +24,7 @@
 .define  MapWidth $200
 .define  ScreenBottomVram $3e3e
 .define  fractional_inc $0020
-
+.define  Playerspeed 3
  ; Organize ram.
 
 .enum $c000 export    ; export labels to symbol file.
@@ -223,7 +223,7 @@ mainloop:
 
 ; Move player right.
     ld a,(plx)          ; get player x-coordinate.
-    add a,hspeed        ; add constant hspeed
+    add a,Playerspeed   ; add constant hspeed
     ld (plx),a          ; update player x-coordinate.
     jp endchk           ; exit key check part.
 
