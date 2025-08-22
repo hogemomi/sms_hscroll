@@ -372,6 +372,19 @@ ldsat:
     otir                ; output buffer to vdp.
     ret
 
+; Generate sat buffer data from player's x,y coordinates.
+
+upbuf
+    ld a,(ply)          ; load player's current y-coordinate.
+    ld hl,plrvp         ; point to sat buffer.
+    call cary           ; refresh buffer according to y.
+
+    ld a,(plx)          ; load player's current x-coordinate.
+    ld hl,plrhp         ; point to sat buffer.
+    call carx           ; refresh buffer according to x.
+
+    ret
+
 ; ----------------------
 ; Wait Vblank
 wait_vblank:
