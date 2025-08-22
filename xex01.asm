@@ -25,6 +25,9 @@
 .define  ScreenBottomVram $3e3e
 .define  fractional_inc $0020
 .define  Playerspeed 3
+.define plrvp $c008   ; first player vpos.
+.define plrhp $c090  ; first player hpos.
+.define plrcc $c091  ; first player cc.
  ; Organize ram.
 
 .enum $c000 export    ; export labels to symbol file.
