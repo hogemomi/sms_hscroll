@@ -372,6 +372,8 @@ ldsat:
     otir                ; output buffer to vdp.
     ret
 
+; --------------------------------------------
+; UPDATE SAT BUFFER
 ; Generate sat buffer data from player's x,y coordinates.
 
 upbuf
