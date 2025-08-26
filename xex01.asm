@@ -387,6 +387,26 @@ upbuf
 
     ret
 
+; --------------------------------------------------------------
+; CAR Y TO SPRITES' VERTICAL POSITIONS (VPOS) IN BUFFER.
+cary
+   ld b,4              ; a car is 4 tiles wide.
+-      push af             ; a row of 4 tiles share the same y,
+       push af             ; so here the y's are saved on stack.
+       push af
+       push af
+       add a,8             ; next row is 8 pixels below.
+       djnz -              ; make 4 consecutive rows.
+
+       ld de,15            ; load buffer offset into DE.
+       add hl,de           ; add buffer offset to HL.
+       ld b,16             ; we need to update 16 bytes.
+-      pop af              ; get saved y from stack.
+       ld (hl),a           ; write it to the buffer.
+       dec hl              ; point to previous byte.
+       djnz -              ; backwards from vpos+15 to vpos+0.
+       ret
+
 ; ----------------------
 ; Wait Vblank
 wait_vblank:
