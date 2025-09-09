@@ -184,13 +184,18 @@ draw_startmap:
     ld hl,$0000
     ld (fixedPoint),hl
 
-    ; preset map columun address
+; Initialize variables - once per game.
+    ld a,140
+    ld (ply),a  ; set player y.
+
+
+; preset map columun address
     ld hl,bgmap
     ld bc,$0040 ;map width screenx2
     add hl,bc
     ld (NextColSrc),hl
 
-    ; preset vram address
+; preset vram address
     ld hl,$3800
     ld (NextColVram),hl
 
