@@ -207,6 +207,8 @@ draw_startmap:
 
     ld a,79             ; player starts at the road's center.
     ld (plx),a          ; set x-coordinate.
+
+
     ld a,%11100000  ; turn screen on - normal sprites
     ld b,1
     call setreg  ; set register 1
