@@ -191,11 +191,6 @@ draw_startmap:
     ld hl,$0000
     ld (fixedPoint),hl
 
-; Initialize variables - once per game.
-    ld a,140
-    ld (ply),a  ; set player y.
-
-
 ; preset map columun address
     ld hl,bgmap
     ld bc,$0040 ;map width screenx2
@@ -205,6 +200,10 @@ draw_startmap:
 ; preset vram address
     ld hl,$3800
     ld (NextColVram),hl
+
+; Initialize variables - once per game.
+    ld a,140
+    ld (ply),a  ; set player y.
 
 ; Put a shining new player car in the buffer.
     ld de,plrcc         ; point to player cc in buffer.
