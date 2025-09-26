@@ -207,14 +207,12 @@ draw_startmap:
     ld (NextColVram),hl
 
 ; Put a shining new player car in the buffer.
-
     ld de,plrcc         ; point to player cc in buffer.
     ld hl,plrcar        ; point to player car graphics.
     call carcc          ; set the char codes for player car.
 
     ld a,79             ; player starts at the road's center.
     ld (plx),a          ; set x-coordinate.
-
 
     ld a,%11100000  ; turn screen on - normal sprites
     ld b,1
