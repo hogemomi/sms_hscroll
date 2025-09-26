@@ -87,8 +87,15 @@ inigam ld hl,regdat     ; point to register init data.
     djnz -        ; jump back to '-' if b > 0.
 
 ;==============================================================
-; Clear VRAM
+; Initialize game
 ;==============================================================
+; Overwrite the first 4 kb of ram with zeroes.
+inigam ld hl,$c000         ; point to beginning of ram.
+       ld bc,$1000         ; 4 kb to fill.
+       ld a,0              ; with value 0.
+       call mfill          ; do it!
+
+; Clear VRAM
 ; 1. Set VRAM write address to $0000
     ld hl,$0000 | $4000
     call vrampr
