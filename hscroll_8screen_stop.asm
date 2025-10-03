@@ -214,7 +214,7 @@ stopscroll_loop:
     xor a
     ld (ScrollSpeed),a
     ld a,$01
-    ld (Scrool),a
+    ld (Scroll),a
     jp mainloop
 
 ; --------------------------------------------------------------
