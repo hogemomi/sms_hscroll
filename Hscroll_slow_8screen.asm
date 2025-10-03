@@ -2,7 +2,7 @@
 ;        Holizontal Scroll            ;
 ; ------------------------------------;
 
-.sdsctag 0.1, "Hscroll", "Step 1 - Scroller", "hogel"
+.sdsctag 0.1, "Hscroll", "Slow 8screen", "hogel"
 
 .memorymap           ; create 2 x 16 kb slots for rom.
     defaultslot 0
