@@ -23,7 +23,7 @@
 .define  MapHeight $18
 .define  MapWidth $200
 .define  ScreenBottomVram $3e3e
-.define  fractional_inc $0020
+.define  fractional_inc $0080
 
  ; Organize ram.
 
@@ -180,11 +180,16 @@ mainloop:
     halt   ; start main loop with vblank
     call wait_vblank
 
-; -------------------
+; ----------------------
 ; Scroll count check
     ld a,(ScrollCount)
     cp $07
-    jp z,stopscroll
+    jp nz,hscroll
+
+; ----------------------
+; Scroll stop
+stopscroll:
+    jp mainloop
 
 ; ----------------------
 ; Update vdp right when vblank begins!
@@ -227,7 +232,7 @@ initialize_fixedpoint:
 ; -------------------
 ; Map end check
     ld a,(Scroll)
-    cp $01
+    cp $00
     jp z,screen_cnt
     jp mainloop
 
@@ -236,11 +241,8 @@ screen_cnt:
     ld a,(ScreenCount)
     inc a
     ld (ScreenCount),a
-    jp mainloop
-
-; ----------------------
-; Scroll stop
-stopscroll:
+    cp $07
+    jp z,stopscroll
     jp mainloop
 
 ; --------------------------------------------------------------
