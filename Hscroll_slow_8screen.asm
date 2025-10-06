@@ -155,7 +155,7 @@ draw_startmap:
     ld (Scroll),a
     ld hl,$0000
     ld (fixedPoint),hl
-    ld (ScrollVal),a
+    ld (ScrollVal),hl
 
     ; preset map columun address
     ld hl,bgmap
