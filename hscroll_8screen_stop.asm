@@ -20,11 +20,9 @@
 .endro
 
 .define  VDPcontrol $bf
-.define  HScrollSpeed 1
 .define  MapHeight $18
 .define  MapWidth $200
 .define  ScreenBottomVram $3e3e
-.define  fractional_inc $0080
 
  ; Organize ram.
 
@@ -34,10 +32,10 @@
     NextColSrc dw
     NextColVram dw
     DrawLoopCount dw
-    ScrollVal dw
-    fixedPoint dw
-    ScrollSpeed db
+    ScrollCount dw
+    ScreenCount db
     Scroll db        ; vdp scroll register buffer
+    ScrollSpeed db
     Frame db         ; frame counter
     VDPstatus db
 .ende
@@ -100,7 +98,7 @@ inigam ld hl,regdat     ; point to register init data.
     ld hl,bgpal
     ld bc,16   ; 16 colors
     call vramwr
-
+    
     ld hl,$0000      ; first tile @ index 0.
     call vrampr
     ld hl,bgtile
@@ -153,9 +151,8 @@ draw_startmap:
     xor a         ; set A = 0
     ld (Frame),a
     ld (Scroll),a
-    ld hl,$0000
-    ld (fixedPoint),hl
-    ld (ScrollVal),hl
+    ld (ScrollCount),a
+    ld (ScreenCount),a
 
     ; preset map columun address
     ld hl,bgmap
@@ -179,69 +176,41 @@ mainloop:
     halt   ; start main loop with vblank
     call wait_vblank
 
-; Update vdp right when vblank begins
-hscroll:
-    ld a,(Scroll)
-    ld b,$08
-    call setreg
-
-; -------------------
-; fixed point mathmatic
-    ld hl,(fixedPoint)
-    ld de,fractional_inc
-    add hl,de
-; Update fixed point value
-    ld (fixedPoint),hl
-
-; Scroll value update
-; or
-; Scroll buffer update
-    ld a,h
-    cp $01
-    jr nz,scrollbuf_update
-
-; Scroll value update
-    ld bc,(ScrollVal)
-    add hl,bc
-    ld (ScrollVal),hl
-
-; Scroll Buffer update
-scrollbuf_update:
-    ld a,(Scroll)
-    ld b,h
-    sub b
-    ld (Scroll),a
-    cp $01
-    jr z,drawcoltiming
-    jp mainloop
-
 ; -------------------
 ; Draw Column Timing check every 8px scroll
-drawcoltiming:
-    ld a,h
     ld a,(Scroll)
     and %00000111
     call z,draw_column
 
-; ----------------------
-; Initialize fixed_point values
-initialize_fixedpoint:
-    ld hl,0
-    ld (fixedPoint),hl
+; Horizontal scroll
+; Update vdp right when vblank begins!
+    ld a,(Scroll)
+    ld b,$08
+    call setreg
 
-; -------------------
+; Scroll buffer update
+    ld a,(ScrollSpeed)
+    ld b,a
+    ld a,(Scroll)
+    sub b
+    ld (Scroll),a
+
 ; Map end check
-    ld hl,(ScrollVal)
-    ld a,h
+    cp $00
+    jr z,screen_cnt
+    jp mainloop
+
+screen_cnt:
+    ld a,(ScreenCount)
+    inc a
+    ld (ScreenCount),a
     cp $07
-    ld a,l
-    cp $bf
-    jp z,stopscroll
+    jp z,stopscroll_loop
     jp mainloop
 
 ; ----------------------
-; Stop Scroll
-stopscroll:
+; Scroll stop
+stopscroll_loop:
     xor a
     ld (ScrollSpeed),a
     ld a,$01
