@@ -211,7 +211,6 @@ scrollbuf_update:
     ld b,h
     sub b
     ld (Scroll),a
-    ld a,h
     cp $01
     jr z,drawcoltiming
     jp mainloop
