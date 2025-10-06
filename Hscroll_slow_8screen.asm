@@ -2,7 +2,7 @@
 ;        Holizontal Scroll            ;
 ; ------------------------------------;
 
-.sdsctag 0.1, "Hscroll", "Slow 8screen", "hogel"
+.sdsctag 0.1, "Hscroll", "Step 1 - Scroller", "hogel"
 
 .memorymap           ; create 2 x 16 kb slots for rom.
     defaultslot 0
@@ -20,6 +20,7 @@
 .endro
 
 .define  VDPcontrol $bf
+.define  HScrollSpeed 1
 .define  MapHeight $18
 .define  MapWidth $200
 .define  ScreenBottomVram $3e3e
@@ -33,10 +34,9 @@
     NextColSrc dw
     NextColVram dw
     DrawLoopCount dw
-    ScrollCount dw
-    ScreenCount db
+    ScrollVal dw
     fixedPoint dw
-    ScrollSpeed dw
+    ScrollSpeed db
     Scroll db        ; vdp scroll register buffer
     Frame db         ; frame counter
     VDPstatus db
@@ -100,7 +100,7 @@ inigam ld hl,regdat     ; point to register init data.
     ld hl,bgpal
     ld bc,16   ; 16 colors
     call vramwr
-    
+
     ld hl,$0000      ; first tile @ index 0.
     call vrampr
     ld hl,bgtile
@@ -153,10 +153,9 @@ draw_startmap:
     xor a         ; set A = 0
     ld (Frame),a
     ld (Scroll),a
-    ld (ScrollCount),a
-    ld (ScreenCount),a
     ld hl,$0000
     ld (fixedPoint),hl
+    ld (ScrollVal),a
 
     ; preset map columun address
     ld hl,bgmap
@@ -180,19 +179,7 @@ mainloop:
     halt   ; start main loop with vblank
     call wait_vblank
 
-; ----------------------
-; Scroll count check
-    ld a,(ScrollCount)
-    cp $07
-    jp nz,hscroll
-
-; ----------------------
-; Scroll stop
-stopscroll:
-    jp mainloop
-
-; ----------------------
-; Update vdp right when vblank begins!
+; Update vdp right when vblank begins
 hscroll:
     ld a,(Scroll)
     ld b,$08
@@ -200,13 +187,26 @@ hscroll:
 
 ; -------------------
 ; fixed point mathmatic
-    ld hl,(fixedPoint) 
+    ld hl,(fixedPoint)
     ld de,fractional_inc
     add hl,de
 ; Update fixed point value
     ld (fixedPoint),hl
 
-; scroll background update the scroll buffer
+; Scroll value update
+; or
+; Scroll buffer update
+    ld a,h
+    cp $01
+    jp nz,scrollbuf_update
+
+; Scroll value update
+    ld bc,(ScrollVal)
+    add hl,bc
+    ld (ScrollVal),hl
+
+; Scroll Buffer update
+scrollbuf_update:
     ld a,(Scroll)
     ld b,h
     sub b
@@ -219,6 +219,7 @@ hscroll:
 ; -------------------
 ; Draw Column Timing check every 8px scroll
 drawcoltiming:
+    ld a,h
     ld a,(Scroll)
     and %00000111
     call z,draw_column
@@ -231,18 +232,21 @@ initialize_fixedpoint:
 
 ; -------------------
 ; Map end check
-    ld a,(Scroll)
-    cp $00
-    jp z,screen_cnt
+    ld hl,(ScrollVal)
+    ld a,h
+    cp $07
+    ld a,l
+    cp $bf
+    jp z,stopscroll
     jp mainloop
 
-; -------------------
-screen_cnt:
-    ld a,(ScreenCount)
-    inc a
-    ld (ScreenCount),a
-    cp $07
-    jp z,stopscroll
+; ----------------------
+; Stop Scroll
+stopscroll:
+    xor a
+    ld (ScrollSpeed),a
+    ld a,$01
+    ld (Scroll),a
     jp mainloop
 
 ; --------------------------------------------------------------
