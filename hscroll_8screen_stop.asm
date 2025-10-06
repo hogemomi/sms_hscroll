@@ -198,7 +198,7 @@ hscroll:
 ; Scroll buffer update
     ld a,h
     cp $01
-    jp nz,scrollbuf_update
+    jr nz,scrollbuf_update
 
 ; Scroll value update
     ld bc,(ScrollVal)
@@ -213,7 +213,7 @@ scrollbuf_update:
     ld (Scroll),a
     ld a,h
     cp $01
-    jp z,drawcoltiming
+    jr z,drawcoltiming
     jp mainloop
 
 ; -------------------
