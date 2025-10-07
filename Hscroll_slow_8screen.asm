@@ -28,7 +28,7 @@
 
  ; Organize ram.
 
-.enum $c000 export      ; export labels to symbol file.
+.enum $c000 export   ; export labels to symbol file.
     NextRawSrc dw
     NextRawVram dw
     NextColSrc dw
@@ -36,7 +36,7 @@
     DrawLoopCount dw
     ScrollVal dw
     fixedPoint dw
-    ScrollSpeed db
+    ScrollSpeed db   ; scroll speed
     Scroll db        ; vdp scroll register buffer
     Frame db         ; frame counter
     VDPstatus db
