@@ -20,7 +20,6 @@
 .endro
 
 .define  VDPcontrol $bf
-.define  HScrollSpeed 1
 .define  MapHeight $18
 .define  MapWidth $200
 .define  ScreenBottomVram $3e3e
