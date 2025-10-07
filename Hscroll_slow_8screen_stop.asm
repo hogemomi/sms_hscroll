@@ -201,7 +201,6 @@ scroll_processing:
     ld hl,(fixedPoint)
     ld de,fractional_inc
     add hl,de
-
 ; Update fixed point value
     ld (fixedPoint),hl
 
