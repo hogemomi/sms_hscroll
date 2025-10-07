@@ -185,10 +185,23 @@ hscroll:
     call setreg
 
 ; -------------------
+; Map end check
+    ld hl,(ScrollVal)
+    ld a,h
+    cp $07
+    jp nz,scroll_processing
+    ld a,l
+    cp $bf
+    jp z,stop_scroll
+
+; -------------------
+; scroll proess
 ; fixed point mathmatic
+scroll_processing:
     ld hl,(fixedPoint)
     ld de,fractional_inc
     add hl,de
+
 ; Update fixed point value
     ld (fixedPoint),hl
 
@@ -228,20 +241,9 @@ initialize_fixedpoint:
     ld hl,0
     ld (fixedPoint),hl
 
-; -------------------
-; Map end check
-    ld hl,(ScrollVal)
-    ld a,h
-    cp $07
-    jp nz,mainloop
-    ld a,l
-    cp $bf
-    jp nz,mainloop
-    jp stopscroll_loop
-
 ; ----------------------
-; Stop Scroll
-stopscroll_loop:
+; Stop scroll
+stop_scroll
     xor a
     ld (ScrollSpeed),a
     ld a,$01
