@@ -219,7 +219,6 @@ scrollbuf_update:
 ; -------------------
 ; Draw Column Timing check every 8px scroll
 drawcoltiming:
-    ld a,h
     ld a,(Scroll)
     and %00000111
     call z,draw_column
@@ -235,10 +234,11 @@ initialize_fixedpoint:
     ld hl,(ScrollVal)
     ld a,h
     cp $07
+    jp nz,mainloop
     ld a,l
     cp $bf
-    jp z,stopscroll
-    jp mainloop
+    jp nz,mainloop
+    jp stopscroll:
 
 ; ----------------------
 ; Stop Scroll
