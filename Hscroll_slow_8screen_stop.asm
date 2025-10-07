@@ -238,11 +238,11 @@ initialize_fixedpoint:
     ld a,l
     cp $bf
     jp nz,mainloop
-    jp stopscroll:
+    jp stopscroll_loop
 
 ; ----------------------
 ; Stop Scroll
-stopscroll:
+stopscroll_loop:
     xor a
     ld (ScrollSpeed),a
     ld a,$01
