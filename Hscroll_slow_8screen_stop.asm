@@ -213,7 +213,6 @@ scroll_process:
     ld a,(Scroll)
     sub h
     ld (Scroll),a
-    ld a,h
     cp $01
     jp z,drawcoltiming
     jp mainloop
