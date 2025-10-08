@@ -205,19 +205,11 @@ scroll_processing:
     ld (fixedPoint),hl
 
 ; Scroll value update
-; or
-; Scroll buffer update
-    ld a,h
-    cp $01
-    jp nz,scrollbuf_update
-
-; Scroll value update
     ld bc,(ScrollVal)
-    add hl,bc
-    ld (ScrollVal),hl
+    add bc,hl
+    ld (ScrollVal),bc
 
 ; Scroll Buffer update
-scrollbuf_update:
     ld a,(Scroll)
     ld b,h
     sub b
@@ -239,6 +231,7 @@ drawcoltiming:
 initialize_fixedpoint:
     ld hl,0
     ld (fixedPoint),hl
+    jp mainloop
 
 ; ----------------------
 ; Stop scroll
