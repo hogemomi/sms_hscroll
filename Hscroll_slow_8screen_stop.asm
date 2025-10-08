@@ -179,7 +179,6 @@ mainloop:
     call wait_vblank
 
 ; Update vdp right when vblank begins
-hscroll:
     ld a,(Scroll)
     ld b,$08
     call setreg
