@@ -189,7 +189,7 @@ hscroll:
     ld hl,(ScrollVal)
     ld a,h
     cp $07
-    jp nz,scroll_processing
+    jp nz,scroll_process:
     ld a,l
     cp $bf
     jp z,stop_scroll
@@ -197,7 +197,7 @@ hscroll:
 ; -------------------
 ; scroll proess
 ; fixed point mathmatic
-scroll_processing:
+scroll_process:
     ld hl,(fixedPoint)
     ld de,fractional_inc
     add hl,de
