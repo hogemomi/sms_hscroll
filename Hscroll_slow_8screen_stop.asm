@@ -207,7 +207,7 @@ scroll_processing:
 ; Scroll value update
     ld bc,(ScrollVal)
     add hl,bc
-    ld (ScrollVal),bc
+    ld (ScrollVal),hl
 
 ; Scroll Buffer update
     ld a,(Scroll)
