@@ -211,8 +211,7 @@ scroll_process:
 
 ; Scroll Buffer update
     ld a,(Scroll)
-    ld b,h
-    sub b
+    sub h
     ld (Scroll),a
     ld a,h
     cp $01
