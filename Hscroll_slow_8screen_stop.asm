@@ -188,7 +188,7 @@ mainloop:
     ld hl,(ScrollVal)
     ld a,h
     cp $07
-    jp nz,scroll_process:
+    jr nz,scroll_process:
     ld a,l
     cp $bf
     jp z,stop_scroll
@@ -213,7 +213,7 @@ scroll_process:
     sub h
     ld (Scroll),a
     cp $01
-    jp z,drawcoltiming
+    jr z,drawcoltiming
     jp mainloop
 
 ; -------------------
