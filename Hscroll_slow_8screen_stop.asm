@@ -215,6 +215,7 @@ scroll_process:
     jp mainloop
 
 ; Scroll value update
+scrollval_update:
     ld bc,(ScrollVal)
     add hl,bc
     ld (ScrollVal),hl
