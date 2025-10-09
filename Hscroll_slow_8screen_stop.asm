@@ -215,19 +215,19 @@ scroll_process:
     cp $01
     jr z,scrollval_update
 
+; Scroll value update
+scrollval_update:
+    ld hl,(ScrollVal)
+    inc hl
+    ld (ScrollVal),hl
+    jp mainloop
+
 ; Scroll Buffer update
     ld a,(Scroll)
     sub h
     ld (Scroll),a
     cp $01
     jr z,drawcoltiming
-    jp mainloop
-
-; Scroll value update
-scrollval_update:
-    ld hl,(ScrollVal)
-    inc hl
-    ld (ScrollVal),hl
     jp mainloop
 
 ; -------------------
