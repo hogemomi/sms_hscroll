@@ -213,16 +213,16 @@ scroll_process:
     ld (fixedPoint),hl
     ld a,h
     cp $01
-    jr z,scrollval_update
+    jr nz,scrollbuf_up
 
-; Scroll value update
-scrollval_update:
+; Scroll value updat
     ld hl,(ScrollVal)
     inc hl
     ld (ScrollVal),hl
     jp mainloop
 
 ; Scroll Buffer update
+scrollbuf_up
     ld a,(Scroll)
     sub h
     ld (Scroll),a
