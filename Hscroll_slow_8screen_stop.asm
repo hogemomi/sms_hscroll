@@ -188,10 +188,19 @@ mainloop:
     ld hl,(ScrollVal)
     ld a,h
     cp $80
-    jr nz,scroll_process:
+    jr nz,scroll_process
     ld a,l
     cp $00
-    jp z,stop_scroll
+    jp nz,scroll_process
+
+; ----------------------
+; Stop scroll
+stop_scroll
+    xor a
+    ld (ScrollSpeed),a
+    ld a,$00
+    ld (Scroll),a
+    jp mainloop
 
 ; -------------------
 ; scroll proess
@@ -233,15 +242,6 @@ drawcoltiming:
 initialize_fixedpoint:
     ld hl,0
     ld (fixedPoint),hl
-    jp mainloop
-
-; ----------------------
-; Stop scroll
-stop_scroll
-    xor a
-    ld (ScrollSpeed),a
-    ld a,$01
-    ld (Scroll),a
     jp mainloop
 
 ; --------------------------------------------------------------
