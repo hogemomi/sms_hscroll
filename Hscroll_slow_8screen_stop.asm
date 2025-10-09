@@ -187,10 +187,10 @@ mainloop:
 ; Map end check
     ld hl,(ScrollVal)
     ld a,h
-    cp $07
+    cp $80
     jr nz,scroll_process:
     ld a,l
-    cp $bf
+    cp $00
     jp z,stop_scroll
 
 ; -------------------
