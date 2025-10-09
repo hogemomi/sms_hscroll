@@ -202,11 +202,9 @@ scroll_process:
     add hl,de
 ; Update fixed point value
     ld (fixedPoint),hl
-
-; Scroll value update
-    ld bc,(ScrollVal)
-    add hl,bc
-    ld (ScrollVal),hl
+    ld a,h
+    cp $01
+    jr z,scrollval_update
 
 ; Scroll Buffer update
     ld a,(Scroll)
@@ -214,6 +212,12 @@ scroll_process:
     ld (Scroll),a
     cp $01
     jr z,drawcoltiming
+    jp mainloop
+
+; Scroll value update
+    ld bc,(ScrollVal)
+    add hl,bc
+    ld (ScrollVal),hl
     jp mainloop
 
 ; -------------------
