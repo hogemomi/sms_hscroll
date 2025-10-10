@@ -217,6 +217,10 @@ scroll_process:
     ld hl,(ScrollVal)
     inc hl
     ld (ScrollVal),hl
+
+; Initialize fixed_point values
+    ld hl,0
+    ld (fixedPoint),hl
     jp mainloop
 
 ; Scroll Buffer update
@@ -233,13 +237,6 @@ drawcoltiming:
     ld a,(Scroll)
     and %00000111
     call z,draw_column
-
-; ----------------------
-; Initialize fixed_point values
-initialize_fixedpoint:
-    ld hl,0
-    ld (fixedPoint),hl
-    jp mainloop
 
 ; --------------------------------------------------------------
 ; SUBROUTINES
