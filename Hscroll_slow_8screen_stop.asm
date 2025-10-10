@@ -196,8 +196,6 @@ mainloop:
 ; ----------------------
 ; Stop scroll
 stop_scroll
-    xor a
-    ld (ScrollSpeed),a
     ld a,$00
     ld (Scroll),a
     jp mainloop
