@@ -226,7 +226,8 @@ scroll_process:
 ; Scroll Buffer update
 scrollbuf_up
     ld a,(Scroll)
-    sub h
+    ld b,(ScrollSpeed)
+    sub b
     ld (Scroll),a
     cp $01
     jp nz,mainloop
