@@ -147,8 +147,6 @@ draw_startmap:
 
 ; --------------------
 ; Initiarize buffer
-    ld a,1
-    ld (ScrollSpeed),a
     xor a         ; set A = 0
     ld (Frame),a
     ld (Scroll),a
