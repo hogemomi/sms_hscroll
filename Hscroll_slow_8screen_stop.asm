@@ -20,6 +20,8 @@
 .endro
 
 .define  VDPcontrol $bf
+.define  ScrollSpeed $01
+.define  ScrollStop $00
 .define  MapHeight $18
 .define  MapWidth $200
 .define  ScreenBottomVram $3e3e
