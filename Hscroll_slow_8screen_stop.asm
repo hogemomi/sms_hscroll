@@ -227,8 +227,7 @@ scrollbuf_up
     sub h
     ld (Scroll),a
     cp $01
-    jr z,drawcoltiming
-    jp mainloop
+    jp nz,mainloop
 
 ; -------------------
 ; Draw Column Timing check every 8px scroll
