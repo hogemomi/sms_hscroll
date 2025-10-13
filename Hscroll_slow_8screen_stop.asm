@@ -214,9 +214,9 @@ scroll_process:
     jr nz,scrollbuf_up
 
 ; Scroll value updat
-    ld hl,(ScrollVal)
-    inc hl
-    ld (ScrollVal),hl
+    ld bc,(ScrollVal)
+    inc bc
+    ld (ScrollVal),bc
 
 ; Initialize fixed_point values
     ld hl,0
