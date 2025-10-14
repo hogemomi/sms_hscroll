@@ -218,17 +218,17 @@ scroll_process:
     inc bc
     ld (ScrollVal),bc
 
+; Initialize fixed_point values
+    ld bc,0
+    ld (fixedPoint),bc
+
 ; Scroll Buffer update
 scrollbuf_up
     ld a,(Scroll)
     ld b,h
     sub b
     ld (Scroll),a
-
-; Initialize fixed_point values
-    ld hl,0
-    ld (fixedPoint),hl
-    jp nz,mainloop
+    jp mainloop
 
 ; -------------------
 ; Draw Column Timing check every 8px scroll
