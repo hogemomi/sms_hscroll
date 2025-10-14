@@ -218,10 +218,6 @@ scroll_process:
     inc bc
     ld (ScrollVal),bc
 
-; Initialize fixed_point values
-    ld hl,0
-    ld (fixedPoint),hl
-
 ; Scroll Buffer update
 scrollbuf_up
     ld a,(Scroll)
@@ -229,6 +225,10 @@ scrollbuf_up
     sub b
     ld (Scroll),a
     cp $01
+
+; Initialize fixed_point values
+    ld hl,0
+    ld (fixedPoint),hl
     jp nz,mainloop
 
 ; -------------------
