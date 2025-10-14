@@ -226,7 +226,7 @@ scroll_process:
 ; Scroll Buffer update
 scrollbuf_up
     ld a,(Scroll)
-    ld b,(ScrollSpeed)
+    ld b,h
     sub b
     ld (Scroll),a
     cp $01
