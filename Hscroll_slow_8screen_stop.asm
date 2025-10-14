@@ -221,7 +221,6 @@ scroll_process:
 ; Initialize fixed_point values
     ld hl,0
     ld (fixedPoint),hl
-    jp mainloop
 
 ; Scroll Buffer update
 scrollbuf_up
