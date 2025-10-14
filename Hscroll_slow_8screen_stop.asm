@@ -224,7 +224,6 @@ scrollbuf_up
     ld b,h
     sub b
     ld (Scroll),a
-    cp $01
 
 ; Initialize fixed_point values
     ld hl,0
