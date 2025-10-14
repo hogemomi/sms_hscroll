@@ -224,7 +224,6 @@ scrollbuf_up
     ld b,h
     sub b
     ld (Scroll),a
-    jp nz,mainloop
 
 ; Initialize fixed_point values
     ld hl,0
