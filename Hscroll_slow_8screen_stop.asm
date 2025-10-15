@@ -228,6 +228,7 @@ scrollbuf_up
     ld b,h
     sub b
     ld (Scroll),a
+    co $00000111
     jp mainloop
 
 ; -------------------
