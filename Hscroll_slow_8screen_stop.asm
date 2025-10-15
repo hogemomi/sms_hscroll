@@ -25,7 +25,7 @@
 .define  MapHeight $18
 .define  MapWidth $200
 .define  ScreenBottomVram $3e3e
-.define  fractional_inc $0080
+.define  fractional_inc $0070
 
  ; Organize ram.
 
@@ -37,7 +37,6 @@
     DrawLoopCount dw
     ScrollVal dw
     fixedPoint dw
-    ScrollSpeed db   ; scroll speed
     Scroll db        ; vdp scroll register buffer
     Frame db         ; frame counter
     VDPstatus db
@@ -177,21 +176,22 @@ mainloop:
     ei
     halt   ; start main loop with vblank
     call wait_vblank
-
-; Update vdp right when vblank begins
+    
+; ----------------------
+; Update vdp right when vblank begins!
     ld a,(Scroll)
     ld b,$08
     call setreg
 
 ; -------------------
-; Map end check
+; Scroll value check
     ld hl,(ScrollVal)
     ld a,h
-    cp $80
+    cp $06
     jr nz,scroll_process
     ld a,l
-    cp $00
-    jp nz,scroll_process
+    cp $ff
+    jr nz,scroll_process
 
 ; ----------------------
 ; Stop scroll
@@ -218,10 +218,6 @@ scroll_process:
     inc bc
     ld (ScrollVal),bc
 
-; Initialize fixed_point values
-    ld bc,0
-    ld (fixedPoint),bc
-
 ; Scroll Buffer update
 scrollbuf_up
     ld a,(Scroll)
@@ -229,9 +225,19 @@ scrollbuf_up
     sub b
     ld (Scroll),a
 
+; -------------------
 ; Draw Column Timing check every 8px scroll
+drawcoltiming:
+    ld a,(Scroll)
     and %00000111
     call z,draw_column
+    ld a,h
+    cp $01
+    jp nz,mainloop
+
+; Initialize fixed_point values
+    ld hl,0
+    ld (fixedPoint),hl
     jp mainloop
 
 ; --------------------------------------------------------------
