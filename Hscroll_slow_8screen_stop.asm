@@ -228,15 +228,12 @@ scrollbuf_up
     ld b,h
     sub b
     ld (Scroll),a
-    co $00000111
-    jp mainloop
 
-; -------------------
 ; Draw Column Timing check every 8px scroll
 drawcoltiming:
-    ld a,(Scroll)
     and %00000111
     call z,draw_column
+    jp mainloop
 
 ; --------------------------------------------------------------
 ; SUBROUTINES
