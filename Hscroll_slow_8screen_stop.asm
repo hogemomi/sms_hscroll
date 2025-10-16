@@ -227,7 +227,7 @@ scrollbuf_up
 
 ; Draw Column Timing check every 8px scroll
 drawcoltiming:
-    ld a,(Scroll)
+    ld a,(Scrollval)
     and %00000111
     call z,draw_column
     ld a,h
