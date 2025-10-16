@@ -229,6 +229,7 @@ scrollbuf_up
     ld a,(Scrollval)
     and %00000111
     call z,draw_column
+    ld hl,(fixedPoint)
     ld a,h
     cp $01
     jp nz,mainloop
