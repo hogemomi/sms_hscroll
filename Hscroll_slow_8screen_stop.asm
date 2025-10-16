@@ -204,19 +204,19 @@ stop_scroll
 ; scroll proess
 ; fixed point mathmatic
 scroll_process:
-    ld hl,(fixedPoint)
+    ld hl,(fixedpoint)
     ld de,fractional_inc
     add hl,de
 ; Update fixed point value
-    ld (fixedPoint),hl
+    ld (fixedpoint),hl
     ld a,h
     cp $01
     jr nz,scrollbuf_up
 
 ; Scroll value updat
-    ld bc,(ScrollVal)
+    ld bc,(scrollval)
     inc bc
-    ld (ScrollVal),bc
+    ld (scrolval),bc
 
 ; Scroll Buffer update
 scrollbuf_up
@@ -229,7 +229,7 @@ scrollbuf_up
     ld a,(Scrollval)
     and %00000111
     call z,draw_column
-    ld hl,(fixedPoint)
+    ld hl,(fixedpoint)
     ld a,h
     cp $01
     jp nz,mainloop
