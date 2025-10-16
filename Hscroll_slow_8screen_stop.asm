@@ -225,7 +225,6 @@ scrollbuf_up
     sub b
     ld (Scroll),a
 
-; -------------------
 ; Draw Column Timing check every 8px scroll
 drawcoltiming:
     ld a,(Scroll)
