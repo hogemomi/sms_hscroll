@@ -1,8 +1,8 @@
 ; ------------------------------------;
-;        Holizontal scroll            ;
+;        Holizontal Scroll            ;
 ; ------------------------------------;
 
-.sdsctag 0.1, "Hscroll", "Step 1 - scroller", "hogel"
+.sdsctag 0.1, "Hscroll", "Step 1 - Scroller", "hogel"
 
 .memorymap           ; create 2 x 16 kb slots for rom.
     defaultslot 0
@@ -19,27 +19,27 @@
     banks 2
 .endro
 
-.define  vdpcontrol $bf
-.define  scrollspeed $01
-.define  scrollstop $00
-.define  mapheight $18
-.define  mapwidth $200
-.define  screenbottomvram $3e3e
-.define  fractional_inc $0080
+.define  VDPcontrol $bf
+.define  MapHeight $18
+.define  MapWidth $200
+.define  ScreenBottomVram $3e3e
+.define  fractional_inc $0070
 
  ; Organize ram.
 
-.enum $c000 export   ; export labels to symbol file.
-    nextrawsrc dw
-    nextrawvram dw
-    nextcolsrc dw
-    nextcolvram dw
-    drawloopcount dw
-    scrollval dw
-    fixedpoint dw
-    scroll db        ; vdp scroll register buffer
-    frame db         ; frame counter
-    vdpstatus db
+.enum $c000 export      ; export labels to symbol file.
+    NextRawSrc dw
+    NextRawVram dw
+    NextColSrc dw
+    NextColVram dw
+    DrawLoopCount dw
+    ScrollCount dw
+    ScreenCount db
+    fixedPoint dw
+    ScrollSpeed dw
+    Scroll db        ; vdp scroll register buffer
+    Frame db         ; frame counter
+    VDPstatus db
 .ende
 
 .bank 0 slot 0
@@ -53,8 +53,8 @@
 
 .orga $0038          ; frame interrupt address
     ex af,af'        ; save accumulator in its shadow reg.
-    in a,(vdpcontrol)   ; read status flags from VDP control
-    ld (vdpstatus),a    ; save vdp status
+    in a,(VDPcontrol)   ; read status flags from VDP control
+    ld (VDPstatus),a    ; save vdp status
     ex af,af'        ; restore accumulator
     reti                ; return from interrupt
 
@@ -100,7 +100,7 @@ inigam ld hl,regdat     ; point to register init data.
     ld hl,bgpal
     ld bc,16   ; 16 colors
     call vramwr
-
+    
     ld hl,$0000      ; first tile @ index 0.
     call vrampr
     ld hl,bgtile
@@ -110,18 +110,18 @@ inigam ld hl,regdat     ; point to register init data.
 ; Map placement at start
 ; Initial buffer
     ld hl,$3800
-    ld (nextrawvram),hl
+    ld (NextRawVram),hl
     ld hl,bgmap
     ld (NextRawSrc),hl
 
 ; loop count set
-    ld bc,mapheight
-    ld (drawloopcount),bc
+    ld bc,MapHeight
+    ld (DrawLoopCount),bc
 
 ; ---------------
 ; start map configuration
 draw_startmap:
-    ld hl,(nextrawvram)
+    ld hl,(NextRawVram)
     call vrampr
 ; Wriite mapdata
     ld hl,(NextRawSrc)
@@ -129,41 +129,44 @@ draw_startmap:
     call vramwr
 
 ; Vram address update
-    ld hl,(nextrawvram)
+    ld hl,(NextRawVram)
     ld de,$0040
     add hl,de
-    ld (nextrawvram),hl
+    ld (NextRawVram),hl
 
 ; Map source add update
     ld hl,(NextRawSrc)
-    ld bc,mapwidth
+    ld bc,MapWidth
     add hl,bc
     ld (NextRawSrc),hl
 
 ; loop count update
-    ld bc,(drawloopcount)
+    ld bc,(DrawLoopCount)
     dec c
-    ld (drawloopcount),bc
+    ld (DrawLoopCount),bc
     jr nz,draw_startmap
 
 ; --------------------
 ; Initiarize buffer
+    ld a,1
+    ld (ScrollSpeed),a
     xor a         ; set A = 0
-    ld (frame),a
-    ld (scroll),a
+    ld (Frame),a
+    ld (Scroll),a
+    ld (ScrollCount),a
+    ld (ScreenCount),a
     ld hl,$0000
-    ld (fixedpoint),hl
-    ld (scrollval),hl
+    ld (fixedPoint),hl
 
     ; preset map columun address
     ld hl,bgmap
     ld bc,$0040 ;map width screenx2
     add hl,bc
-    ld (nextcolsrc),hl
+    ld (NextColSrc),hl
 
     ; preset vram address
     ld hl,$3800
-    ld (nextcolvram),hl
+    ld (NextColVram),hl
 
     ld a,%11100000  ; turn screen on - normal sprites
     ld b,1
@@ -176,67 +179,43 @@ mainloop:
     ei
     halt   ; start main loop with vblank
     call wait_vblank
-    
+
 ; ----------------------
 ; Update vdp right when vblank begins!
-    ld a,(scroll)
+    ld a,(Scroll)
     ld b,$08
     call setreg
 
 ; -------------------
-; scroll value check
-    ld hl,(scrollval)
-    ld a,h
-    cp $06
-    jr nz,scroll_process
-    ld a,l
-    cp $ff
-    jr nz,scroll_process
-
-; ----------------------
-; Stop scroll
-stop_scroll
-    ld a,$00
-    ld (scroll),a
-    jp mainloop
-
-; -------------------
-; scroll proess
 ; fixed point mathmatic
-scroll_process:
-    ld hl,(fixedpoint)
+    ld hl,(fixedPoint) 
     ld de,fractional_inc
     add hl,de
 ; Update fixed point value
-    ld (fixedpoint),hl
-    ld a,h
-    cp $01
-    jr nz,scrollbuf_up
+    ld (fixedPoint),hl
 
-; scroll value updat
-    ld bc,(scrollval)
-    inc bc
-    ld (scrollval),bc
-
-; scroll Buffer update
-scrollbuf_up
-    ld a,(scroll)
+; scroll background update the scroll buffer
+    ld a,(Scroll)
     ld b,h
     sub b
-    ld (scroll),a
-
-; Draw Column Timing check every 8px scroll
-    ld a,(scrollval)
-    and %00000111
-    call z,draw_column
-    ld hl,(fixedpoint)
+    ld (Scroll),a
     ld a,h
     cp $01
-    jp nz,mainloop
+    jp z,drawcoltiming
+    jp mainloop
 
+; -------------------
+; Draw Column Timing check every 8px scroll
+drawcoltiming:
+    ld a,(Scroll)
+    and %00000111
+    call z,draw_column
+
+; ----------------------
 ; Initialize fixed_point values
+initialize_fixedpoint:
     ld hl,0
-    ld (fixedpoint),hl
+    ld (fixedPoint),hl
     jp mainloop
 
 ; --------------------------------------------------------------
@@ -286,53 +265,53 @@ setreg:
 ; ----------------------
 ; Wait Vblank
 wait_vblank:
-    ld a,(vdpstatus)
+    ld a,(VDPstatus)
     bit 7,a  ; check vblank bit
     jp z, wait_vblank
     res 7,a
-    ld (vdpstatus),a
+    ld (VDPstatus),a
     ret
 
 ; ----------------------
 draw_column:
 ; Loop counter
-    ld a,mapheight
-    ld (drawloopcount),a
+    ld a,MapHeight
+    ld (DrawLoopCount),a
 
 drawcolumn_loop:
 ; write to vram
-    ld hl,(nextcolvram)
+    ld hl,(NextColVram)
     call vrampr
-    ld hl,(nextcolsrc)
+    ld hl,(NextColSrc)
     ld bc,2
     call vramwr
 
 ; Row Vram Source update
-    ld hl,(nextcolvram)
+    ld hl,(NextColVram)
     ld bc,$0040
     add hl,bc
-    ld (nextcolvram),hl
+    ld (NextColVram),hl
 
-    ld hl,(nextcolsrc)
-    ld bc,mapwidth
+    ld hl,(NextColSrc)
+    ld bc,MapWidth
     add hl,bc
-    ld (nextcolsrc),hl
+    ld (NextColSrc),hl
 
 ; loop counter
-    ld a,(drawloopcount)
+    ld a,(DrawLoopCount)
     dec a
-    ld (drawloopcount),a
+    ld (DrawLoopCount),a
     jp nz,drawcolumn_loop
 
 ; Next column source add
-    ld hl,(nextcolsrc)
+    ld hl,(NextColSrc)
     ld bc,$2ffe
     or a
     sbc hl,bc
-    ld (nextcolsrc),hl
+    ld (NextColSrc),hl
 
 ; Vram add reset
-    ld hl,(nextcolvram)
+    ld hl,(NextColVram)
     ld a,h
     cp $3e
     jr nz,next_colvramadd
@@ -342,16 +321,16 @@ drawcolumn_loop:
 
 ; Move top vram add
     ld hl,$3800
-    ld (nextcolvram),hl
+    ld (NextColVram),hl
     ret
 
 ; Next column vram add
     next_colvramadd:
-    ld hl,(nextcolvram)
+    ld hl,(NextColVram)
     ld bc,$05fe
     or a
     sbc hl,bc
-    ld (nextcolvram),hl
+    ld (NextColVram),hl
     ret
 ; --------------------------------------------------------------
 ; DATA
