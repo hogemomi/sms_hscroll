@@ -193,6 +193,9 @@ mainloop:
     add hl,de
 ; Update fixed point value
     ld (fixedPoint),hl
+    ld a,h
+    cp $01
+    jr nz,scrollupdate
 
 ; scroll value update
     ld bc,(scrollval)
@@ -200,6 +203,7 @@ mainloop:
     ld (scrollval),bc
 
 ; scroll background update the scroll buffer
+scrollupdate:
     ld a,(Scroll)
     ld b,h
     sub b
