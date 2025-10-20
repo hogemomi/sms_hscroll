@@ -194,6 +194,11 @@ mainloop:
 ; Update fixed point value
     ld (fixedPoint),hl
 
+; scroll value update
+    ld bc,(scrollval)
+    inc bc
+    ld (scrollval),bc
+
 ; scroll background update the scroll buffer
     ld a,(Scroll)
     ld b,h
