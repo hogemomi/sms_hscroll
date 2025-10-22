@@ -1,8 +1,8 @@
 ; ------------------------------------;
-;        Holizontal Scroll            ;
+;        holizontal scroll            ;
 ; ------------------------------------;
 
-.sdsctag 0.1, "Hscroll", "Step 1 - Scroller", "hogel"
+.sdsctag 0.1, "hscroll", "step 1 - scroller", "hogel"
 
 .memorymap           ; create 2 x 16 kb slots for rom.
     defaultslot 0
@@ -19,27 +19,28 @@
     banks 2
 .endro
 
-.define  VDPcontrol $bf
-.define  MapHeight $18
-.define  MapWidth $200
-.define  ScreenBottomVram $3e3e
-.define  fractional_inc $0070
+.define  vdpcontrol $bf
+.define  mapheight $18
+.define  mapwidth $200
+.define  screenbottomvram $3e3e
+.define  fractional_inc $0040
 
- ; Organize ram.
+ ; organize ram.
 
 .enum $c000 export      ; export labels to symbol file.
-    NextRawSrc dw
-    NextRawVram dw
-    NextColSrc dw
-    NextColVram dw
-    DrawLoopCount dw
-    ScrollCount dw
-    ScreenCount db
-    fixedPoint dw
-    ScrollSpeed dw
-    Scroll db        ; vdp scroll register buffer
-    Frame db         ; frame counter
-    VDPstatus db
+    nextrawsrc dw
+    nextrawvram dw
+    nextcolsrc dw
+    nextcolvram dw
+    drawloopcount dw
+    scrollcount dw
+    fixedpoint dw
+    scrollval dw
+    screencount db
+    scrollspeed db
+    scroll db        ; vdp scroll register buffer
+    frame db         ; frame counter
+    vdpstatus db
 .ende
 
 .bank 0 slot 0
@@ -49,52 +50,52 @@
     ld sp,$dff0      ; default stack pointer address.
     jp inigam        ; initialize game.
 
-; Read the vdp status flag at every frame interrupt.
+; read the vdp status flag at every frame interrupt.
 
 .orga $0038          ; frame interrupt address
     ex af,af'        ; save accumulator in its shadow reg.
-    in a,(VDPcontrol)   ; read status flags from VDP control
-    ld (VDPstatus),a    ; save vdp status
+    in a,(vdpcontrol)   ; read status flags from vdp control
+    ld (vdpstatus),a    ; save vdp status
     ex af,af'        ; restore accumulator
     reti                ; return from interrupt
 
-; Disable the pause button - this is an unforgiving game!
+; disable the pause button - this is an unforgiving game!
 
 .orga $0066          ; pause button interrupt.
     retn          ; disable pause button.
 
-; Initialize game.
-; Initialize the VDP registers.
+; initialize game.
+; initialize the vdp registers.
 
 inigam ld hl,regdat     ; point to register init data.
     ld b,11          ; 11 bytes of register data.
-    ld c,$80         ; VDP register command byte.
+    ld c,$80         ; vdp register command byte.
 
 -:
-    ld a,(hl)        ; load one byte of data into A.
-    out ($bf),a      ; output data to VDP command port.
+    ld a,(hl)        ; load one byte of data into a.
+    out ($bf),a      ; output data to vdp command port.
     ld a,c        ; load the command byte.
-    out ($bf),a      ; output it to the VDP command port.
+    out ($bf),a      ; output it to the vdp command port.
     inc hl        ; inc. pointer to next byte of data.
     inc c         ; inc. command byte to next register.
     djnz -        ; jump back to '-' if b > 0.
 
 ;==============================================================
-; Clear VRAM
+; clear vram
 ;==============================================================
-; 1. Set VRAM write address to $0000
+; 1. set vram write address to $0000
     ld hl,$0000 | $4000
     call vrampr
-; 2. Output 16KB of zeroes
-    ld bc,$4000     ; Counter for 16KB of VRAM
+; 2. output 16kb of zeroes
+    ld bc,$4000     ; counter for 16kb of vram
 -:  xor a
-    out ($be),a ; Output to VRAM address, which is auto-incremented after each write
+    out ($be),a ; output to vram address, which is auto-incremented after each write
     dec bc
     ld a,b
     or c
     jr nz,-
 
-; Setup the background assets for the main loop.
+; setup the background assets for the main loop.
     ld hl,$c000   ; color bank 1, color 0
     call vrampr
     ld hl,bgpal
@@ -107,66 +108,67 @@ inigam ld hl,regdat     ; point to register init data.
     ld bc,192*32   ; each tile is 32 bytes.
     call vramwr
 
-; Map placement at start
-; Initial buffer
+; map placement at start
+; initial buffer
     ld hl,$3800
-    ld (NextRawVram),hl
+    ld (nextrawvram),hl
     ld hl,bgmap
-    ld (NextRawSrc),hl
+    ld (nextrawsrc),hl
 
 ; loop count set
-    ld bc,MapHeight
-    ld (DrawLoopCount),bc
+    ld bc,mapheight
+    ld (drawloopcount),bc
 
 ; ---------------
 ; start map configuration
 draw_startmap:
-    ld hl,(NextRawVram)
+    ld hl,(nextrawvram)
     call vrampr
-; Wriite mapdata
-    ld hl,(NextRawSrc)
+; wriite mapdata
+    ld hl,(nextrawsrc)
     ld bc,$0040
     call vramwr
 
-; Vram address update
-    ld hl,(NextRawVram)
+; vram address update
+    ld hl,(nextrawvram)
     ld de,$0040
     add hl,de
-    ld (NextRawVram),hl
+    ld (nextrawvram),hl
 
-; Map source add update
-    ld hl,(NextRawSrc)
-    ld bc,MapWidth
+; map source add update
+    ld hl,(nextrawsrc)
+    ld bc,mapwidth
     add hl,bc
-    ld (NextRawSrc),hl
+    ld (nextrawsrc),hl
 
 ; loop count update
-    ld bc,(DrawLoopCount)
+    ld bc,(drawloopcount)
     dec c
-    ld (DrawLoopCount),bc
+    ld (drawloopcount),bc
     jr nz,draw_startmap
 
 ; --------------------
-; Initiarize buffer
+; initiarize buffer
     ld a,1
-    ld (ScrollSpeed),a
-    xor a         ; set A = 0
-    ld (Frame),a
-    ld (Scroll),a
-    ld (ScrollCount),a
-    ld (ScreenCount),a
+    ld (scrollspeed),a
+    xor a         ; set a = 0
+    ld (frame),a
+    ld (scroll),a
+    ld (scrollcount),a
+    ld (screencount),a
     ld hl,$0000
-    ld (fixedPoint),hl
+    ld (fixedpoint),hl
+    ld (scrollval),hl
 
     ; preset map columun address
     ld hl,bgmap
     ld bc,$0040 ;map width screenx2
     add hl,bc
-    ld (NextColSrc),hl
+    ld (nextcolsrc),hl
 
     ; preset vram address
     ld hl,$3800
-    ld (NextColVram),hl
+    ld (nextcolvram),hl
 
     ld a,%11100000  ; turn screen on - normal sprites
     ld b,1
@@ -181,18 +183,18 @@ mainloop:
     call wait_vblank
 
 ; ----------------------
-; Update vdp right when vblank begins!
-    ld a,(Scroll)
+; update vdp right when vblank begins!
+    ld a,(scroll)
     ld b,$08
     call setreg
 
 ; -------------------
 ; fixed point mathmatic
-    ld hl,(fixedPoint) 
+    ld hl,(fixedpoint) 
     ld de,fractional_inc
     add hl,de
-; Update fixed point value
-    ld (fixedPoint),hl
+; update fixed point value
+    ld (fixedpoint),hl
     ld a,h
     cp $01
     jr nz,scrollupdate
@@ -204,34 +206,34 @@ mainloop:
 
 ; scroll background update the scroll buffer
 scrollupdate:
-    ld a,(Scroll)
+    ld a,(scroll)
     ld b,h
     sub b
-    ld (Scroll),a
+    ld (scroll),a
     ld a,h
     cp $01
     jp z,drawcoltiming
     jp mainloop
 
 ; -------------------
-; Draw Column Timing check every 8px scroll
+; draw column timing check every 8px scroll
 drawcoltiming:
-    ld a,(Scroll)
+    ld a,(scrollval)
     and %00000111
     call z,draw_column
 
 ; ----------------------
-; Initialize fixed_point values
+; initialize fixed_point values
 initialize_fixedpoint:
     ld hl,0
-    ld (fixedPoint),hl
+    ld (fixedpoint),hl
     jp mainloop
 
 ; --------------------------------------------------------------
-; SUBROUTINES
+; subroutines
 ; --------------------------------------------------------------
-; PREPARE VRAM.
-; Set up vdp to recieve data at vram address in HL.
+; prepare vram.
+; set up vdp to recieve data at vram address in hl.
 
 vrampr:
     push af
@@ -244,9 +246,9 @@ vrampr:
     ret
 
 ; --------------------------------------------------------------
-; WRITE TO VRAM
-; Write BC amount of bytes from data source pointed to by HL.
-; Tip: Use vrampr before calling.
+; write to vram
+; write bc amount of bytes from data source pointed to by hl.
+; tip: use vrampr before calling.
 
 vramwr:
     ld a,(hl)
@@ -259,10 +261,10 @@ vramwr:
     ret
 
 ; --------------------------------------------------------------
-; SET VDP REGISTER.
-; Write to target register.
-; A = byte to be loaded into vdp register.
-; B = target register 0-10.
+; set vdp register.
+; write to target register.
+; a = byte to be loaded into vdp register.
+; b = target register 0-10.
 
 setreg:
     out ($bf),a      ; output command word 1/2.
@@ -272,55 +274,55 @@ setreg:
     ret
 
 ; ----------------------
-; Wait Vblank
+; wait vblank
 wait_vblank:
-    ld a,(VDPstatus)
+    ld a,(vdpstatus)
     bit 7,a  ; check vblank bit
     jp z, wait_vblank
     res 7,a
-    ld (VDPstatus),a
+    ld (vdpstatus),a
     ret
 
 ; ----------------------
 draw_column:
-; Loop counter
-    ld a,MapHeight
-    ld (DrawLoopCount),a
+; loop counter
+    ld a,mapheight
+    ld (drawloopcount),a
 
 drawcolumn_loop:
 ; write to vram
-    ld hl,(NextColVram)
+    ld hl,(nextcolvram)
     call vrampr
-    ld hl,(NextColSrc)
+    ld hl,(nextcolsrc)
     ld bc,2
     call vramwr
 
-; Row Vram Source update
-    ld hl,(NextColVram)
+; row vram source update
+    ld hl,(nextcolvram)
     ld bc,$0040
     add hl,bc
-    ld (NextColVram),hl
+    ld (nextcolvram),hl
 
-    ld hl,(NextColSrc)
-    ld bc,MapWidth
+    ld hl,(nextcolsrc)
+    ld bc,mapwidth
     add hl,bc
-    ld (NextColSrc),hl
+    ld (nextcolsrc),hl
 
 ; loop counter
-    ld a,(DrawLoopCount)
+    ld a,(drawloopcount)
     dec a
-    ld (DrawLoopCount),a
+    ld (drawloopcount),a
     jp nz,drawcolumn_loop
 
-; Next column source add
-    ld hl,(NextColSrc)
+; next column source add
+    ld hl,(nextcolsrc)
     ld bc,$2ffe
     or a
     sbc hl,bc
-    ld (NextColSrc),hl
+    ld (nextcolsrc),hl
 
-; Vram add reset
-    ld hl,(NextColVram)
+; vram add reset
+    ld hl,(nextcolvram)
     ld a,h
     cp $3e
     jr nz,next_colvramadd
@@ -328,23 +330,23 @@ drawcolumn_loop:
     cp $3e
     jp nz,next_colvramadd
 
-; Move top vram add
+; move top vram add
     ld hl,$3800
-    ld (NextColVram),hl
+    ld (nextcolvram),hl
     ret
 
-; Next column vram add
+; next column vram add
     next_colvramadd:
-    ld hl,(NextColVram)
+    ld hl,(nextcolvram)
     ld bc,$05fe
     or a
     sbc hl,bc
-    ld (NextColVram),hl
+    ld (nextcolvram),hl
     ret
 ; --------------------------------------------------------------
-; DATA
+; data
 ; --------------------------------------------------------------
-; Initial values for the 11 vdp registers.
+; initial values for the 11 vdp registers.
 
 regdat .db %00100110    ; reg. 0, display and interrupt mode.
                   ; bit 4 = line interrupt (disabled).
@@ -368,7 +370,7 @@ regdat .db %00100110    ; reg. 0, display and interrupt mode.
                   ; always set it to $ff.
 
     .db $ff          ; reg. 5, sprite attribute table.
-                  ; $ff = sprite attrib. table at $3F00.
+                  ; $ff = sprite attrib. table at $3f00.
 
     .db $ff          ; reg. 6, sprite tile address.
                   ; $ff = sprite tiles in bank 2.
@@ -383,8 +385,8 @@ regdat .db %00100110    ; reg. 0, display and interrupt mode.
     .db $ff          ; reg. 10, raster line interrupt.
                   ; turn off line int. requests.
 
-; Background assets.
+; background assets.
 
-bgpal   .include "Assets_test\palette.inc"
-bgtile  .include "Assets_test\tiles.inc"
-bgmap   .include "Assets_test\tilemap3.inc"
+bgpal   .include "assets_test\palette.inc"
+bgtile  .include "assets_test\tiles.inc"
+bgmap   .include "assets_test\tilemap3.inc"
