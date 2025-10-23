@@ -151,6 +151,7 @@ draw_startmap:
 ; initiarize buffer
     ld a,1
     ld (scrollspeed),a
+    ld (scrollval),a
     xor a         ; set a = 0
     ld (frame),a
     ld (scroll),a
@@ -158,7 +159,6 @@ draw_startmap:
     ld (screencount),a
     ld hl,$0000
     ld (fixedpoint),hl
-    ld (scrollval),hl
 
     ; preset map columun address
     ld hl,bgmap
@@ -191,9 +191,6 @@ mainloop:
 ; -------------------
 ; draw column timing check every 8px scroll
 drawcoltiming:
-    ld a,l
-    cp $00
-    jr nz,(fixedpointath)
     ld a,(scrollval)
     and %00000111
     call z,draw_column
