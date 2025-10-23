@@ -155,14 +155,14 @@ draw_startmap:
 ; initiarize buffer
     ld a,1
     ld (scrollspeed),a
-    ld (scrollval),a
     xor a         ; set a = 0
     ld (frame),a
     ld (scroll),a
     ld (scrollcount),a
     ld (screencount),a
-    ld hl,$0001
+    ld hl,$0000
     ld (fixedpoint),hl
+    ld (scrollval),a
 
     ; preset map columun address
     ld hl,bgmap
