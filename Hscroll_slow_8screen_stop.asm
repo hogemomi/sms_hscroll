@@ -192,7 +192,7 @@ mainloop:
 ; draw column timing check every 8px scroll
 drawcoltiming:
     ld a,l
-    cp $80
+    cp $00
     jr nz,(fixedpointath)
     ld a,(scrollval)
     and %00000111
