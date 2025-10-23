@@ -119,6 +119,10 @@ inigam ld hl,regdat     ; point to register init data.
     ld bc,mapheight
     ld (drawloopcount),bc
 
+    ld a,%11100000  ; turn screen on - normal sprites
+    ld b,1
+    call setreg  ; set register 1
+
 ; ---------------
 ; start map configuration
 draw_startmap:
@@ -169,10 +173,6 @@ draw_startmap:
     ; preset vram address
     ld hl,$3800
     ld (nextcolvram),hl
-
-    ld a,%11100000  ; turn screen on - normal sprites
-    ld b,1
-    call setreg  ; set register 1
 
 ; -----------------
 ; main loop
