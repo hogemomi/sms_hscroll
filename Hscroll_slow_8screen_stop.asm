@@ -191,12 +191,16 @@ mainloop:
 ; -------------------
 ; draw column timing check every 8px scroll
 drawcoltiming:
+    ld a,l
+    cp $80
+    jr nz,(fixedpointath)
     ld a,(scrollval)
     and %00000111
     call z,draw_column
 
 ; -------------------
 ; fixed point mathmatic
+fixedpointath:
     ld hl,(fixedpoint) 
     ld de,fractional_inc
     add hl,de
