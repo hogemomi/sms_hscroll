@@ -182,12 +182,6 @@ mainloop:
     halt   ; start main loop with vblank
     call wait_vblank
 
-; ----------------------
-; update vdp right when vblank begins!
-    ld a,(scroll)
-    ld b,$08
-    call setreg
-
 ; -------------------
 ; fixed point mathmatic
 fixedpointath:
@@ -228,6 +222,12 @@ drawcoltiming:
 initialize_fixedpoint:
     ld hl,0
     ld (fixedpoint),hl
+
+; ----------------------
+; update vdp right when vblank begins!
+    ld a,(scroll)
+    ld b,$08
+    call setreg
     jp mainloop
 
 ; --------------------------------------------------------------
