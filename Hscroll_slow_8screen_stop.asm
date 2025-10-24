@@ -190,9 +190,6 @@ fixedpointath:
     add hl,de
 ; update fixed point value
     ld (fixedpoint),hl
-    ld a,l
-    cp $80
-    jr z,scrollupdate
     ld a,h
     cp $01
     jr nz,scrollupdate
