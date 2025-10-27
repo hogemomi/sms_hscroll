@@ -215,11 +215,11 @@ scrollupdate:
     ld (scroll),a
     ld a,h
     cp $01
-    jp nz,mainloop
+    jp z,intfixedpoint
 
 ; ----------------------
 ; initialize fixed_point values
-initialize_fixedpoint:
+intfixedpoint:
     ld hl,0
     ld (fixedpoint),hl
 
