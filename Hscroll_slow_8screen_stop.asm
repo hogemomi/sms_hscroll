@@ -23,7 +23,7 @@
 .define  mapheight $18
 .define  mapwidth $200
 .define  screenbottomvram $3e3e
-.define  fractional_inc $0040
+.define  fractional_inc $0080
 
  ; organize ram.
 
