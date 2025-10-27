@@ -218,16 +218,17 @@ scrollupdate:
     jp z,intfixedpoint
 
 ; ----------------------
-; initialize fixed_point values
-intfixedpoint:
-    ld hl,0
-    ld (fixedpoint),hl
-
-; ----------------------
 ; update vdp right when vblank begins!
     ld a,(scroll)
     ld b,$08
     call setreg
+    jp mainloop
+
+; ----------------------
+; initialize fixed_point values
+intfixedpoint:
+    ld hl,0
+    ld (fixedpoint),hl
     jp mainloop
 
 ; --------------------------------------------------------------
