@@ -209,12 +209,10 @@ drawcoltiming:
 ; scroll background update the scroll buffer
 scrollupdate:
     ld a,(scroll)
+    ld hl,(fixedpoint)
     ld b,h
     sub b
     ld (scroll),a
-    ld a,h
-    cp $01
-    jp z,drawcoltiming
     jp mainloop
 
 ; ----------------------
