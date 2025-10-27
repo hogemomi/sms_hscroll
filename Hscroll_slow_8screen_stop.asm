@@ -199,6 +199,13 @@ fixedpointath:
     inc bc
     ld (scrollval),bc
 
+; -------------------
+; draw column timing check every 8px scroll
+drawcoltiming:
+    ld a,(scrollval)
+    and %00000111
+    call z,draw_column
+
 ; scroll background update the scroll buffer
 scrollupdate:
     ld a,(scroll)
@@ -209,13 +216,6 @@ scrollupdate:
     cp $01
     jp z,drawcoltiming
     jp mainloop
-
-; -------------------
-; draw column timing check every 8px scroll
-drawcoltiming:
-    ld a,(scrollval)
-    and %00000111
-    call z,draw_column
 
 ; ----------------------
 ; initialize fixed_point values
