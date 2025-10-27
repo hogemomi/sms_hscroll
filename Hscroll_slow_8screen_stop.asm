@@ -213,7 +213,9 @@ scrollupdate:
     ld b,h
     sub b
     ld (scroll),a
-    jp mainloop
+    ld a,h
+    cp $01
+    jp z,mainloop
 
 ; ----------------------
 ; initialize fixed_point values
