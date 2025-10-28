@@ -182,6 +182,13 @@ mainloop:
     halt   ; start main loop with vblank
     call wait_vblank
 
+; ----------------------
+; update vdp right when vblank begins!
+    ld a,(scroll)
+    ld b,$08
+    call setreg
+    jp mainloop
+
 ; -------------------
 ; fixed point mathmatic
 fixedpointath:
@@ -216,13 +223,6 @@ scrollupdate:
     ld a,h
     cp $01
     jp z,intfixedpoint
-
-; ----------------------
-; update vdp right when vblank begins!
-    ld a,(scroll)
-    ld b,$08
-    call setreg
-    jp mainloop
 
 ; ----------------------
 ; initialize fixed_point values
