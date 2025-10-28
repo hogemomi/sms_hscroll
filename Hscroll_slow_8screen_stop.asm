@@ -222,6 +222,7 @@ scrollupdate:
     ld a,h
     cp $01
     jp z,intfixedpoint
+    jp mainloop
 
 ; ----------------------
 ; initialize fixed_point values
