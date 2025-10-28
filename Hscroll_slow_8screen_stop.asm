@@ -202,9 +202,9 @@ fixedpointath:
     jr nz,scrollupdate
 
 ; scroll value update
-    ld bc,(scrollval)
-    inc bc
-    ld (scrollval),bc
+    ld hl,(scrollval)
+    inc hl
+    ld (scrollval),hl
 
 ; -------------------
 ; draw column timing check every 8px scroll
