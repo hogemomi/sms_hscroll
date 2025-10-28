@@ -211,6 +211,10 @@ fixedpointath:
 drawcoltiming:
     ld a,(scrollval)
     and %00000111
+    ld a,l
+    cp $08
+    jr nz,scrollupdate
+    
     call z,draw_column
 
 ; scroll background update the scroll buffer
