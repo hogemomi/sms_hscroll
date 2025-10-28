@@ -187,7 +187,6 @@ mainloop:
     ld a,(scroll)
     ld b,$08
     call setreg
-    jp mainloop
 
 ; -------------------
 ; fixed point mathmatic
