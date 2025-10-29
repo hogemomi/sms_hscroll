@@ -210,6 +210,7 @@ fixedpointath:
 ; draw column timing check every 8px scroll
     ld a,(scrollval)
     and %00000111
+    ld nz,scrollupdate
     ld a,l
     cp $08
     jr nz,scrollupdate
