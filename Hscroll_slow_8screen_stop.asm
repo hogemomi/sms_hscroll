@@ -208,7 +208,6 @@ fixedpointath:
 
 ; -------------------
 ; draw column timing check every 8px scroll
-drawcoltiming:
     ld a,(scrollval)
     and %00000111
     ld a,l
