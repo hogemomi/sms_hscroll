@@ -162,8 +162,7 @@ draw_startmap:
     ld (screencount),a
     ld hl,$0000
     ld (fixedpoint),hl
-    ld hl,$0001
-    ld (scrollval),a
+    ld (scrollval),hl
 
     ; preset map columun address
     ld hl,bgmap
@@ -183,16 +182,10 @@ mainloop:
     halt   ; start main loop with vblank
     call wait_vblank
 
-; ----------------------
-; update vdp right when vblank begins!
-    ld a,(scroll)
-    ld b,$08
-    call setreg
-
 ; -------------------
 ; fixed point mathmatic
 fixedpointath:
-    ld hl,(fixedpoint) 
+    ld hl,(fixedpoint)
     ld de,fractional_inc
     add hl,de
 ; update fixed point value
@@ -202,19 +195,15 @@ fixedpointath:
     jr nz,scrollupdate
 
 ; scroll value update
-    ld hl,(scrollval)
-    inc hl
-    ld (scrollval),hl
+    ld bc,(scrollval)
+    inc bc
+    ld (scrollval),bc
 
 ; -------------------
 ; draw column timing check every 8px scroll
+drawcoltiming:
     ld a,(scroll)
     and %00000111
-    ld nz,scrollupdate
-    ld a,l
-    cp $08
-    jr nz,scrollupdate
-    
     call z,draw_column
 
 ; scroll background update the scroll buffer
@@ -227,6 +216,12 @@ scrollupdate:
     ld a,h
     cp $01
     jp z,intfixedpoint
+
+; ----------------------
+; update vdp right when vblank begins!
+    ld a,(scroll)
+    ld b,$08
+    call setreg
     jp mainloop
 
 ; ----------------------
