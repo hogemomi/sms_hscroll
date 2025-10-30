@@ -34,7 +34,7 @@
     nextcolvram dw
     drawloopcount dw
     scrollcount dw
-    fixedpoint dw
+    scroll_decpoint dw
     scrollval dw
     screencount db
     scrollspeed db
@@ -161,7 +161,7 @@ draw_startmap:
     ld (scrollcount),a
     ld (screencount),a
     ld hl,$0000
-    ld (fixedpoint),hl
+    ld (scroll_decpoint),hl
     ld (scrollval),hl
 
     ; preset map columun address
@@ -183,13 +183,13 @@ mainloop:
     call wait_vblank
 
 ; -------------------
-; fixed point mathmatic
-fixedpointath:
-    ld hl,(fixedpoint)
+; scroll decimal point mathmatics
+scoll_decpoint_maths
+    ld hl,(scroll_decpoint)
     ld de,fractional_inc
     add hl,de
-; update fixed point value
-    ld (fixedpoint),hl
+; update decimal point value
+    ld (scoll_decpoint),hl
     ld a,h
     cp $01
     jr nz,scrollupdate
