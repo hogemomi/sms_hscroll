@@ -225,7 +225,7 @@ scrollupdate:
     jp mainloop
 
 ; ----------------------
-; initialize fixed_point values
+; initialize scroll decpoint variable
 int_scoll_decpoint:
     ld hl,0
     ld (scroll_decpoint),hl
