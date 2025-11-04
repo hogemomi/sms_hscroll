@@ -23,7 +23,8 @@
 .define  mapheight $18
 .define  mapwidth $200
 .define  screenbottomvram $3e3e
-.define  fractional_inc $0080
+.define  scroll_dec_inc $0080
+.define  scrollval_dec_inc $0020
 
  ; organize ram.
 
@@ -187,7 +188,7 @@ mainloop:
 ; scroll decimal point mathmatics
 scoll_decpoint_maths
     ld hl,(scroll_decpoint)
-    ld de,fractional_inc
+    ld de,scroll_dec_inc
     add hl,de
 ; update decimal point value
     ld (scoll_decpoint),hl
@@ -196,8 +197,8 @@ scoll_decpoint_maths
     jr nz,scrollupdate
 
 ; scroll value update
-    ld hl,(scrollval_decpoint)
-    ld bc,(scrollval)
+    ld hl,(scrollval)
+    ld bc,scrollval_dec_inc
     add hl,bc
     ld (scrollval),hl
 
