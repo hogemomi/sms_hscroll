@@ -35,6 +35,7 @@
     drawloopcount dw
     scrollcount dw
     scroll_decpoint dw
+    scrollval_decpoint dw
     scrollval dw
     screencount db
     scrollspeed db
