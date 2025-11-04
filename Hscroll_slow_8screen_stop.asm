@@ -196,9 +196,10 @@ scoll_decpoint_maths
     jr nz,scrollupdate
 
 ; scroll value update
+    ld hl,(scrollval_decpoint)
     ld bc,(scrollval)
-    inc bc
-    ld (scrollval),bc
+    add hl,bc
+    ld (scrollval),hl
 
 ; -------------------
 ; draw column timing check every 8px scroll
