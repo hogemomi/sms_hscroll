@@ -23,8 +23,7 @@
 .define  mapheight $18
 .define  mapwidth $200
 .define  screenbottomvram $3e3e
-.define  scrollval_frac_inc $0080
-.define  scrollcout_frac_inc $0020
+.define  fractional_inc $0080
 
  ; organize ram.
 
@@ -34,10 +33,10 @@
     nextcolsrc dw
     nextcolvram dw
     drawloopcount dw
-    scrollcount dw
+    scroll_count dw
+    scrollval_frac dw
     scrollspeed db
-    scrollcout_frac_point dw
-    scrollval_frac_point dw        ; vdp scroll register buffer
+    scrollval db        ; vdp scroll register buffer
     frame db         ; frame counter
     vdpstatus db
 .ende
@@ -156,11 +155,10 @@ draw_startmap:
     ld (scrollspeed),a
     xor a         ; set a = 0
     ld (frame),a
-    ld (scroll),a
-    ld (scrollcount),a
-    ld (screencount),a
+    ld (scrollval),a
+    ld (scroll_count),a
     ld hl,$0000
-    ld (scroll_decpoint),hl
+    ld (scrollval_frac),hl
     ld (scrollval),hl
 
     ; preset map columun address
@@ -182,52 +180,52 @@ mainloop:
     call wait_vblank
 
 ; -------------------
-; scroll fractional mathmatics
-    ld hl,(scroll_decpoint)
-    ld de,scroll_dec_inc
+; fixed point mathmatic
+fixedpointath:
+    ld hl,(scrollval_frac)
+    ld de,fractional_inc
     add hl,de
-; update decimal point value
-    ld (scoll_decpoint),hl
+; update fixed point value
+    ld (scrollval_frac),hl
     ld a,h
     cp $01
-    jr nz,scrollupdate
+    jr nz,scrollval_update
 
 ; scroll value update
-    ld hl,(scrollcount)
-    ld bc,scrollval_dec_inc
-    add hl,bc
-    ld (scrollcount),hl
+    ld bc,(scroll_count)
+    inc bc
+    ld (scroll_count),bc
 
 ; -------------------
 ; draw column timing check every 8px scroll
 drawcoltiming:
-    ld a,(scrollval_frac_point)
+    ld a,(scrollval)
     and %00000111
     call z,draw_column
 
 ; scroll background update the scroll buffer
-scrollupdate:
+scrollval_update:
     ld a,(scrollval)
-    ld hl,(scroll_decpoint)
+    ld hl,(scrollval_frac)
     ld b,h
     sub b
-    ld (scrollval_frac_point),a
+    ld (scrollval),a
     ld a,h
     cp $01
-    jp z,int_scoll_decpoint
+    jp z,intfixedpoint
 
 ; ----------------------
 ; update vdp right when vblank begins!
-    ld a,(scroll)
+    ld a,(scrollval)
     ld b,$08
     call setreg
     jp mainloop
 
 ; ----------------------
-; initialize scroll decpoint variable
-int_scoll_decpoint:
+; initialize fixed_point values
+intfixedpoint:
     ld hl,0
-    ld (scroll_decpoint),hl
+    ld (scrollval_frac),hl
     jp mainloop
 
 ; --------------------------------------------------------------
