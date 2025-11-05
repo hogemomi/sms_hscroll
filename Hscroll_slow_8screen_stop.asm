@@ -34,9 +34,10 @@
     nextcolsrc dw
     nextcolvram dw
     drawloopcount dw
-    scrollcout_frac_point dw
+    scrollcount dw
     scrollspeed db
-    scrollval_frac_point db        ; vdp scroll register buffer
+    scrollcout_frac_point dw
+    scrollval_frac_point dw        ; vdp scroll register buffer
     frame db         ; frame counter
     vdpstatus db
 .ende
@@ -181,8 +182,7 @@ mainloop:
     call wait_vblank
 
 ; -------------------
-; scroll decimal point mathmatics
-scoll_decpoint_maths
+; scroll fractional mathmatics
     ld hl,(scroll_decpoint)
     ld de,scroll_dec_inc
     add hl,de
@@ -193,10 +193,10 @@ scoll_decpoint_maths
     jr nz,scrollupdate
 
 ; scroll value update
-    ld hl,(scrollval)
+    ld hl,(scrollcount)
     ld bc,scrollval_dec_inc
     add hl,bc
-    ld (scrollval),hl
+    ld (scrollcount),hl
 
 ; -------------------
 ; draw column timing check every 8px scroll
@@ -207,7 +207,7 @@ drawcoltiming:
 
 ; scroll background update the scroll buffer
 scrollupdate:
-    ld a,(scrollval_frac_point)
+    ld a,(scrollval)
     ld hl,(scroll_decpoint)
     ld b,h
     sub b
