@@ -212,7 +212,7 @@ scrollval_update:
     ld (scrollval),a
     ld a,h
     cp $01
-    jp z,intfixedpoint
+    jp z,int_scrollval_frac
 
 ; ----------------------
 ; update vdp right when vblank begins!
@@ -223,7 +223,7 @@ scrollval_update:
 
 ; ----------------------
 ; initialize fixed_point values
-intfixedpoint:
+int_scrollval_frac:
     ld hl,0
     ld (scrollval_frac),hl
     jp mainloop
