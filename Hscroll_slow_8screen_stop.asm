@@ -23,8 +23,8 @@
 .define  mapheight $18
 .define  mapwidth $200
 .define  screenbottomvram $3e3e
-.define  scroll_dec_inc $0080
-.define  scrollval_dec_inc $0020
+.define  scrollval_frac_inc $0080
+.define  scrollcout_frac_inc $0020
 
  ; organize ram.
 
@@ -34,13 +34,9 @@
     nextcolsrc dw
     nextcolvram dw
     drawloopcount dw
-    scrollcount dw
-    scroll_decpoint dw
-    scrollval_decpoint dw
-    scrollval dw
-    screencount db
+    scrollcout_frac_point dw
     scrollspeed db
-    scroll db        ; vdp scroll register buffer
+    scrollval_frac_point db        ; vdp scroll register buffer
     frame db         ; frame counter
     vdpstatus db
 .ende
@@ -205,17 +201,17 @@ scoll_decpoint_maths
 ; -------------------
 ; draw column timing check every 8px scroll
 drawcoltiming:
-    ld a,(scroll)
+    ld a,(scrollval_frac_point)
     and %00000111
     call z,draw_column
 
 ; scroll background update the scroll buffer
 scrollupdate:
-    ld a,(scroll)
+    ld a,(scrollval_frac_point)
     ld hl,(scroll_decpoint)
     ld b,h
     sub b
-    ld (scroll),a
+    ld (scrollval_frac_point),a
     ld a,h
     cp $01
     jp z,int_scoll_decpoint
