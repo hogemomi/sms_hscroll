@@ -193,17 +193,7 @@ frac_point_math:
     jr nz,scrollval_update
 
 ; -------------------
-; Map end check
-    ld hl,(scroll_count)
-    ld a,h
-    cp $07
-    jp nz,
-    cp $00
-    jr z,screen_cnt
-    jp mainloop
-
-; -------------------
-; scroll value update
+; scroll count update
     ld hl,(scroll_count)
     ld bc,scrollcount_frac_inc
     add hl,bc
@@ -232,6 +222,16 @@ scrollval_update:
     ld a,(scrollval)
     ld b,$08
     call setreg
+
+; -------------------
+; Map end check
+    ld hl,(scroll_count)
+    ld a,h
+    cp $07
+    jp nz,scrollval_update
+    ld a,l
+    cp $ff
+    jr nz,screen_cnt
     jp mainloop
 
 ; ----------------------
