@@ -23,7 +23,8 @@
 .define  mapheight $18
 .define  mapwidth $200
 .define  screenbottomvram $3e3e
-.define  fractional_inc $0080
+.define  scrollval_frac_inc $0080
+.define  scrollcount_frac_inc $0020
 
  ; organize ram.
 
@@ -180,12 +181,12 @@ mainloop:
     call wait_vblank
 
 ; -------------------
-; fixed point mathmatic
-fixedpointath:
+; fractional point mathmatic
+frac_point_math:
     ld hl,(scrollval_frac)
-    ld de,fractional_inc
+    ld de,scrollval_frac_inc
     add hl,de
-; update fixed point value
+; update fractional point value
     ld (scrollval_frac),hl
     ld a,h
     cp $01
