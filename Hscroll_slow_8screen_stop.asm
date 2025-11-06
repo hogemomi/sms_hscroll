@@ -193,8 +193,9 @@ frac_point_math:
     jr nz,scrollval_update
 
 ; scroll value update
-    ld bc,(scroll_count)
-    inc bc
+    ld hl,(scroll_count)
+    ld bc,scrollcount_frac_inc
+    add hl,bc
     ld (scroll_count),bc
 
 ; -------------------
