@@ -228,14 +228,13 @@ scrollval_update:
     ld hl,(scroll_count)
     ld a,h
     cp $07
-    jp nz,scrollval_update
+    jp nz,mainloop
     ld a,l
     cp $ff
-    jr nz,screen_cnt
-    jp mainloop
+    jr nz,mainloop
 
 ; ----------------------
-; initialize fixed_point values
+; initialize scrollvalue fractional
 int_scrollval_frac:
     ld hl,0
     ld (scrollval_frac),hl
