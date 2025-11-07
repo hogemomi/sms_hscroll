@@ -180,6 +180,12 @@ mainloop:
     halt   ; start main loop with vblank
     call wait_vblank
 
+; ----------------------
+; update vdp right when vblank begins!
+    ld a,(scrollval)
+    ld b,$08
+    call setreg
+
 ; -------------------
 ; fractional point mathmatic
 frac_point_math:
@@ -216,12 +222,6 @@ scrollval_update:
     ld a,h
     cp $01
     jp z,int_scrollval_frac
-
-; ----------------------
-; update vdp right when vblank begins!
-    ld a,(scrollval)
-    ld b,$08
-    call setreg
 
 ; -------------------
 ; Map end check
