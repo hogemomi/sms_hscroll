@@ -197,7 +197,7 @@ frac_point_math:
     ld hl,(scroll_count)
     ld bc,scrollcount_frac_inc
     add hl,bc
-    ld (scroll_count),bc
+    ld (scroll_count),hl
 
 ; -------------------
 ; draw column timing check every 8px scroll
