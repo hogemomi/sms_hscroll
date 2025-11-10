@@ -236,7 +236,7 @@ scrollval_update:
 ; Scroll stop
 stopscroll_loop:
     xor a
-    ld (ScrollSpeed),a
+    ld (Scrollval),a
     ld a,$01
     ld (Scroll),a
     jp mainloop
