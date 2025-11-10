@@ -231,6 +231,16 @@ scrollval_update:
     jp nz,mainloop
     ld a,l
     cp $ff
+
+; ----------------------
+; Scroll stop
+stopscroll_loop:
+    xor a
+    ld (ScrollSpeed),a
+    ld a,$01
+    ld (Scroll),a
+    jp mainloop
+
     jr nz,mainloop
 
 ; ----------------------
