@@ -191,10 +191,10 @@ mainloop:
     ld hl,(scroll_count)
     ld a,h
     cp $07
-    jp nz,frac_point_math
+    jp nz,scrollval_math
     ld a,l
     cp $ff
-    jr nz,frac_point_math
+    jr nz,scrollval_math
 
 ; ----------------------
 ; Scroll stop
@@ -205,7 +205,7 @@ stopscroll_loop:
 
 ; -------------------
 ; fractional point mathmatic
-frac_point_math:
+scrollval_math:
     ld hl,(scrollval_frac)
     ld de,scrollval_frac_inc
     add hl,de
