@@ -186,6 +186,15 @@ mainloop:
     ld b,$08
     call setreg
 
+; ----------------------
+; Scroll stop
+stopscroll_loop:
+    xor a
+    ld (Scrollval),a
+    ld a,$01
+    ld (Scroll),a
+    jp mainloop
+
 ; -------------------
 ; fractional point mathmatic
 frac_point_math:
@@ -231,16 +240,6 @@ scrollval_update:
     jp nz,mainloop
     ld a,l
     cp $ff
-
-; ----------------------
-; Scroll stop
-stopscroll_loop:
-    xor a
-    ld (Scrollval),a
-    ld a,$01
-    ld (Scroll),a
-    jp mainloop
-
     jr nz,mainloop
 
 ; ----------------------
