@@ -199,10 +199,8 @@ mainloop:
 ; ----------------------
 ; Scroll stop
 stopscroll_loop:
-    xor a
-    ld (Scrollval),a
-    ld a,$01
-    ld (Scroll),a
+    ld hl,0
+    ld (Scrollval),hl
     jp mainloop
 
 ; -------------------
