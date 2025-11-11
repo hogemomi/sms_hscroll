@@ -239,6 +239,7 @@ scrollval_update:
     ld a,h
     cp $01
     jp z,int_scrollval_frac
+    jp mainloop
 
 ; ----------------------
 ; initialize scrollvalue fractional
