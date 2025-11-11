@@ -186,6 +186,16 @@ mainloop:
     ld b,$08
     call setreg
 
+; -------------------
+; Map end check
+    ld hl,(scroll_count)
+    ld a,h
+    cp $07
+    jp nz,frac_point_math
+    ld a,l
+    cp $ff
+    jr nz,frac_point_math
+
 ; ----------------------
 ; Scroll stop
 stopscroll_loop:
@@ -231,16 +241,6 @@ scrollval_update:
     ld a,h
     cp $01
     jp z,int_scrollval_frac
-
-; -------------------
-; Map end check
-    ld hl,(scroll_count)
-    ld a,h
-    cp $07
-    jp nz,mainloop
-    ld a,l
-    cp $ff
-    jr nz,mainloop
 
 ; ----------------------
 ; initialize scrollvalue fractional
