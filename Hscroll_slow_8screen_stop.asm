@@ -24,7 +24,7 @@
 .define  mapwidth $200
 .define  screenbottomvram $3e3e
 .define  scrollval_frac_inc $0080
-.define  scrollcount_frac_inc $0020
+.define  scrollcount_frac_inc $20
 
  ; organize ram.
 
