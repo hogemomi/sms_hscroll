@@ -94,12 +94,19 @@ inigam ld hl,regdat     ; point to register init data.
     or c
     jr nz,-
 
-; setup the background assets for the main loop.
+; setup the background assets.
+; Load palette
     ld hl,$c000   ; color bank 1, color 0
     call vrampr
     ld hl,bgpal
     ld bc,16   ; 16 colors
     call vramwr
+
+    ld hl,$c010         ; color bank 2, color 0 (sprites).
+    call vrampr         ; prepare vram.
+    ld hl,sprpal        ; sprite palette data.
+    ld bc,16             ; 5 colors.
+    call vramwr         ; set sprite palette.
     
     ld hl,$0000      ; first tile @ index 0.
     call vrampr
