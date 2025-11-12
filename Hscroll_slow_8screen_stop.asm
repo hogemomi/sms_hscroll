@@ -168,8 +168,8 @@ draw_startmap:
 ; initiarize buffer
     xor a
     ld (scrollval),a
+    ld (scroll_count),a
     ld hl,0
-    ld (scroll_count),hl
     ld (scrollval_frac),hl
 
     ; preset map columun address
