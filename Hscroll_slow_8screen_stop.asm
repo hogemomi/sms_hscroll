@@ -107,11 +107,18 @@ inigam ld hl,regdat     ; point to register init data.
     ld hl,sprpal        ; sprite palette data.
     ld bc,16             ; 5 colors.
     call vramwr         ; set sprite palette.
-    
+
+; Load tile    
     ld hl,$0000      ; first tile @ index 0.
     call vrampr
     ld hl,bgtile
     ld bc,192*32   ; each tile is 32 bytes.
+    call vramwr
+
+    ld hl,$2000         ; first tile @ index 256.
+    call vrampr         ; prepare vram.
+    ld hl,pltile        ; player car tile data.
+    ld bc,192*32         ; 16 tiles, 32 bytes each.
     call vramwr
 
 ; map placement at start
