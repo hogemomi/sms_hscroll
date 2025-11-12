@@ -34,9 +34,9 @@
     nextcolsrc dw
     nextcolvram dw
     drawloopcount dw
-    scroll_count dw
     scrollval_frac dw
     scrollspeed db
+    scroll_count db
     scrollval db        ; vdp scroll register buffer
     frame db         ; frame counter
     vdpstatus db
