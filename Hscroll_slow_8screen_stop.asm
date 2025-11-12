@@ -23,8 +23,8 @@
 .define  mapheight $18
 .define  mapwidth $200
 .define  screenbottomvram $3e3e
-.define  scrollval_frac_inc $80
-.define  scrollcount_frac_inc $20
+.define  scrollval_frac_inc $0080
+.define  scrollcount_frac_inc $0020
 
  ; organize ram.
 
@@ -217,8 +217,8 @@ stopscroll_loop:
 ; fractional point mathmatic
 scrollval_math:
     ld hl,(scrollval_frac)
-    ld de,scrollval_frac_inc
-    add hl,de
+    ld bc,scrollval_frac_inc
+    add hl,bc
 ; update fractional point value
     ld (scrollval_frac),hl
     ld a,h
