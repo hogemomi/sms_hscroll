@@ -168,6 +168,7 @@ draw_startmap:
 ; initiarize buffer
     xor a
     ld (scrollval),a
+    ld a,$10
     ld (scroll_count),a
     ld hl,0
     ld (scrollval_frac),hl
