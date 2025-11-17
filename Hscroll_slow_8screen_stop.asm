@@ -35,8 +35,8 @@
     nextcolvram dw
     drawloopcount dw
     scrollval_frac dw
+    scroll_count dw
     scrollspeed db
-    scroll_count db
     scrollval db        ; vdp scroll register buffer
     frame db         ; frame counter
     vdpstatus db
@@ -186,7 +186,10 @@ mainloop:
 
 ; -------------------
 ; Map end check
-    ld a,(scroll_count)
+    ld hl,(scroll_count)
+    ld a,h
+    cp $07
+    ld a,l
     cp $ff
     jr nz,scrollval_math
 
