@@ -24,7 +24,7 @@
 .define  mapwidth $200
 .define  screenbottomvram $3e3e
 .define  scrollval_frac_inc $0080
-.define  scrollcount_frac_inc $10
+.define  scrollcount_frac_inc $01
 
  ; organize ram.
 
@@ -102,23 +102,11 @@ inigam ld hl,regdat     ; point to register init data.
     ld bc,16   ; 16 colors
     call vramwr
 
-    ld hl,$c010         ; color bank 2, color 0 (sprites).
-    call vrampr         ; prepare vram.
-    ld hl,sprpal        ; sprite palette data.
-    ld bc,16             ; 5 colors.
-    call vramwr         ; set sprite palette.
-
 ; Load tile    
     ld hl,$0000      ; first tile @ index 0.
     call vrampr
     ld hl,bgtile
     ld bc,192*32   ; each tile is 32 bytes.
-    call vramwr
-
-    ld hl,$2000         ; first tile @ index 256.
-    call vrampr         ; prepare vram.
-    ld hl,pltile        ; player car tile data.
-    ld bc,256*32         ; 16 tiles, 32 bytes each.
     call vramwr
 
 ; map placement at start
@@ -168,7 +156,6 @@ draw_startmap:
 ; initiarize buffer
     xor a
     ld (scrollval),a
-    ld a,$10
     ld (scroll_count),a
     ld hl,0
     ld (scrollval_frac),hl
@@ -199,11 +186,7 @@ mainloop:
 
 ; -------------------
 ; Map end check
-    ld hl,(scroll_count)
-    ld a,h
-    cp $07
-    jp nz,scrollval_math
-    ld a,l
+    ld a,(scroll_count)
     cp $ff
     jr nz,scrollval_math
 
