@@ -102,6 +102,11 @@ inigam ld hl,regdat     ; point to register init data.
     ld bc,16   ; 16 colors
     call vramwr
 
+    ld hl,$c010         ; color bank 2, color 0 (sprites).
+    call vrampr         ; prepare vram.
+    ld bc,16             ; 5 colors.
+    call vramwr         ; set sprite palette.
+
 ; Load tile    
     ld hl,$0000      ; first tile @ index 0.
     call vrampr
@@ -156,8 +161,8 @@ draw_startmap:
 ; initiarize buffer
     xor a
     ld (scrollval),a
-    ld (scroll_count),a
     ld hl,0
+    ld (scroll_count),hl
     ld (scrollval_frac),hl
 
     ; preset map columun address
@@ -188,7 +193,8 @@ mainloop:
 ; Map end check
     ld hl,(scroll_count)
     ld a,h
-    cp $07
+    cp $06
+    jp nz,scrollval_math
     ld a,l
     cp $ff
     jr nz,scrollval_math
@@ -197,7 +203,7 @@ mainloop:
 ; Scroll stop
 stopscroll_loop:
     ld hl,0
-    ld (Scrollval),hl
+    ld (scrollval),hl
     jp mainloop
 
 ; -------------------
