@@ -104,6 +104,7 @@ inigam ld hl,regdat     ; point to register init data.
 
     ld hl,$c010         ; color bank 2, color 0 (sprites).
     call vrampr         ; prepare vram.
+    ld hl,sprpal        ; sprite palette data.
     ld bc,16             ; 5 colors.
     call vramwr         ; set sprite palette.
 
