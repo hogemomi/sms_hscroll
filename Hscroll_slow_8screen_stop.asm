@@ -29,6 +29,7 @@
  ; organize ram.
 
 .enum $c000 export      ; export labels to symbol file.
+    satbuf dsb 256
     nextrawsrc dw
     nextrawvram dw
     nextcolsrc dw
