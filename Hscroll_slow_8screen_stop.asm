@@ -191,6 +191,10 @@ mainloop:
     halt   ; start main loop with vblank
     call wait_vblank
 
+; -------------------
+; load sat buffer to vram. The cars
+    call ldsat
+
 ; ----------------------
 ; update vdp right when vblank begins!
     ld a,(scrollval)
