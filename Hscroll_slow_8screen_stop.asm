@@ -303,6 +303,19 @@ setreg:
     out ($bf),a      ; output command word 2/2.
     ret
 
+; --------------------------------------------------------------
+; LOAD SPRITE ATTRIBUTE TABLE
+SAT from the buffer.
+
+ldsat:
+    ld hl,$3f00         ; point to start of SAT in vram.
+    call vrampr         ; prepare vram to recieve data.
+    ld b,255            ; amount of bytes to output.
+    ld c,$be            ; destination is vdp data port.
+    ld hl,satbuf        ; source is start of sat buffer.
+    otir                ; output buffer to vdp.
+    ret
+
 ; ----------------------
 ; wait vblank
 wait_vblank:
