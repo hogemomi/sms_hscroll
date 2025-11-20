@@ -437,3 +437,5 @@ regdat .db %00100110    ; reg. 0, display and interrupt mode.
 bgpal   .include "assets_test\palette.inc"
 bgtile  .include "assets_test\tiles.inc"
 bgmap   .include "assets_test\tilemap3.inc"
+palspr  .include "assets\sprites (palette).inc"
+pltile  .include "assets\player (tiles).inc"
