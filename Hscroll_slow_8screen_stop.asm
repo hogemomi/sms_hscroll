@@ -25,9 +25,11 @@
 .define  screenbottomvram $3e3e
 .define  scrollval_frac_inc $0080
 .define  scrollcount_frac_inc $01
+.define plrvp $c008   ; first player vpos.
+.define plrhp $c090  ; first player hpos.
+.define plrcc $c091  ; first player cc.
 
  ; organize ram.
-
 .enum $c000 export      ; export labels to symbol file.
     satbuf dsb 256
     nextrawsrc dw
