@@ -84,7 +84,7 @@ inigam ld hl,regdat     ; point to register init data.
 ; clear vram
 ;==============================================================
 ; 1. set vram write address to $0000
-    ld hl,$0000 | $4000
+    ld hl,0
     call vrampr
 ; 2. output 16kb of zeroes
     ld bc,$4000     ; counter for 16kb of vram
