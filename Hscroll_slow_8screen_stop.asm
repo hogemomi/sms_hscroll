@@ -180,6 +180,9 @@ draw_startmap:
     ld hl,plrcar        ; point to player car graphics.
     call carcc          ; set the char codes for player car.
 
+    ld a,79             ; player starts at the road's center.
+    ld (plx),a          ; set x-coordinate.
+
     ; preset map columun address
     ld hl,bgmap
     ld bc,$0040 ;map width screenx2
