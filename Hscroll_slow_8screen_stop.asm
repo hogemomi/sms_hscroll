@@ -175,6 +175,11 @@ draw_startmap:
     ld (scroll_count),hl
     ld (scrollval_frac),hl
 
+; Put a shining new player car in the buffer.
+       ld de,plrcc         ; point to player cc in buffer.
+       ld hl,plrcar        ; point to player car graphics.
+       call carcc          ; set the char codes for player car.
+
     ; preset map columun address
     ld hl,bgmap
     ld bc,$0040 ;map width screenx2
@@ -308,6 +313,17 @@ setreg:
     or b
     out ($bf),a      ; output command word 2/2.
     ret
+
+; -------------------------------------------------------------
+; SET CAR SPRITES' CHARACTER CODES (CC)
+; HL = pointer to 16 byte char codes block, DE = buffer index.
+carcc ld bc,16
+-      ldi
+       inc de
+       ld a,b
+       or c
+       jp nz,-
+       ret
 
 ; --------------------------------------------------------------
 ; LOAD SPRITE ATTRIBUTE TABLE
