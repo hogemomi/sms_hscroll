@@ -176,9 +176,9 @@ draw_startmap:
     ld (scrollval_frac),hl
 
 ; Put a shining new player car in the buffer.
-       ld de,plrcc         ; point to player cc in buffer.
-       ld hl,plrcar        ; point to player car graphics.
-       call carcc          ; set the char codes for player car.
+    ld de,plrcc         ; point to player cc in buffer.
+    ld hl,plrcar        ; point to player car graphics.
+    call carcc          ; set the char codes for player car.
 
     ; preset map columun address
     ld hl,bgmap
