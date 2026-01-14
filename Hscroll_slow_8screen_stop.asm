@@ -317,13 +317,14 @@ setreg:
 ; -------------------------------------------------------------
 ; SET CAR SPRITES' CHARACTER CODES (CC)
 ; HL = pointer to 16 byte char codes block, DE = buffer index.
-carcc ld bc,16
--      ldi
-       inc de
-       ld a,b
-       or c
-       jp nz,-
-       ret
+carcc:
+    ld bc,16
+-   ldi
+    inc de
+    ld a,b
+    or c
+    jp nz,-
+    ret
 
 ; --------------------------------------------------------------
 ; LOAD SPRITE ATTRIBUTE TABLE
