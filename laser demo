@@ -1,0 +1,554 @@
+; ============================================
+; SMS Laser Demo
+; 自機8方向移動 + 右方向16タイル固定レーザー
+; WLA-DX (Z80) アセンブリ
+; ============================================
+
+.MEMORYMAP
+    DEFAULTSLOT 0
+    SLOTSIZE $8000
+    SLOT 0 $0000
+    SLOTSIZE $2000
+    SLOT 1 $C000
+.ENDME
+
+.ROMBANKMAP
+    BANKSTOTAL 1
+    BANKSIZE $8000
+    BANKS 1
+.ENDRO
+
+; ============================================
+; 定数
+; ============================================
+.DEFINE NAME_TABLE_BASE  $3800
+.DEFINE SAT_BASE         $3F00
+.DEFINE LASER_LENGTH     16
+.DEFINE LASER_DURATION   90
+.DEFINE LASER_TILE_BODY  2      ; BGタイル番号(レーザー用パターン)
+.DEFINE PLAYER_TILE      1      ; スプライトタイル番号(自機用パターン)
+
+.DEFINE PLAYER_MIN_X 8
+.DEFINE PLAYER_MAX_X 200
+.DEFINE PLAYER_MIN_Y 16
+.DEFINE PLAYER_MAX_Y 176
+
+; ジョイパッド1 (ポート$DC、負論理:0=押されている)
+.DEFINE JOY_UP_BIT    0
+.DEFINE JOY_DOWN_BIT  1
+.DEFINE JOY_LEFT_BIT  2
+.DEFINE JOY_RIGHT_BIT 3
+.DEFINE JOY_FIRE_BIT  4
+
+; ============================================
+; ワークRAM ($C000-)
+; ============================================
+.RAMSECTION "MainVars" SLOT 1 ORGA $C000
+    PlayerX:          db
+    PlayerY:          db
+    LaserActive:      db
+    LaserAttached:    db
+    LaserOriginTileX: db
+    LaserRowTile:     db
+    LaserTimer:       db
+    LaserBackupTiles: dsb LASER_LENGTH
+.ENDS
+
+; ============================================
+; ブート / 割り込みベクタ
+; ============================================
+.BANK 0 SLOT 0
+.ORG $0000
+.SECTION "Boot" FORCE
+    di
+    im 1
+    jp Start
+.ENDS
+
+.ORG $0038
+.SECTION "IntVector" FORCE
+    push af
+    in   a,($bf)      ; VDPステータス読み出しで割り込み要因をクリア
+    pop  af
+    ei
+    reti
+.ENDS
+
+.ORG $0066
+.SECTION "NMIVector" FORCE
+    retn
+.ENDS
+
+; ============================================
+; メインコード
+; ============================================
+.ORG $0100
+.SECTION "Main" FORCE
+
+Start:
+    ld   sp,$DFF0
+
+    ; --- VDPレジスタ初期化 ---
+    ld   hl,VdpInitData
+    ld   b,11
+    ld   c,$bf
+-:
+    ld   a,(hl)
+    out  (c),a
+    inc  hl
+    ld   a,(hl)
+    out  (c),a
+    inc  hl
+    djnz -
+
+    ; --- VRAMを$0000から全クリア ---
+    ld   hl,$4000        ; 書き込みモード、アドレス0
+    call VDPSetAddrWriteHL
+    ld   bc,$4000         ; 16KB
+    xor  a
+ClearVRAMLoop:
+    out  ($be),a
+    dec  bc
+    ld   a,b
+    or   c
+    jr   nz,ClearVRAMLoop
+    xor  a
+
+    ; --- パレット設定 ---
+    ld   hl,$C000          ; CRAM書き込みモード、アドレス0
+    call VDPSetAddrWriteHL
+    ld   b,32
+    ld   hl,PaletteData
+PalLoop:
+    ld   a,(hl)
+    out  ($be),a
+    inc  hl
+    djnz PalLoop
+
+    ; --- タイルパターン読み込み(パターンテーブル先頭) ---
+    ld   hl,$4000
+    call VDPSetAddrWriteHL
+    ld   hl,TileData
+    ld   bc,TileDataEnd-TileData
+TileLoadLoop:
+    ld   a,(hl)
+    out  ($be),a
+    inc  hl
+    dec  bc
+    ld   a,b
+    or   c
+    jr   nz,TileLoadLoop
+
+    ; --- ネームテーブルを全てタイル0(空白)でクリア ---
+    ld   hl,NAME_TABLE_BASE | $4000
+    call VDPSetAddrWriteHL
+    ld   bc,32*28*2
+    xor  a
+NameClearLoop:
+    out  ($be),a
+    dec  bc
+    ld   a,b
+    or   c
+    jr   nz,NameClearLoop
+    xor  a
+
+    ; --- スプライト属性テーブルを初期化(未使用スプライトはY=$D0で非表示) ---
+    ld   hl,SAT_BASE | $4000
+    call VDPSetAddrWriteHL
+    ld   b,64
+    ld   a,$D0
+SATClearLoop:
+    out  ($be),a
+    djnz SATClearLoop
+
+    call InitPlayerAndLaser
+
+    ; --- 画面表示ON + VBlank割り込み有効化 ---
+    ld   a,$E0
+    out  ($bf),a
+    ld   a,$81
+    out  ($bf),a
+
+    ei
+
+MainLoop:
+    halt
+    call ReadJoypad
+    call UpdatePlayer
+    call CheckFireLaser
+    call UpdateLaser
+    call UpdateSprites
+    jr   MainLoop
+
+; ============================================
+; VDPアドレス設定 (HL=VDPアドレス、上位2bitでモード指定済み)
+; 書き込み: HL = (addr) | $4000
+; 読み出し: HL = (addr) | $0000
+; ============================================
+VDPSetAddrWriteHL:
+    push af
+    ld   a,l
+    out  ($bf),a
+    ld   a,h
+    out  ($bf),a
+    pop  af
+    ret
+
+; ============================================
+; 初期化
+; ============================================
+InitPlayerAndLaser:
+    ld   a,100
+    ld   (PlayerX),a
+    ld   a,96
+    ld   (PlayerY),a
+    xor  a
+    ld   (LaserActive),a
+    ret
+
+; ============================================
+; ジョイパッド読み取り
+; ============================================
+JoyState: .db 0
+
+ReadJoypad:
+    in   a,($dc)
+    ld   (JoyState),a
+    ret
+
+; ============================================
+; 自機の8方向移動
+; ============================================
+UpdatePlayer:
+    ld   a,(JoyState)
+    ld   b,a
+
+    bit  JOY_UP_BIT,b
+    jr   nz,SkipUp
+        ld   a,(PlayerY)
+        cp   PLAYER_MIN_Y
+        jr   z,SkipUp
+        dec  a
+        ld   (PlayerY),a
+SkipUp:
+
+    bit  JOY_DOWN_BIT,b
+    jr   nz,SkipDown
+        ld   a,(PlayerY)
+        cp   PLAYER_MAX_Y
+        jr   z,SkipDown
+        inc  a
+        ld   (PlayerY),a
+SkipDown:
+
+    bit  JOY_LEFT_BIT,b
+    jr   nz,SkipLeft
+        ld   a,(PlayerX)
+        cp   PLAYER_MIN_X
+        jr   z,SkipLeft
+        dec  a
+        ld   (PlayerX),a
+SkipLeft:
+
+    bit  JOY_RIGHT_BIT,b
+    jr   nz,SkipRight
+        ld   a,(PlayerX)
+        cp   PLAYER_MAX_X
+        jr   z,SkipRight
+        inc  a
+        ld   (PlayerX),a
+SkipRight:
+    ret
+
+; ============================================
+; レーザー発射判定
+; ============================================
+CheckFireLaser:
+    ld   a,(LaserActive)
+    or   a
+    ret  nz
+
+    ld   a,(JoyState)
+    bit  JOY_FIRE_BIT,a
+    ret  nz
+
+    ld   a,1
+    ld   (LaserActive),a
+    ld   (LaserAttached),a
+
+    ld   a,(PlayerX)
+    srl  a
+    srl  a
+    srl  a
+    ld   (LaserOriginTileX),a
+
+    ld   a,(PlayerY)
+    srl  a
+    srl  a
+    srl  a
+    ld   (LaserRowTile),a
+
+    ld   a,LASER_DURATION
+    ld   (LaserTimer),a
+
+    call DrawLaserRow
+    ret
+
+; ============================================
+; レーザーの毎フレーム更新
+; ============================================
+UpdateLaser:
+    ld   a,(LaserActive)
+    or   a
+    ret  z
+
+    ld   a,(LaserAttached)
+    or   a
+    jr   z,SkipFollow
+
+    ld   a,(PlayerX)
+    srl  a
+    srl  a
+    srl  a
+    ld   b,a
+    ld   a,(LaserOriginTileX)
+    cp   b
+    jr   z,StillAttached
+
+    xor  a
+    ld   (LaserAttached),a
+    jr   SkipFollow
+
+StillAttached:
+    ld   a,(PlayerY)
+    srl  a
+    srl  a
+    srl  a
+    ld   b,a
+    ld   a,(LaserRowTile)
+    cp   b
+    jr   z,SkipFollow
+
+    call EraseLaserRow
+    ld   a,b
+    ld   (LaserRowTile),a
+    call DrawLaserRow
+
+SkipFollow:
+    ld   a,(LaserTimer)
+    dec  a
+    ld   (LaserTimer),a
+    or   a
+    ret  nz
+
+    call EraseLaserRow
+    xor  a
+    ld   (LaserActive),a
+    ret
+
+; ============================================
+; レーザー描画(元タイルをバックアップしてから上書き)
+; ============================================
+DrawLaserRow:
+    ld   a,(LaserOriginTileX)
+    inc  a
+    ld   c,a
+
+    ld   a,(LaserRowTile)
+    ld   d,a
+
+    ld   ix,LaserBackupTiles
+    ld   b,LASER_LENGTH
+
+DrawLaserLoop:
+    push bc
+    push de
+
+    ld   h,0
+    ld   l,d
+    add  hl,hl
+    add  hl,hl
+    add  hl,hl
+    add  hl,hl
+    add  hl,hl
+    ld   a,l
+    add  a,c
+    ld   l,a
+    jr   nc,DrawNoCarry
+    inc  h
+DrawNoCarry:
+    add  hl,hl
+    ld   de,NAME_TABLE_BASE
+    add  hl,de
+
+    ; --- 元のタイルを読み出してバックアップ ---
+    ld   d,h
+    ld   e,l
+    call VDPSetAddrReadDE
+    in   a,($be)
+    ld   (ix+0),a
+    inc  ix
+
+    ; --- レーザータイルを書き込み ---
+    ld   d,h
+    ld   e,l
+    call VDPSetAddrWriteDE
+    ld   a,LASER_TILE_BODY
+    out  ($be),a
+    xor  a
+    out  ($be),a
+
+    pop  de
+    pop  bc
+    inc  c
+    djnz DrawLaserLoop
+    ret
+
+; ============================================
+; レーザー消去(バックアップした元タイルに復元)
+; ============================================
+EraseLaserRow:
+    ld   a,(LaserOriginTileX)
+    inc  a
+    ld   c,a
+
+    ld   a,(LaserRowTile)
+    ld   d,a
+
+    ld   ix,LaserBackupTiles
+    ld   b,LASER_LENGTH
+
+EraseLaserLoop:
+    push bc
+    push de
+
+    ld   h,0
+    ld   l,d
+    add  hl,hl
+    add  hl,hl
+    add  hl,hl
+    add  hl,hl
+    add  hl,hl
+    ld   a,l
+    add  a,c
+    ld   l,a
+    jr   nc,EraseNoCarry
+    inc  h
+EraseNoCarry:
+    add  hl,hl
+    ld   de,NAME_TABLE_BASE
+    add  hl,de
+
+    ld   d,h
+    ld   e,l
+    call VDPSetAddrWriteDE
+    ld   a,(ix+0)
+    out  ($be),a
+    xor  a
+    out  ($be),a
+    inc  ix
+
+    pop  de
+    pop  bc
+    inc  c
+    djnz EraseLaserLoop
+    ret
+
+; VDPアドレス設定 (DE=ネームテーブル内オフセット、書き込み/読み出し)
+VDPSetAddrWriteDE:
+    push af
+    ld   a,e
+    out  ($bf),a
+    ld   a,d
+    or   $40
+    out  ($bf),a
+    pop  af
+    ret
+
+VDPSetAddrReadDE:
+    push af
+    ld   a,e
+    out  ($bf),a
+    ld   a,d
+    and  $3F
+    out  ($bf),a
+    pop  af
+    ret
+
+; ============================================
+; スプライト(自機)のVRAM書き込み
+; ============================================
+UpdateSprites:
+    ld   hl,SAT_BASE | $4000
+    call VDPSetAddrWriteHL
+
+    ld   a,(PlayerY)
+    dec  a
+    out  ($be),a
+
+    ld   a,$D0
+    out  ($be),a
+    ; 残り62バイトはY=$D0のまま(未使用)なので触らない
+
+    ld   hl,(SAT_BASE+$40) | $4000
+    call VDPSetAddrWriteHL
+    ld   a,(PlayerX)
+    out  ($be),a
+    ld   a,PLAYER_TILE
+    out  ($be),a
+    ret
+
+.ENDS
+
+; ============================================
+; データ
+; ============================================
+.ORG $1000
+.SECTION "Data" FORCE
+
+VdpInitData:
+    .db $04,$80   ; reg0: Mode4 enable
+    .db $80,$81   ; reg1: 画面OFF(起動時)
+    .db $FF,$82   ; reg2: ネームテーブル = $3800
+    .db $FF,$83   ; reg3: カラーテーブル(Mode4未使用)
+    .db $FF,$84   ; reg4: パターンテーブル(Mode4未使用)
+    .db $FF,$85   ; reg5: スプライト属性テーブル = $3F00
+    .db $00,$86   ; reg6: スプライトパターンテーブル = バンク0
+    .db $00,$87   ; reg7: ボーダーカラー
+    .db $00,$88   ; reg8: 水平スクロール
+    .db $00,$89   ; reg9: 垂直スクロール
+    .db $FF,$8A   ; reg10: ラインカウンタ(H-int無効)
+
+; パレット (32バイト: BG 0-15, スプライト 16-31)
+; フォーマット: --BBGGRR (6bit, 各chは0-3)
+PaletteData:
+    .db $00 ; 0  背景(黒)
+    .db $00 ; 1  未使用
+    .db $0F ; 2  レーザー(黄色 R3 G3 B0)
+    .db $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00 ; 3-13未使用
+    .db $00,$00
+    ; スプライトパレット(16-31)
+    .db $00 ; 16 未使用(スプライト色0=透過扱い)
+    .db $3F ; 17 自機(白 R3 G3 B3)
+    .db $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
+
+; タイルパターン (Mode4, 1タイル=32バイト, 4bitplane×8行)
+; タイル0: 空白(全ドットcolor0)
+; タイル1: 自機(全ドットcolor1 → スプライトパレット17=白)
+; タイル2: レーザー(全ドットcolor2 → BGパレット2=黄色)
+TileData:
+; --- タイル0: 空白 ---
+.REPT 8
+    .db $00,$00,$00,$00
+.ENDR
+; --- タイル1: 自機(color index 1 = bp0のみ1) ---
+.REPT 8
+    .db $FF,$00,$00,$00
+.ENDR
+; --- タイル2: レーザー(color index 2 = bp1のみ1) ---
+.REPT 8
+    .db $00,$FF,$00,$00
+.ENDR
+TileDataEnd:
+
+.ENDS
