@@ -23,15 +23,21 @@
 ; ============================================
 .DEFINE NAME_TABLE_BASE  $3800
 .DEFINE SAT_BASE         $3F00
-.DEFINE LASER_LENGTH     16
+.DEFINE LASER_LENGTH     22
 .DEFINE LASER_DURATION   90
 .DEFINE LASER_TILE_BODY  2      ; BGタイル番号(レーザー用パターン)
 .DEFINE PLAYER_TILE      1      ; スプライトタイル番号(自機用パターン)
+.DEFINE LASER_FLY_SPEED  2      ; 満長後、1フレームに何タイル分右へ飛ぶか
+.DEFINE SCREEN_COLS      32     ; ネームテーブルの横タイル数
+.DEFINE SCREEN_ROWS      28     ; ネームテーブルの縦タイル数
+.DEFINE SCROLL_SPEED_X   1      ; 横方向の自動スクロール速度(ピクセル/フレーム)
 
 .DEFINE PLAYER_MIN_X 8
 .DEFINE PLAYER_MAX_X 200
-.DEFINE PLAYER_MIN_Y 16
-.DEFINE PLAYER_MAX_Y 176
+.DEFINE PLAYER_SCREEN_Y_MIN 16   ; 画面上で自機が留まる帯(ここを超えるとカメラが追従)
+.DEFINE PLAYER_SCREEN_Y_MAX 176
+.DEFINE WORLD_HEIGHT_PX     448  ; 縦方向のワールド高さ(224px×2画面分)でループ
+.DEFINE TABLE_HEIGHT_PX     224  ; ハードウェアのネームテーブル実高さ(28行×8px)
 
 ; ジョイパッド1 (ポート$DC、負論理:0=押されている)
 .DEFINE JOY_UP_BIT    0
@@ -44,14 +50,21 @@
 ; ワークRAM ($C000-)
 ; ============================================
 .RAMSECTION "MainVars" SLOT 1 ORGA $C000
-    PlayerX:          db
-    PlayerY:          db
+    PlayerX:          db     ; 画面座標(スプライトは常に画面座標系、スクロールの影響を受けない)
+    PlayerY:          db     ; 画面座標(毎フレーム再計算される表示用の値)
+    PlayerWorldY:     dw     ; ワールド座標(0?447、2画面分でループ)
+    CameraWorldX:     dw     ; 横スクロールの「真の」ワールド座標(単調増加、折り返さない)
+    CameraWorldY:     dw     ; 縦スクロールの「真の」ワールド座標(0?447、2画面分でループ)
     LaserActive:      db
-    LaserAttached:    db
-    LaserOriginTileX: db
-    LaserRowTile:     db
-    LaserTimer:       db
+    LaserGrowing:     db
+    LaserRowTile:     db     ; 現在の物理タイル行(0-27、描画ループで使用)
+    LaserStartCol:    db     ; 現在の物理タイル列(0-31、描画ループで使用)
+    LaserWorldPixelX: dw     ; ビーム左端の「真の」ワールドピクセル座標(画面外判定用)
+    LaserLen:         db
     LaserBackupTiles: dsb LASER_LENGTH
+    PrevJoyState:     db
+    JoyState:         db
+    TempWord:         dw     ; 計算用スクラッチ領域
 .ENDS
 
 ; ============================================
@@ -105,14 +118,13 @@ Start:
     ld   hl,$4000        ; 書き込みモード、アドレス0
     call VDPSetAddrWriteHL
     ld   bc,$4000         ; 16KB
-    xor  a
 ClearVRAMLoop:
+    xor  a
     out  ($be),a
     dec  bc
     ld   a,b
     or   c
     jr   nz,ClearVRAMLoop
-    xor  a
 
     ; --- パレット設定 ---
     ld   hl,$C000          ; CRAM書き込みモード、アドレス0
@@ -139,18 +151,35 @@ TileLoadLoop:
     or   c
     jr   nz,TileLoadLoop
 
-    ; --- ネームテーブルを全てタイル0(空白)でクリア ---
+    ; --- ネームテーブルに星空を疎らに配置(8bitアキュムレータの
+    ;     オーバーフローを利用した疑似ランダム) ---
     ld   hl,NAME_TABLE_BASE | $4000
     call VDPSetAddrWriteHL
-    ld   bc,32*28*2
-    xor  a
-NameClearLoop:
+    ld   bc,32*28          ; タイル数(896個)
+    ld   e,0               ; 疑似乱数アキュムレータ
+StarFieldLoop:
+    ld   a,e
+    add  a,23
+    ld   e,a
+    jr   nc,StarFieldBlank  ; オーバーフローしなければ空白タイル
+
+    ld   a,3                ; 星タイル
     out  ($be),a
+    xor  a
+    out  ($be),a
+    jr   StarFieldNext
+
+StarFieldBlank:
+    xor  a
+    out  ($be),a
+    xor  a
+    out  ($be),a
+
+StarFieldNext:
     dec  bc
     ld   a,b
     or   c
-    jr   nz,NameClearLoop
-    xor  a
+    jr   nz,StarFieldLoop
 
     ; --- スプライト属性テーブルを初期化(未使用スプライトはY=$D0で非表示) ---
     ld   hl,SAT_BASE | $4000
@@ -175,9 +204,11 @@ MainLoop:
     halt
     call ReadJoypad
     call UpdatePlayer
+    call UpdateCamera     ; 横自動スクロール+縦カメラ追従(PlayerYを再計算)
+    call UpdateSprites    ; 自機の座標書き込みを最優先(レーザー処理でVBlankが
+                          ; 圧迫されても、自機の表示だけは確実に間に合わせる)
     call CheckFireLaser
     call UpdateLaser
-    call UpdateSprites
     jr   MainLoop
 
 ; ============================================
@@ -202,16 +233,26 @@ InitPlayerAndLaser:
     ld   (PlayerX),a
     ld   a,96
     ld   (PlayerY),a
+    ld   hl,96
+    ld   (PlayerWorldY),hl  ; 起動時はカメラオフセット0なので画面座標=ワールド座標
+    ld   hl,0
+    ld   (CameraWorldX),hl
+    ld   (CameraWorldY),hl
     xor  a
     ld   (LaserActive),a
+    ld   (LaserGrowing),a
+    ld   (LaserLen),a
+    ld   a,$FF
+    ld   (JoyState),a
+    ld   (PrevJoyState),a
     ret
 
 ; ============================================
 ; ジョイパッド読み取り
 ; ============================================
-JoyState: .db 0
-
 ReadJoypad:
+    ld   a,(JoyState)
+    ld   (PrevJoyState),a
     in   a,($dc)
     ld   (JoyState),a
     ret
@@ -225,20 +266,31 @@ UpdatePlayer:
 
     bit  JOY_UP_BIT,b
     jr   nz,SkipUp
-        ld   a,(PlayerY)
-        cp   PLAYER_MIN_Y
-        jr   z,SkipUp
-        dec  a
-        ld   (PlayerY),a
+        ld   hl,(PlayerWorldY)
+        ld   a,h
+        or   l
+        jr   nz,UpDec
+        ld   hl,WORLD_HEIGHT_PX-1   ; 0から上に行く場合はループして最下部へ
+        jr   UpStore
+    UpDec:
+        dec  hl
+    UpStore:
+        ld   (PlayerWorldY),hl
 SkipUp:
 
     bit  JOY_DOWN_BIT,b
     jr   nz,SkipDown
-        ld   a,(PlayerY)
-        cp   PLAYER_MAX_Y
-        jr   z,SkipDown
-        inc  a
-        ld   (PlayerY),a
+        ld   hl,(PlayerWorldY)
+        inc  hl
+        ld   a,h
+        cp   (WORLD_HEIGHT_PX>>8)
+        jr   nz,DownStore
+        ld   a,l
+        cp   (WORLD_HEIGHT_PX&$FF)
+        jr   nz,DownStore
+        ld   hl,0                  ; 最下部を超えたらループして最上部へ
+    DownStore:
+        ld   (PlayerWorldY),hl
 SkipDown:
 
     bit  JOY_LEFT_BIT,b
@@ -261,37 +313,201 @@ SkipRight:
     ret
 
 ; ============================================
+; カメラ更新: 横は自動スクロール(真のワールド座標、単調増加)、
+; 縦は自機のワールドY座標(0?447、2画面分でループ)が
+; 画面上の帯[PLAYER_SCREEN_Y_MIN, PLAYER_SCREEN_Y_MAX]に収まるよう追従する
+; ============================================
+UpdateCamera:
+    ; --- 横方向: 常に一定速度で自動的に右へスクロール(16bit、折り返さない) ---
+    ld   hl,(CameraWorldX)
+    ld   de,SCROLL_SPEED_X
+    add  hl,de
+    ld   (CameraWorldX),hl
+    ld   a,l
+    neg
+    out  ($bf),a
+    ld   a,$88             ; reg8(水平スクロール)
+    out  ($bf),a
+
+    ; --- 縦方向: diff = (PlayerWorldY - CameraWorldY) mod448 を計算 ---
+    ld   hl,(PlayerWorldY)
+    ld   de,(CameraWorldY)
+    or   a
+    sbc  hl,de
+    jr   nc,DiffOK
+    ld   de,WORLD_HEIGHT_PX
+    add  hl,de
+DiffOK:
+    ld   (TempWord),hl
+
+    ; effective = diff<224なら diff、そうでなければ diff-448 (ループ境界をまたぐ場合の符号付き解釈)
+    ld   de,224
+    or   a
+    sbc  hl,de
+    jr   c,EffSmall
+    ld   hl,(TempWord)
+    ld   de,WORLD_HEIGHT_PX
+    or   a
+    sbc  hl,de
+    jr   EffDone
+EffSmall:
+    ld   hl,(TempWord)
+EffDone:
+    ; hl = effective (符号付き16bitとして扱う。通常-224?+223程度)
+    ld   a,h
+    bit  7,a
+    jr   nz,CamTooHighY
+
+    ld   a,l
+    cp   PLAYER_SCREEN_Y_MIN
+    jr   c,CamTooHighY
+
+    cp   PLAYER_SCREEN_Y_MAX+1
+    jr   c,CamNoChangeY
+
+    ; --- 帯の下端を超えている→カメラを進める ---
+    sub  PLAYER_SCREEN_Y_MAX
+    call AdvanceCameraY
+    jr   CamNoChangeY
+
+CamTooHighY:
+    ; --- 帯の上端より上(またはeffectiveが負)→カメラを戻す ---
+    ld   a,l
+    neg
+    add  a,PLAYER_SCREEN_Y_MIN
+    call RetreatCameraY
+
+CamNoChangeY:
+    ; --- 画面表示用のPlayerYを再計算 ---
+    ld   hl,(PlayerWorldY)
+    ld   de,(CameraWorldY)
+    or   a
+    sbc  hl,de
+    jr   nc,FinalDiffOK
+    ld   de,WORLD_HEIGHT_PX
+    add  hl,de
+FinalDiffOK:
+    ld   a,l
+    ld   (PlayerY),a
+
+    ; --- R9書き込み: CameraWorldYをネームテーブルの実高さ(224)でmodしてから符号反転 ---
+    ld   hl,(CameraWorldY)
+    call Mod224_16
+    ld   a,l
+    neg
+    out  ($bf),a
+    ld   a,$89              ; reg9(垂直スクロール)
+    out  ($bf),a
+    ret
+
+; --- CameraWorldYをa(px)だけ進める(448でループ) ---
+AdvanceCameraY:
+    ld   hl,(CameraWorldY)
+    ld   d,0
+    ld   e,a
+    add  hl,de
+    ld   de,WORLD_HEIGHT_PX
+    or   a
+    sbc  hl,de
+    jr   c,AdvNoWrap
+    ld   (CameraWorldY),hl
+    ret
+AdvNoWrap:
+    add  hl,de
+    ld   (CameraWorldY),hl
+    ret
+
+; --- CameraWorldYをa(px)だけ戻す(448でループ) ---
+RetreatCameraY:
+    ld   hl,(CameraWorldY)
+    ld   d,0
+    ld   e,a
+    or   a
+    sbc  hl,de
+    jr   nc,RetNoWrap
+    ld   de,WORLD_HEIGHT_PX
+    add  hl,de
+RetNoWrap:
+    ld   (CameraWorldY),hl
+    ret
+
+; --- hl(0-447)をネームテーブル実高さ(224)でmodする ---
+Mod224_16:
+    ld   de,TABLE_HEIGHT_PX
+    or   a
+    sbc  hl,de
+    jr   nc,Mod224Done
+    add  hl,de
+Mod224Done:
+    ret
+
+; ============================================
 ; レーザー発射判定
 ; ============================================
 CheckFireLaser:
     ld   a,(LaserActive)
     or   a
-    ret  nz
+    ret  nz                 ; 現在のレーザーが画面上に存在する間は発射不可
 
+    ; ボタンが押されていれば発射(押しっぱなしでもOK。
+    ; 連射の間隔は上のLaserActiveチェック=前弾が画面から消えるまで、で制御される)
     ld   a,(JoyState)
     bit  JOY_FIRE_BIT,a
     ret  nz
 
     ld   a,1
     ld   (LaserActive),a
-    ld   (LaserAttached),a
+    ld   (LaserGrowing),a
+    xor  a
+    ld   (LaserLen),a
 
-    ld   a,(PlayerX)
-    srl  a
-    srl  a
-    srl  a
-    ld   (LaserOriginTileX),a
-
-    ld   a,(PlayerY)
-    srl  a
-    srl  a
-    srl  a
+    call CalcPlayerWorldColRow  ; b=現在の開始列(ワールド考慮), c=現在の行
+    ld   a,b
+    ld   (LaserStartCol),a
+    ld   a,c
     ld   (LaserRowTile),a
 
-    ld   a,LASER_DURATION
-    ld   (LaserTimer),a
+    ; --- LaserWorldPixelX(真のワールド座標)を計算。画面外判定に使う ---
+    ld   hl,(CameraWorldX)
+    ld   d,0
+    ld   a,(PlayerX)
+    ld   e,a
+    add  hl,de              ; hl = 自機の真のワールドピクセルX
+    ld   a,l
+    and  $F8                ; タイル境界に切り下げ
+    ld   l,a
+    ld   de,8
+    add  hl,de               ; +1タイル分(ビーム開始位置)
+    ld   (LaserWorldPixelX),hl
 
-    call DrawLaserRow
+    call GrowLaserOneTile   ; 発射した瞬間に先頭1タイル目を出す
+    ret
+
+; ============================================
+; 自機の「現在あるべきビーム開始位置」を計算する
+; (横スクロール量CameraWorldXを加味したワールド列 + ワールド行)
+; 出力: b = 開始列(0-31, ラップ済み), c = 行(0-27)
+; ============================================
+CalcPlayerWorldColRow:
+    ld   hl,(CameraWorldX)
+    ld   a,l                ; 下位バイトのみ使用(列計算はmod256で十分)
+    ld   b,a
+    ld   a,(PlayerX)
+    add  a,b                ; a = (CameraWorldX+PlayerX) mod256 = ワールド画素X
+    srl  a
+    srl  a
+    srl  a                  ; a = ワールドタイル列(0-31、8bitラップにより自然にmod32)
+    inc  a
+    and  $1F                ; 31→0への繰り上がりを吸収
+    ld   b,a
+
+    ld   hl,(PlayerWorldY)
+    call Mod224_16          ; hl = PlayerWorldY mod224(ネームテーブルの実高さで正規化)
+    ld   a,l
+    srl  a
+    srl  a
+    srl  a                  ; a = ワールドタイル行(0-27)
+    ld   c,a
     ret
 
 ; ============================================
@@ -302,67 +518,182 @@ UpdateLaser:
     or   a
     ret  z
 
-    ld   a,(LaserAttached)
+    ld   a,(LaserGrowing)
     or   a
-    jr   z,SkipFollow
+    jp   z,FlyLaser
 
-    ld   a,(PlayerX)
-    srl  a
-    srl  a
-    srl  a
-    ld   b,a
-    ld   a,(LaserOriginTileX)
+    ; --- 成長中は自機の現在位置(X,Y両方、スクロール考慮)に完全に追従する ---
+    call CalcPlayerWorldColRow  ; b = 現在あるべき開始列, c = 現在あるべき行
+
+    ld   a,(LaserStartCol)
     cp   b
-    jr   z,StillAttached
-
-    xor  a
-    ld   (LaserAttached),a
-    jr   SkipFollow
-
-StillAttached:
-    ld   a,(PlayerY)
-    srl  a
-    srl  a
-    srl  a
-    ld   b,a
+    jr   nz,NeedReposition
     ld   a,(LaserRowTile)
-    cp   b
+    cp   c
     jr   z,SkipFollow
 
+NeedReposition:
+    ; --- 今表示中の分だけ消してから、新しい位置に同じ本数を描き直す ---
+    ; (EraseLaserRow/DrawLaserRow内部でbcをループカウンタ等に使うため、
+    ;  新しい位置(b,c)はスタックに退避してから呼び出す)
+    push bc
     call EraseLaserRow
+    pop  bc
     ld   a,b
+    ld   (LaserStartCol),a
+    ld   a,c
     ld   (LaserRowTile),a
+
+    ; --- LaserWorldPixelXも自機の現在位置に同期させる ---
+    ld   hl,(CameraWorldX)
+    ld   d,0
+    ld   a,(PlayerX)
+    ld   e,a
+    add  hl,de
+    ld   a,l
+    and  $F8
+    ld   l,a
+    ld   de,8
+    add  hl,de
+    ld   (LaserWorldPixelX),hl
+
     call DrawLaserRow
 
 SkipFollow:
-    ld   a,(LaserTimer)
-    dec  a
-    ld   (LaserTimer),a
-    or   a
-    ret  nz
+    ; --- まだ最大長に達していなければ1タイルずつ伸ばす ---
+    ld   a,(LaserLen)
+    cp   LASER_LENGTH
+    jr   nc,GrowDone
+    call GrowLaserOneTile
+    ret
 
+GrowDone:
+    ; --- 満長になったら自機から完全に切り離し、飛行フェーズへ ---
+    xor  a
+    ld   (LaserGrowing),a
+    ret
+
+; ============================================
+; 飛行フェーズ: ビーム全体(先頭・末尾とも)を毎フレーム右へ進める。
+; LaserWorldPixelXは「真の」ワールド座標(折り返さない)なので、
+; カメラの真のワールド座標(CameraWorldX)との差が画面幅(256px)を
+; 超えたかどうかで、画面外に出たと確実に判定できる。
+; ============================================
+FlyLaser:
     call EraseLaserRow
+
+    ld   hl,(LaserWorldPixelX)
+    ld   de,LASER_FLY_SPEED*8
+    add  hl,de
+    ld   (LaserWorldPixelX),hl
+
+    ; --- 新しい物理タイル列を導出(下位バイトのみ使用、mod32) ---
+    ld   a,l
+    srl  a
+    srl  a
+    srl  a
+    and  $1F
+    ld   (LaserStartCol),a
+
+    ; --- 画面外判定: LaserWorldPixelX - CameraWorldX が256px以上なら画面外 ---
+    ld   hl,(LaserWorldPixelX)
+    ld   de,(CameraWorldX)
+    or   a
+    sbc  hl,de
+    ld   a,h
+    or   a
+    jr   nz,LaserGone
+
+    call DrawLaserRow
+    ret
+
+LaserGone:
     xor  a
     ld   (LaserActive),a
+    ret
+
+; ============================================
+; レーザーを1タイルだけ先端に伸ばす(成長アニメーション用)
+; ============================================
+GrowLaserOneTile:
+    ld   a,(LaserLen)
+    ld   c,a               ; c = 追加するタイルのインデックス(0始まり)
+    inc  a
+    ld   (LaserLen),a
+
+    ; --- バックアップ先を先に計算(LaserBackupTiles + インデックス) ---
+    ld   e,c
+    ld   d,0
+    ld   ix,LaserBackupTiles
+    add  ix,de
+
+    ld   a,(LaserStartCol)
+    add  a,c
+    and  $1F               ; 列は常に0-31にラップ
+    ld   c,a               ; c = 実際の列番号
+
+    ld   a,(LaserRowTile)
+    ld   d,a               ; d = 行番号
+
+    ld   h,0
+    ld   l,d
+    add  hl,hl
+    add  hl,hl
+    add  hl,hl
+    add  hl,hl
+    add  hl,hl
+    ld   a,l
+    add  a,c
+    ld   l,a
+    jr   nc,GrowNoCarry
+    inc  h
+GrowNoCarry:
+    add  hl,hl
+    ld   de,NAME_TABLE_BASE
+    add  hl,de
+
+    ; --- バックアップ先を計算(LaserBackupTiles + (LaserLen-1)) ---
+    push hl
+    ld   d,h
+    ld   e,l
+    call VDPSetAddrReadDE
+    in   a,($be)
+    ld   (ix+0),a
+    pop  hl
+
+    ld   d,h
+    ld   e,l
+    call VDPSetAddrWriteDE
+    ld   a,LASER_TILE_BODY
+    out  ($be),a
+    xor  a
+    out  ($be),a
     ret
 
 ; ============================================
 ; レーザー描画(元タイルをバックアップしてから上書き)
 ; ============================================
 DrawLaserRow:
-    ld   a,(LaserOriginTileX)
-    inc  a
+    ld   a,(LaserLen)
+    or   a
+    ret  z
+    ld   b,a
+
+    ld   a,(LaserStartCol)
     ld   c,a
 
     ld   a,(LaserRowTile)
     ld   d,a
 
     ld   ix,LaserBackupTiles
-    ld   b,LASER_LENGTH
 
 DrawLaserLoop:
     push bc
     push de
+
+    ld   a,c
+    and  $1F               ; 列は常に0-31にラップ(ワールドが横方向に周期的なため)
+    ld   c,a
 
     ld   h,0
     ld   l,d
@@ -387,7 +718,6 @@ DrawNoCarry:
     call VDPSetAddrReadDE
     in   a,($be)
     ld   (ix+0),a
-    inc  ix
 
     ; --- レーザータイルを書き込み ---
     ld   d,h
@@ -401,6 +731,7 @@ DrawNoCarry:
     pop  de
     pop  bc
     inc  c
+    inc  ix
     djnz DrawLaserLoop
     ret
 
@@ -408,19 +739,26 @@ DrawNoCarry:
 ; レーザー消去(バックアップした元タイルに復元)
 ; ============================================
 EraseLaserRow:
-    ld   a,(LaserOriginTileX)
-    inc  a
+    ld   a,(LaserLen)
+    or   a
+    ret  z
+    ld   b,a
+
+    ld   a,(LaserStartCol)
     ld   c,a
 
     ld   a,(LaserRowTile)
     ld   d,a
 
     ld   ix,LaserBackupTiles
-    ld   b,LASER_LENGTH
 
 EraseLaserLoop:
     push bc
     push de
+
+    ld   a,c
+    and  $1F               ; 列は常に0-31にラップ
+    ld   c,a
 
     ld   h,0
     ld   l,d
@@ -446,11 +784,11 @@ EraseNoCarry:
     out  ($be),a
     xor  a
     out  ($be),a
-    inc  ix
 
     pop  de
     pop  bc
     inc  c
+    inc  ix
     djnz EraseLaserLoop
     ret
 
@@ -490,7 +828,7 @@ UpdateSprites:
     out  ($be),a
     ; 残り62バイトはY=$D0のまま(未使用)なので触らない
 
-    ld   hl,(SAT_BASE+$40) | $4000
+    ld   hl,(SAT_BASE+$80) | $4000
     call VDPSetAddrWriteHL
     ld   a,(PlayerX)
     out  ($be),a
@@ -523,7 +861,7 @@ VdpInitData:
 ; フォーマット: --BBGGRR (6bit, 各chは0-3)
 PaletteData:
     .db $00 ; 0  背景(黒)
-    .db $00 ; 1  未使用
+    .db $3F ; 1  星(白 R3 G3 B3)
     .db $0F ; 2  レーザー(黄色 R3 G3 B0)
     .db $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00 ; 3-13未使用
     .db $00,$00
@@ -535,7 +873,8 @@ PaletteData:
 ; タイルパターン (Mode4, 1タイル=32バイト, 4bitplane×8行)
 ; タイル0: 空白(全ドットcolor0)
 ; タイル1: 自機(全ドットcolor1 → スプライトパレット17=白)
-; タイル2: レーザー(全ドットcolor2 → BGパレット2=黄色)
+; タイル2: レーザー(縦7,8番目のピクセル行だけcolor2 → BGパレット2=黄色)
+; タイル3: 星(中央付近に1ピクセルだけcolor1 → BGパレット1=白)
 TileData:
 ; --- タイル0: 空白 ---
 .REPT 8
@@ -545,9 +884,20 @@ TileData:
 .REPT 8
     .db $FF,$00,$00,$00
 .ENDR
-; --- タイル2: レーザー(color index 2 = bp1のみ1) ---
-.REPT 8
+; --- タイル2: レーザー(1?6行目は空白、7・8行目だけ黄色の2ピクセルライン) ---
+.REPT 6
+    .db $00,$00,$00,$00
+.ENDR
+.REPT 2
     .db $00,$FF,$00,$00
+.ENDR
+; --- タイル3: 星(5行目に1ピクセルだけ点灯) ---
+.REPT 4
+    .db $00,$00,$00,$00
+.ENDR
+    .db $10,$00,$00,$00
+.REPT 3
+    .db $00,$00,$00,$00
 .ENDR
 TileDataEnd:
 
