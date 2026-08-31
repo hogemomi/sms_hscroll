@@ -25,13 +25,10 @@
 .define  screenbottomvram $3e3e
 .define  scrollval_frac_inc $0080
 .define  scrollcount_frac_inc $01
-.define plrvp $c008   ; first player vpos.
-.define plrhp $c090  ; first player hpos.
-.define plrcc $c091  ; first player cc.
 
  ; organize ram.
+
 .enum $c000 export      ; export labels to symbol file.
-    satbuf dsb 256
     nextrawsrc dw
     nextrawvram dw
     nextcolsrc dw
@@ -43,7 +40,6 @@
     scrollval db        ; vdp scroll register buffer
     frame db         ; frame counter
     vdpstatus db
-    colidx dsb 1        ; 現在書き込み中の物理列番号 (0-31)
 .ende
 
 .bank 0 slot 0
@@ -87,7 +83,7 @@ inigam ld hl,regdat     ; point to register init data.
 ; clear vram
 ;==============================================================
 ; 1. set vram write address to $0000
-    ld hl,0
+    ld hl,$0000 | $4000
     call vrampr
 ; 2. output 16kb of zeroes
     ld bc,$4000     ; counter for 16kb of vram
@@ -108,7 +104,6 @@ inigam ld hl,regdat     ; point to register init data.
 
     ld hl,$c010         ; color bank 2, color 0 (sprites).
     call vrampr         ; prepare vram.
-    ld hl,sprpal        ; sprite palette data.
     ld bc,16             ; 5 colors.
     call vramwr         ; set sprite palette.
 
@@ -118,12 +113,6 @@ inigam ld hl,regdat     ; point to register init data.
     ld hl,bgtile
     ld bc,192*32   ; each tile is 32 bytes.
     call vramwr
-
-    ld hl,$2000         ; first tile @ index 256.
-    call vrampr         ; prepare vram.
-    ld hl,pltile        ; player car tile data.
-    ld bc,256*32         ; 16 tiles, 32 bytes each.
-    call vramwr         ; write player car tiles to vram.
 
 ; map placement at start
 ; initial buffer
@@ -175,15 +164,6 @@ draw_startmap:
     ld hl,0
     ld (scroll_count),hl
     ld (scrollval_frac),hl
-    ld (colidx),a        ; 最初に上書きする列は0番
-
-; Put a shining new player car in the buffer.
-    ld de,plrcc         ; point to player cc in buffer.
-    ld hl,plrcar        ; point to player car graphics.
-    call carcc          ; set the char codes for player car.
-
-    ld a,79             ; player starts at the road's center.
-    ld (plx),a          ; set x-coordinate.
 
     ; preset map columun address
     ld hl,bgmap
@@ -202,10 +182,6 @@ mainloop:
     ei
     halt   ; start main loop with vblank
     call wait_vblank
-
-; -------------------
-; load sat buffer to vram. The cars
-    call ldsat
 
 ; ----------------------
 ; update vdp right when vblank begins!
@@ -319,31 +295,6 @@ setreg:
     out ($bf),a      ; output command word 2/2.
     ret
 
-; -------------------------------------------------------------
-; SET CAR SPRITES' CHARACTER CODES (CC)
-; HL = pointer to 16 byte char codes block, DE = buffer index.
-carcc:
-    ld bc,16
--   ldi
-    inc de
-    ld a,b
-    or c
-    jp nz,-
-    ret
-
-; --------------------------------------------------------------
-; LOAD SPRITE ATTRIBUTE TABLE
-SAT from the buffer.
-
-ldsat:
-    ld hl,$3f00         ; point to start of SAT in vram.
-    call vrampr         ; prepare vram to recieve data.
-    ld hl,satbuf        ; source is start of sat buffer.
-    ld b,255            ; amount of bytes to output.
-    ld c,$be            ; destination is vdp data port.
-    otir                ; output buffer to vdp.
-    ret
-
 ; ----------------------
 ; wait vblank
 wait_vblank:
@@ -356,13 +307,6 @@ wait_vblank:
 
 ; ----------------------
 draw_column:
-    ld a,(colidx)
-    add a,a              ; ×2 (1タイル=2バイト)
-    ld l,a
-    ld h,0
-    ld bc,$3800
-    add hl,bc
-    ld (nextcolvram),hl
 ; loop counter
     ld a,mapheight
     ld (drawloopcount),a
@@ -399,11 +343,27 @@ drawcolumn_loop:
     sbc hl,bc
     ld (nextcolsrc),hl
 
-; 列を1つ書き終えたら、次に上書きする物理列へ進める
-    ld a,(colidx)
-    inc a
-    and %00011111        ; 32で割った余り (0-31でループ)
-    ld (colidx),a
+; vram add reset
+    ld hl,(nextcolvram)
+    ld a,h
+    cp $3e
+    jr nz,next_colvramadd
+    ld a,l
+    cp $3e
+    jp nz,next_colvramadd
+
+; move top vram add
+    ld hl,$3800
+    ld (nextcolvram),hl
+    ret
+
+; next column vram add
+    next_colvramadd:
+    ld hl,(nextcolvram)
+    ld bc,$05fe
+    or a
+    sbc hl,bc
+    ld (nextcolvram),hl
     ret
 ; --------------------------------------------------------------
 ; data
@@ -452,5 +412,3 @@ regdat .db %00100110    ; reg. 0, display and interrupt mode.
 bgpal   .include "assets_test\palette.inc"
 bgtile  .include "assets_test\tiles.inc"
 bgmap   .include "assets_test\tilemap3.inc"
-palspr  .include "assets\sprites (palette).inc"
-pltile  .include "assets\player (tiles).inc"
