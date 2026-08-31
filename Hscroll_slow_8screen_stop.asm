@@ -43,6 +43,7 @@
     scrollval db        ; vdp scroll register buffer
     frame db         ; frame counter
     vdpstatus db
+    colidx dsb 1        ; 現在書き込み中の物理列番号 (0-31)
 .ende
 
 .bank 0 slot 0
@@ -174,6 +175,7 @@ draw_startmap:
     ld hl,0
     ld (scroll_count),hl
     ld (scrollval_frac),hl
+    ld (colidx),a        ; 最初に上書きする列は0番
 
 ; Put a shining new player car in the buffer.
     ld de,plrcc         ; point to player cc in buffer.
@@ -354,6 +356,13 @@ wait_vblank:
 
 ; ----------------------
 draw_column:
+    ld a,(colidx)
+    add a,a              ; ×2 (1タイル=2バイト)
+    ld l,a
+    ld h,0
+    ld bc,$3800
+    add hl,bc
+    ld (nextcolvram),hl
 ; loop counter
     ld a,mapheight
     ld (drawloopcount),a
@@ -390,27 +399,11 @@ drawcolumn_loop:
     sbc hl,bc
     ld (nextcolsrc),hl
 
-; vram add reset
-    ld hl,(nextcolvram)
-    ld a,h
-    cp $3e
-    jr nz,next_colvramadd
-    ld a,l
-    cp $3e
-    jp nz,next_colvramadd
-
-; move top vram add
-    ld hl,$3800
-    ld (nextcolvram),hl
-    ret
-
-; next column vram add
-    next_colvramadd:
-    ld hl,(nextcolvram)
-    ld bc,$05fe
-    or a
-    sbc hl,bc
-    ld (nextcolvram),hl
+; 列を1つ書き終えたら、次に上書きする物理列へ進める
+    ld a,(colidx)
+    inc a
+    and %00011111        ; 32で割った余り (0-31でループ)
+    ld (colidx),a
     ret
 ; --------------------------------------------------------------
 ; data
